@@ -1,1 +1,277 @@
-asdasd
+<!-- <!DOCTYPE html> -->
+<meta charset="utf-8">
+<style>
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg text{
+    font-family:optima;
+}
+
+svg text .title{
+    font-size: 2em;
+}
+
+.lifespan .outside_brush {
+    fill-opacity: 0.1
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+</style>
+<body>
+    <div id = "chart"></div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+<script>
+var test = {}
+var data_high = ["RE-P001-T","RE-P002-T","RE-P003-T","RE-P004-T","RE-P005-T"]
+console.log(data_high.includes("RE-P001-T"))
+//load survival data in.
+d3.csv("http://127.0.0.1:5500/PDIAMOND/file/Overall_survivals.csv", function(raw_data){
+
+function filterBySample(obj){
+    if (data_high.includes(obj.sample)){
+        return obj.sample;
+    }
+    //console.log(data_high.includes(obj.sample)) 
+}
+//Data cleaning:
+var data = raw_data.map(function(d){
+    var new_d = {}
+    // new_d.age_entry_year = +d.ageentry/12; //patient start
+    // new_d.age_year = +d.age/12;            //patient end
+    new_d.time = +d.os/12
+    new_d.death    = d.death  == "Y" ? true : false;
+    new_d.sample = d.Sample
+    //console.log(new_d.sample)
+    // new_d.gender   = d.gender == "2" ? "female" : "male"
+    return new_d;
+    })
+    .sort(d => d.time)
+    //.filter(filterBySample)
+
+test = data
+//charting code goes here.
+
+var chartWidth  = 700, // default width
+    chartHeight = 500;
+
+var margin = {top: 20, right: 40, bottom: 35, left: 30},
+    width  = chartWidth - margin.left - margin.right,
+    height = chartHeight - margin.top - margin.bottom;
+
+// var svg = d3.select(this).append("svg") //leaving for when packaged up.
+var svg = d3.select("#chart").append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top  + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// var min_date = d3.min(data, (d) => d.time)
+// var max_date = d3.max(data, (d) => d.time)
+var min_date = 0
+//var max_date = d3.max(data, (d)=>d.time)
+var max_date = 7.8
+var x = d3.scaleLinear()
+    .range([0, width])
+    .domain([min_date, max_date]);
+
+//y scale for the data chart on top
+var y = d3.scaleLinear()
+    .range([height/2 - 20, height/2])
+    .domain([0,data.length]);
+
+//y scale for the survival plot on bottom
+var y_surv = d3.scaleLinear()
+    .range([height, 0])
+    .domain([0,1]);
+
+/*var lines = svg.selectAll(".lifespan")
+    .data(data)
+    .enter().append("line")
+    .attr("class", "lifespan")
+    .attrs({
+        "x1": (d) => x(d.time+1),
+        "x2": (d) => x(d.time),
+        "y1": (d,i) => y(i),
+        "y2": (d,i) => y(i),
+        "stroke": (d) => d.death ? "steelblue": "orangered",
+        "stroke-width": 1
+    })
+    .on("mouseover", highlight)
+    .on("mouseout", unhighlight)
+    .transition().duration(500)
+    .delay(function(d, i) { return (data.length - i) * 5; })
+    .attr("x2", (d) => x(d.time))
+*/
+svg.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+        .append("text")
+        .attrs({
+            "class": "axis-title",
+            "y": 20,
+            "x": width/2 +1,
+            "dy": "0.8em"
+        })
+        .styles({
+            "text-anchor": "center",
+            "fill": "black",
+            "font-size": 15
+        })
+        .text("Time in Years");
+
+////////////////////////////////  Make legend ////////////////////////////////////////////////
+var legend = svg.append("g")
+    .attr("class", "legend")
+    .attr("transform", "translate(" + width + "," + margin.top + ")"
+    );
+
+var titleAttributes = {
+    "fill": "#636363",
+    "text-anchor": "end",
+    "font-size": "2em"
+}
+
+var legendAttributes = {
+    "x": -5,
+    "text-anchor": "end",
+}
+
+//legend.append("text")
+ //   .text("Data/Individuals")
+  //  .attrs(titleAttributes)
+
+legend.append("text")
+    .text("Low")
+    .attrs(legendAttributes)
+    .attrs({
+        "y": "3.5em",
+        "fill": "steelblue"
+    })
+
+legend.append("text")
+    .text("High")
+    .attrs(legendAttributes)
+    .attrs({
+        //Y 위치
+        "y": "2.5em",
+        "fill": "orangered"
+    })
+
+svg.append("text")
+    .text("K-M Survival Curve")
+    .attrs(titleAttributes)
+    .attr("transform", "translate(" + width + "," + (height/2 + margin.top*2) + ")");
+
+//////////////// Drawing the Survival Function //////////////
+//draw bar above to seperate the two plots from eachother
+/*svg.append("line")
+    .attrs({
+        x1: 0, x2: width,
+        y1: height/2, y2: height/2,
+        stroke: "black",
+        "stroke-width": 1,
+        opacity: 0.3
+    })
+*/
+var km_surv = KM_Curve(data);
+km_surv.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
+
+var surv_func = svg.append("g")
+    .attr("class", "survival_function")
+
+var line = d3.line()
+    .curve(d3.curveStepAfter)
+    .x(d => x(d.t_i) )
+    .y(d => y_surv(d.S_t));
+
+// var line2 = d3.line()
+//     .curve(d3.curveStepAfter)
+//     .x(d => x(d.t_i) )
+//     .y(d => y_surv(d.S_t+1));
+
+surv_func.append("path")
+    .datum(km_surv)
+    .attr("class", "line")
+    .style("stroke", "orange")
+    .attr("d", line);
+    // .attr("d", line2);
+
+function update_survival(newData){
+    surv_func.select(".line")
+        .datum(newData)
+        .transition().duration(500)
+        .attr("d", line);
+}
+
+svg.append("g")
+    .attr("class", "axis axis--y")
+    .call(d3.axisLeft(y_surv))
+
+
+function KM_Curve(data){
+    //Source http://stackoverflow.com/questions/11246758/how-to-get-unique-values-in-an-array
+    Array.prototype.contains = function(v) {
+        for(var i = 0; i < this.length; i++) {
+            if(this[i] === v) return true;
+        }
+        return false;
+    };
+    Array.prototype.unique = function() {
+        var arr = [];
+        for(var i = 0; i < this.length; i++) {
+            if(!arr.contains(this[i])) {
+                arr.push(this[i]);
+            }
+        }
+        return arr;
+    }
+
+    //get unique times of death.
+    death_times = data.filter(d => d.death)
+        .map(d => d.time)
+        .unique()
+        .sort()
+
+    km_table = death_times.map(t_i => {
+        //Number of deaths at t_i
+        var d_i = data.filter(d => d.time == t_i && d.death).length
+
+        //number at risk. Aka       in study,          but  havent had event yet.
+        var Y_i = data.filter(d => d.time >= t_i).length
+
+        var s_t = 1 - (d_i/Y_i);
+
+        return {"t_i": t_i, "d_i": d_i, "Y_i": Y_i, "s_t": s_t}
+    })
+    //console.log(km_table);
+
+    for (let [i, row] of km_table.entries()) {
+        var t = row.t_i,
+            s_t = row.s_t,
+            last_S_t = i != 0 ? km_table[i-1].S_t : 1;
+        km_table[i].S_t = last_S_t * s_t;
+    }
+
+    // console.table(km_table)
+    return km_table;
+}
+
+
+
+}) //close csv loader
+
+
+</script>
