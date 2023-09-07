@@ -21,21 +21,17 @@ svg text .title{
     fill-opacity: 0.1
 }
 
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
-}
 
 </style>
 <body>
-    <div id="tester" style="width:600px;height:250px;"></div>
+    <div id="tester" style="width:800px;height:600px;"></div>
     <div id = "chart"></div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
 <script>
 
+const Pi = 3.141592
 var test = {}
 var data_high_list = ["RE-P001-T","RE-P002-T","RE-P003-T","RE-P004-T","RE-P005-T"]
 
@@ -95,6 +91,44 @@ kmsurv_low.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
 censor_high.unshift({"c_i": min_date, "c_s": 1})
 censor_low.unshift({"c_i": min_date, "c_s": 1})
 
+data_table = log_rank_Test(data,data_high,data_low)
+        //console.log(data_table)
+g1 = data_table[0]
+g2 = data_table[1]
+for(let i = 0; i < g1.length; i++){
+    g1[i].e_i = (g1[i].n_i/(g1[i].n_i + g2[i].n_i)) * (g1[i].m_i+g2[i].m_i)
+    g2[i].e_i = (g2[i].n_i/(g1[i].n_i + g2[i].n_i)) * (g1[i].m_i+g2[i].m_i)
+    }
+        
+for(let i = 0; i < g1.length; i++){
+    g1[i].o_i = g1[i].m_i - g1[i].e_i
+    g2[i].o_i = g2[i].m_i - g2[i].e_i
+    }
+        
+variance = 0
+for(let i = 0; i < g1.length; i++){
+    if (g1[i].n_i + g2[i].n_i == 1){
+        variance += 0
+        }
+    else{
+        variance += ((g1[i].n_i*g2[i].n_i)*(g1[i].m_i + g2[i].m_i)*(g1[i].n_i+g2[i].n_i - g1[i].m_i-g2[i].m_i))/((g1[i].n_i + g2[i].n_i)*(g1[i].n_i + g2[i].n_i)*(g1[i].n_i + g2[i].n_i-1))
+        }   
+    //console.log(variance)
+    }
+        
+sum_o = 0
+for(let i = 0; i < g1.length; i++){
+    sum_o += g2[i].o_i
+    }   
+        
+log_rank_test_val = sum_o**2/variance
+//console.log(g1)
+//console.log(log_rank_test_val)
+        //import myModule from './my-module';
+p_val = ChiSq(log_rank_test_val, 1).toFixed(4)
+//console.log(p_val)
+
+
 trace1 = {
   x: kmsurv_high.map((item) => item.t_i),
   y: kmsurv_high.map((item) => item.S_t),
@@ -117,24 +151,36 @@ trace3 = {
   x: censor_low.map((item) => item.c_t),
   y: censor_low.map((item) => item.c_s),
   mode: 'markers',
-  marker: { size: 3, color: 'blue' }
+  marker: { size: 6, color: 'blue' },
+  showlegend :false
 }
 trace4 = {
   x: censor_high.map((item) => item.c_t),
   y: censor_high.map((item) => item.c_s),
   mode: 'markers',
-  
-  marker: { size: 3, color: 'red' }
+  marker: { size: 6, color: 'red' },
+  showlegend :false
 }
 
 var data = [trace1, trace2, trace3, trace4];
 
 var layout = {
+    title : {
+        text : "type of DNA<br>P-value = " + p_val,
+    },
+
+   yaxis:{
+        autotick: false,
+        ticks: 'outside',
+        tick0: 0,
+        dtick: 0.25,
+        range : [0,1]
+    },
   legend: {
-    y: 0.5,
-    traceorder: 'reversed',
+    autosize : false,
     font: {size: 16},
-    yref: 'paper'
+    yref: 'paper',
+    title : p_val
   }};
 
 Plotly.newPlot('tester', data, layout);
@@ -161,13 +207,17 @@ function KM_Curve(data){
     var death_times = data.filter(d => d.death)
         .map(d => d.time)
         .sort()
+    var censored_times = data.filter(d => !d.death)
+        .map(d => parseFloat(d.time))
+        //censored_times = censored_times.map(v=>parseFloat(v))
     
+    var censored_times_sorted = censored_times.sort(function(a, b)  {
+        return a - b;
+        });
     
     var km_table = death_times.map(t_i => {
-        //Number of deaths at t_i
         var d_i = data.filter(d => d.time == t_i && d.death).length
 
-        //number at risk. Aka       in study,          but  havent had event yet.
         var Y_i = data.filter(d => d.time >= t_i).length
 
         var s_t = 1 - (d_i/Y_i);
@@ -177,13 +227,7 @@ function KM_Curve(data){
     
     //console.log(km_table);
     //console.log(km_table);
-    var censored_times = data.filter(d => !d.death)
-    .map(d => parseFloat(d.time))
-    //censored_times = censored_times.map(v=>parseFloat(v))
-
-    var censored_times_sorted = censored_times.sort(function(a, b)  {
-                            return a - b;
-                        });
+    
 
     var censor_table = []
     /*console.log("censored_time")
@@ -231,7 +275,67 @@ function KM_Curve(data){
     km_table[km_table.length] = {"t_i": max_date, "d_i": max_date, "Y_i": max_date, "S_t": cur_km}
     return [km_table, censor_table];
 }
+
+function ChiSq(x,n) {
+    if(n==1 & x>1000) {return 0}
+    if(x>1000 | n>1000) {
+        var q=ChiSq((x-n)*(x-n)/(2*n),1)/2
+        if(x>n) {return q} {return 1-q}
+        }
+    var p=Math.exp(-0.5*x); if((n%2)==1) { p=p*Math.sqrt(2*x/Pi) }
+    var k=n; while(k>=2) { p=p*x/k; k=k-2 }
+    var t=p; var a=n; while(t>0.0000000001*p) { a=a+2; t=t*x/a; p=p+t }
+    return 1-p
+    }
+
+function log_rank_Test(data,high,low){
+
+    death_times_high = high.filter(d => d.death)
+        .map(d => d.time)
+        .sort()
+    death_times_low = low.filter(d => d.death)
+        .map(d => d.time)
+        .sort()
+    
+    censored_times_high = high.filter(d => !d.death)
+        .map(d => parseFloat(d.time))
+        //censored_times = censored_times.map(v=>parseFloat(v))
+    
+    censored_times_sorted_high = censored_times_high.sort(function(a, b)  {
+        return a - b;
+        });
+    censored_times_low = low.filter(d => !d.death)
+        .map(d => parseFloat(d.time))
+        //censored_times = censored_times.map(v=>parseFloat(v))
+    
+    censored_times_sorted_low = censored_times_low.sort(function(a, b)  {
+        return a - b;
+        });
+    prev_t = 0
+    var group1 = data.map(t_i => {
+        var m_i = death_times_high.filter(d => d == t_i.time).length
+
+        var n_i = high.filter(d => d.time >= t_i.time).length
         
+        var q_i = censored_times_sorted_high.filter(d=>d <= t_i.time && d.time > prev_t).length
+        
+        prev_t = t_i.time
+        return {"t_i": t_i.time, "n_i": n_i, "m_i": m_i, "q_t": q_i}
+    })
+    var group2 = data.map(t_i => {
+        var m_i = death_times_low.filter(d => d == t_i.time).length
+
+        var n_i = low.filter(d => d.time >= t_i.time).length
+        
+        var q_i = censored_times_sorted_low.filter(d=>d <= t_i.time && d > prev_t).length
+        
+        prev_t = t_i.time
+        return {"t_i": t_i.time, "n_i": n_i, "m_i": m_i, "q_t": q_i}
+    })
+
+    return [group1, group2]
+}
+
 })
 	
 </script>
