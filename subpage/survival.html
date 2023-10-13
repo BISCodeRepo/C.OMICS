@@ -1,45 +1,408 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Box Plot</title>
+
+</head>
+
 <style>
+  .container1 {
+    display: flex;
+    flex-direction: column;
+    height: 76vh;
+  }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+  .box1,
+  .box2 {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-svg text{
-    font-family:optima;
-}
+  .flex-hori {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-svg text .title{
-    font-size: 2em;
-}
-
-.lifespan .outside_brush {
-    fill-opacity: 0.1
-}
-
-
+  .char-div {
+    width: 50%;
+    height: 38vh;
+  }
 </style>
+
 <body>
-    <div id="tester" style="width:800px;height:600px;"></div>
-    <div id = "chart"></div>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
-<script>
+  <div class="layerPopup">
+    <div class="spinner"></div>
+  </div>
+  <div style="display: flex;margin: auto;">
 
-const Pi = 3.141592
-var test = {}
-var data_high_list = ["RE-P001-T","RE-P002-T","RE-P003-T","RE-P004-T","RE-P005-T"]
+    <div style="display: flex;margin: auto;">
+      <div style="width: 300px;">
+        <select id="select-tools" multiple placeholder="Target"></select>
+      </div>
+      <button id="apply-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
+        Apply
+      </button>
+    </div>
+  </div>
 
+  <div class="container1">
+    <div class="box1">
+      <div id="myDiv0" class="char-div"></div>
+      <div id="myDiv1" class="char-div"></div>
+    </div>
+
+    <div class="box2">
+      <div id="myDiv2" class="char-div"></div>
+      <div id="myDiv3" class="char-div"></div>
+    </div>
+  </div>
+
+  <div class="flex-hori">
+    <div id="page-index"></div>
+  </div>
+
+  <div class="flex-hori">
+    <button id="pre-btn" type="button" class="btn btn-primary">
+      Pre
+    </button>
+    <button id="next-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
+      Next
+    </button>
+  </div>
+
+
+  <script>
+
+    var preBtn = $("#pre-btn")
+    preBtn.prop("disabled", true)
+    var nextBtn = $("#next-btn")
+    nextBtn.prop("disabled", true)
+    var pageIndex = $("#page-index")
+
+    var $select = $('#select-tools').selectize({
+      plugins: ["remove_button"],
+      maxItems: 1,
+      maxOptions: 100,
+      valueField: 'id',
+      labelField: 'title',
+      searchField: 'title',
+      options: [],
+      create: false,
+    });
+
+
+
+
+    var allUniqueValue = new Map();
+    var allPatient = new Map();
+    var proteinPatient = []
+    var genePatient = []
+    var acetlysitePatient = []
+    var phosphositePatient = []
+    var allProtein = new Map();
+    var allGene = new Map();
+    var allAcetlysite = new Map();
+    var allPhosphosite = new Map();
+    var patientInfo = [];
+    var targetOptions = []
+    var index = 1
+    const Pi = 3.141592
+
+
+    function getData() {
+      showSpinner();
+      const patientData = metaArray;
+      const rowHeader = [];
+      patientData.map((row) => {
+        const rowData = row.split(",");
+        rowHeader.push(rowData[0]);
+        let uniqueValue = unique(rowData.slice(1));
+        allUniqueValue.set(rowData[0], uniqueValue);
+      });
+      allUniqueValue.delete('Sample.ID');
+      allUniqueValue.delete('Subtype Membership');
+      allUniqueValue.delete('Age');
+
+      console.log(allUniqueValue)
+      console.log(patientData)
+      //get patientInfo
+      for (let i = 1; i < patientData[0].split(",").length; i++) {
+        patientInfo.push(new PatientMetaData());
+      }
+      for (let i = 0; i < rowHeader.length; i++) {
+        let row = patientData[i].split(",").slice(1)
+        for (let j = 0; j < row.length; j++) {
+          patientInfo[j][rowHeader[i]] = row[j];
+        }
+      }
+      patientInfo.forEach((value) => {
+        allPatient.set(value['Sample.ID'], value)
+      });
+      console.log(allPatient)
+
+      $.ajax({
+        type: "GET",
+        url: baseURL + "/file/Quantitation_proteins.csv",
+        dataType: "text",
+        cache: false,
+        success: function (data) {
+          data = data.split("\n");
+          proteinPatient = data[0].split(",").slice(2);
+          for (let i = 1; i < data.length; i++) {
+            const row = data[i].split(",")
+            allProtein.set(row[0], row.slice(2))
+          }
+          //"RE-P231-T\r"
+          let last = proteinPatient[proteinPatient.length - 1]
+          proteinPatient[proteinPatient.length - 1] = last.substring(0, last.length - 1)
+          // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
+          // console.log(proteinPatient)
+          // console.log(allProtein)
+          for (const key of allProtein.keys()) {
+            targetOptions.push({ id: index, title: key })
+            index++;
+          }
+          console.log(allProtein)
+          $.ajax({
+            type: "GET",
+            url: baseURL + "/file/Quantitation_acetyl.csv",
+            dataType: "text",
+            cache: false,
+            success: function (data) {
+              data = data.split("\n");
+              acetlysitePatient = data[0].split(",").slice(2);
+              for (let i = 1; i < data.length; i++) {
+                const row = data[i].split(",")
+                allAcetlysite.set(row[0], row.slice(2))
+                allAcetlysite.set(row[2], row.slice(2))
+              }
+              //"RE-P231-T\r"
+              let last = acetlysitePatient[acetlysitePatient.length - 1]
+              acetlysitePatient[acetlysitePatient.length - 1] = last.substring(0, last.length - 1)
+              // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
+              // console.log(acetlysitePatient)
+              // console.log(allAcetlysite)
+              for (const key of allAcetlysite.keys()) {
+                targetOptions.push({ id: index, title: key })
+                index++;
+              }
+
+              $.ajax({
+                type: "GET",
+                url: baseURL + "/file/Quantitation_phospho.csv",
+                dataType: "text",
+                cache: false,
+                success: function (data) {
+                  data = data.split("\n");
+                  phosphositePatient = data[0].split(",").slice(2);
+                  for (let i = 1; i < data.length; i++) {
+                    const row = data[i].split(",")
+                    allPhosphosite.set(row[0], row.slice(2))
+                    allPhosphosite.set(row[2], row.slice(2))
+                  }
+                  let last = phosphositePatient[phosphositePatient.length - 1]
+                  phosphositePatient[phosphositePatient.length - 1] = last.substring(0, last.length - 1)
+                  // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
+                  // console.log(phosphositePatient)
+                  // console.log(allPhosphosite)
+                  for (const key of allPhosphosite.keys()) {
+                    targetOptions.push({ id: index, title: key })
+                    index++;
+                  }
+                  console.log(allPhosphosite)
+                  $.ajax({
+                    type: "GET",
+                    url: baseURL + "/file/Quantitation_genes.csv",
+                    dataType: "text",
+                    cache: false,
+                    success: function (data) {
+                      data = data.split("\n");
+                      genePatient = data[0].split(",").slice(1);
+                      for (let i = 1; i < data.length; i++) {
+                        const row = data[i].split(",")
+                        allGene.set(row[0], row.slice(1))
+                      }
+                      //去除多余空值
+                      genePatient = genePatient.slice(0, genePatient.indexOf(''))
+                      // console.log(genePatient)
+                      // console.log(allGene)
+                      for (const key of allGene.keys()) {
+                        targetOptions.push({ id: index, title: key })
+                        index++;
+                      }
+
+                      let groupOptions = []
+                      index = 1
+                      for (const key of allUniqueValue.keys()) {
+                        groupOptions.push({ id: index, title: key })
+                        index++;
+                      }
+                      var selectizeControl = $select[0].selectize;
+                      selectizeControl.addOption(targetOptions)
+                      hideSpinner()
+                      console.log(targetOptions)
+                    },
+
+                  });
+                },
+              });
+            },
+          });
+        },
+      });
+    }
+    
+    getData()
+    function unique(array) {
+      return array.filter((value, index, self) => {
+        return value !== 'None' && value !== '' && self.indexOf(value) === index;
+      });
+    }
+
+    var res = new Map()
+    var page = 0
+    var limit = 0
+    var groupValue = ""
+    $("#apply-btn").click(function () {
+      res = new Map()
+      page = 0
+      const targetValue = $('#select-tools').text();
+      groupValue = $('#select-tools1').text();
+      //let uniqueValue = allUniqueValue.get(groupValue);
+      //uniqueValue = uniqueValue.sort()
+      //console.log(uniqueValue)
+      console.log(targetValue)
+      let targetArray = new Map();
+      let targetPatient = new Map();
+      if (allGene.has(targetValue)) {
+        targetArray.set(targetValue, allGene.get(targetValue))
+        targetPatient.set(targetValue, genePatient)
+      }
+      if (allProtein.has(targetValue)) {
+        targetArray.set(targetValue, allProtein.get(targetValue))
+        targetPatient.set(targetValue, proteinPatient)
+      }
+      //console.log(allAcetlysite)
+      for (const [key, value] of allAcetlysite) {
+        //console.log(key)
+        if (key == null | key == "") continue;
+        if (key.split("_")[0] !== targetValue) continue;
+        targetArray.set(key, value.slice(1))
+        targetPatient.set(key, acetlysitePatient.slice(1))
+      }
+      for (const [key, value] of allPhosphosite) {
+        if (key == null | key == "") continue;
+        if (key.split("_")[0] !== targetValue) continue;
+        targetArray.set(key, value.slice(1))
+        targetPatient.set(key, phosphositePatient.slice(1))
+      }
+    //   var newMap = {};
+      var temp_list = []
+      var iterator = targetArray.values()
+      for (let i = 0 ; i < targetArray.size; i++){
+        temp = []
+        var temp_array = iterator.next().value
+        for(let j = 0; j < temp_array.length; j ++){
+            temp.push(temp_array[j])
+        }
+        temp_list.push(temp)
+      }
+      console.log(temp_list)
+      
+      //console.log(targetArray.values().next().value)
+      //console.log(targetArray.length)
+    //   for(let i = 0 ; i < targetArray.values().next().value.length; i++){
+    //         temp.push((targetArray.values()[i], targetPatient.values()[i]))
+    //   }
+      
+      function median(array) {
+            return array.sort((a, b) => a - b)[Math.floor(array.length / 2)];
+      }
+      patient_list = targetPatient.values().next().value
+      console.log(targetArray)
+      console.log(targetPatient)
+      console.log(targetArray.values())
+      console.log(temp_list)
+      median_iter = targetArray.values()
+      median1 = []
+      for (let i = 0 ; i < targetArray.size; i++){
+      
+        var temp_array = median_iter.next().value
+        median1.push(median(temp_array))
+      }
+    
+      console.log(median1)
+      var high = []
+      for(let i = 0; i < median1.length; i++){
+        var high_index = []
+        for(let j = 0 ; j < temp_list[i].length; j++){
+            if(parseFloat(temp_list[i][j]) >= parseFloat(median1[i])){
+                console.log(temp_list[i][j], median1[i])
+                high_index.push(patient_list[j])
+            }
+        
+        }
+        high.push(high_index)
+      }
+      console.log(high)
+      i = 0
+      for (const [key, value] of targetArray){
+        let cur_target = key
+        let cur_median = median1[i]
+        res.set(cur_target, high[i])
+        i ++ 
+      }
+      limit = Math.ceil(res.size / 4)
+      draw(res)
+
+      function draw(res) {
+      if (res.size !== 0) {
+        pageIndex.text((page + 1) + "/" + limit)
+        if (page === 0) preBtn.prop("disabled", true)
+        else preBtn.prop("disabled", false)
+        if ((page + 1) == limit) nextBtn.prop("disabled", true)
+        else nextBtn.prop("disabled", false)
+      }
+      for (let i = 0; i < 4; i++) {
+        Plotly.purge("myDiv" + i)
+      }
+      let allKeys = Array.from(res.keys())
+      let start = page * 4
+      allKeys = allKeys.slice(start, start + 4)
+      allKeys.forEach((value, index) => {
+        let data = res.get(value)
+        console.log(data)
+        let pValue = 0
+        let pText = ""
+        
+        plot_survival(data,"myDiv"+index, value)
+        
+      })
+    }
+    preBtn.click(function () {
+      page--;
+      draw(res)
+    })
+
+    nextBtn.click(function () {
+      page++;
+      draw(res)
+    })
+
+    })
+
+
+    function plot_survival(data_high_list, location, title){
 var min_date = 0
 //var max_date = d3.max(data, (d)=>d.time)
 var max_date = 11
 
-    d3.csv("../file/Overall_survivals.csv", function(raw_data){
+    d3.csv("http://127.0.0.1:5500/PDIAMOND/file/Overall_survivals.csv", function(raw_data){
 
 function filterHigh(obj){
     if (data_high_list.includes(obj.sample)){
@@ -59,22 +422,20 @@ function filterLow(obj){
 }
 
 //Data cleaning:
-var data = raw_data.map(function(d){
+data = raw_data.map(function(d){
     var new_d = {}
     // new_d.age_entry_year = +d.ageentry/12; //patient start
     // new_d.age_year = +d.age/12;            //patient end
     new_d.time = +d.os/12
     new_d.death    = d.death  == "Y" ? true : false;
     new_d.sample = d.Sample
-    //console.log(new_d.sample)
-    // new_d.gender   = d.gender == "2" ? "female" : "male"
     return new_d;
     })
     .sort(d => d.time)
     //.filter(filterLow)
 
-var data_high = data.filter(filterHigh)
-var data_low = data.filter(filterLow)
+data_high = data.filter(filterHigh)
+data_low = data.filter(filterLow)
         
 var table_high = KM_Curve(data_high);
 kmsurv_high = table_high[0];
@@ -135,7 +496,7 @@ trace1 = {
   mode: 'lines',
   name: 'high',
   
-  line: {shape: 'vh', color: 'red'},
+  line: {shape: 'hv', color: 'red'},
 };
 
 trace2 = {
@@ -151,14 +512,16 @@ trace3 = {
   x: censor_low.map((item) => item.c_t),
   y: censor_low.map((item) => item.c_s),
   mode: 'markers',
-  marker: { size: 6, color: 'blue' },
+  marker: { size: 6, color: 'blue', symbol : 142},
+  
   showlegend :false
 }
 trace4 = {
   x: censor_high.map((item) => item.c_t),
   y: censor_high.map((item) => item.c_s),
   mode: 'markers',
-  marker: { size: 6, color: 'red' },
+  marker: { size: 6, color: 'red', symbol : 142 },
+  
   showlegend :false
 }
 
@@ -166,7 +529,7 @@ var data = [trace1, trace2, trace3, trace4];
 
 var layout = {
     title : {
-        text : "type of DNA<br>P-value = " + p_val,
+        text : title+ "<br>P-value = " + p_val,
     },
 
    yaxis:{
@@ -183,7 +546,7 @@ var layout = {
     title : p_val
   }};
 
-Plotly.newPlot('tester', data, layout);
+Plotly.newPlot(location, data, layout);
 
 function KM_Curve(data){
     //Source http://stackoverflow.com/questions/11246758/how-to-get-unique-values-in-an-array
@@ -243,6 +606,7 @@ function KM_Curve(data){
     j = 0
     var prev_km = 1
     var cur_km = 1
+    //showing censored point in the plot using previous S_t
     for (let [i, row] of km_table.entries()) {
         var t = row.t_i,
             s_t = row.s_t,
@@ -337,5 +701,10 @@ function log_rank_Test(data,high,low){
 }
 
 })
-	
+}	
+
+
 </script>
+</body>
+
+</html>
