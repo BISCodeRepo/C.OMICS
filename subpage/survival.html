@@ -47,11 +47,14 @@
       <button id="apply-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
         Apply
       </button>
+      <button id="sort-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
+        SortBy
+      </button>
     </div>
   </div>
 
   <div class="container1">
-    <div class="box1">
+    <!-- <div class="box1">
       <div id="myDiv0" class="char-div"></div>
       <div id="myDiv1" class="char-div"></div>
     </div>
@@ -59,10 +62,11 @@
     <div class="box2">
       <div id="myDiv2" class="char-div"></div>
       <div id="myDiv3" class="char-div"></div>
-    </div>
+    </div> -->
+
   </div>
 
-  <div class="flex-hori">
+  <!-- <div class="flex-hori">
     <div id="page-index"></div>
   </div>
 
@@ -73,17 +77,16 @@
     <button id="next-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
       Next
     </button>
-  </div>
+  </div> -->
 
 
   <script>
-
     var preBtn = $("#pre-btn")
     preBtn.prop("disabled", true)
     var nextBtn = $("#next-btn")
     nextBtn.prop("disabled", true)
     var pageIndex = $("#page-index")
-
+    var container = document.getElementsByClassName('container1')
     var $select = $('#select-tools').selectize({
       plugins: ["remove_button"],
       maxItems: 1,
@@ -111,8 +114,11 @@
     var patientInfo = [];
     var targetOptions = []
     var index = 1
+    var sort_value = 0
+    result_array = []
     const Pi = 3.141592
-
+    var processed = 0
+    var prev_protein = ''
 
     function getData() {
       showSpinner();
@@ -128,8 +134,8 @@
       allUniqueValue.delete('Subtype Membership');
       allUniqueValue.delete('Age');
 
-      console.log(allUniqueValue)
-      console.log(patientData)
+      //console.log(allUniqueValue)
+      //console.log(patientData)
       //get patientInfo
       for (let i = 1; i < patientData[0].split(",").length; i++) {
         patientInfo.push(new PatientMetaData());
@@ -143,7 +149,7 @@
       patientInfo.forEach((value) => {
         allPatient.set(value['Sample.ID'], value)
       });
-      console.log(allPatient)
+      //console.log(allPatient)
 
       $.ajax({
         type: "GET",
@@ -160,14 +166,14 @@
           //"RE-P231-T\r"
           let last = proteinPatient[proteinPatient.length - 1]
           proteinPatient[proteinPatient.length - 1] = last.substring(0, last.length - 1)
-          // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
+          
           // console.log(proteinPatient)
           // console.log(allProtein)
           for (const key of allProtein.keys()) {
             targetOptions.push({ id: index, title: key })
             index++;
           }
-          console.log(allProtein)
+          //console.log(allProtein)
           $.ajax({
             type: "GET",
             url: baseURL + "/file/Quantitation_acetyl.csv",
@@ -184,7 +190,7 @@
               //"RE-P231-T\r"
               let last = acetlysitePatient[acetlysitePatient.length - 1]
               acetlysitePatient[acetlysitePatient.length - 1] = last.substring(0, last.length - 1)
-              // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
+              
               // console.log(acetlysitePatient)
               // console.log(allAcetlysite)
               for (const key of allAcetlysite.keys()) {
@@ -207,14 +213,14 @@
                   }
                   let last = phosphositePatient[phosphositePatient.length - 1]
                   phosphositePatient[phosphositePatient.length - 1] = last.substring(0, last.length - 1)
-                  // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
+                  
                   // console.log(phosphositePatient)
                   // console.log(allPhosphosite)
                   for (const key of allPhosphosite.keys()) {
                     targetOptions.push({ id: index, title: key })
                     index++;
                   }
-                  console.log(allPhosphosite)
+                  //console.log(allPhosphosite)
                   $.ajax({
                     type: "GET",
                     url: baseURL + "/file/Quantitation_genes.csv",
@@ -245,7 +251,7 @@
                       var selectizeControl = $select[0].selectize;
                       selectizeControl.addOption(targetOptions)
                       hideSpinner()
-                      console.log(targetOptions)
+                      //console.log(targetOptions)
                     },
 
                   });
@@ -258,151 +264,48 @@
     }
     
     getData()
+
+
+
     function unique(array) {
       return array.filter((value, index, self) => {
         return value !== 'None' && value !== '' && self.indexOf(value) === index;
       });
     }
 
-    var res = new Map()
-    var page = 0
-    var limit = 0
-    var groupValue = ""
-    $("#apply-btn").click(function () {
-      res = new Map()
-      page = 0
-      const targetValue = $('#select-tools').text();
-      groupValue = $('#select-tools1').text();
-      //let uniqueValue = allUniqueValue.get(groupValue);
-      //uniqueValue = uniqueValue.sort()
-      //console.log(uniqueValue)
-      console.log(targetValue)
-      let targetArray = new Map();
-      let targetPatient = new Map();
-      if (allGene.has(targetValue)) {
-        targetArray.set(targetValue, allGene.get(targetValue))
-        targetPatient.set(targetValue, genePatient)
-      }
-      if (allProtein.has(targetValue)) {
-        targetArray.set(targetValue, allProtein.get(targetValue))
-        targetPatient.set(targetValue, proteinPatient)
-      }
-      //console.log(allAcetlysite)
-      for (const [key, value] of allAcetlysite) {
-        //console.log(key)
-        if (key == null | key == "") continue;
-        if (key.split("_")[0] !== targetValue) continue;
-        targetArray.set(key, value.slice(1))
-        targetPatient.set(key, acetlysitePatient.slice(1))
-      }
-      for (const [key, value] of allPhosphosite) {
-        if (key == null | key == "") continue;
-        if (key.split("_")[0] !== targetValue) continue;
-        targetArray.set(key, value.slice(1))
-        targetPatient.set(key, phosphositePatient.slice(1))
-      }
-    //   var newMap = {};
-      var temp_list = []
-      var iterator = targetArray.values()
-      for (let i = 0 ; i < targetArray.size; i++){
-        temp = []
-        var temp_array = iterator.next().value
-        for(let j = 0; j < temp_array.length; j ++){
-            temp.push(temp_array[j])
-        }
-        temp_list.push(temp)
-      }
-      console.log(temp_list)
-      
-      //console.log(targetArray.values().next().value)
-      //console.log(targetArray.length)
-    //   for(let i = 0 ; i < targetArray.values().next().value.length; i++){
-    //         temp.push((targetArray.values()[i], targetPatient.values()[i]))
-    //   }
-      
-      function median(array) {
-            return array.sort((a, b) => a - b)[Math.floor(array.length / 2)];
-      }
-      patient_list = targetPatient.values().next().value
-      console.log(targetArray)
-      console.log(targetPatient)
-      console.log(targetArray.values())
-      console.log(temp_list)
-      median_iter = targetArray.values()
-      median1 = []
-      for (let i = 0 ; i < targetArray.size; i++){
-      
-        var temp_array = median_iter.next().value
-        median1.push(median(temp_array))
-      }
-    
-      console.log(median1)
-      var high = []
-      for(let i = 0; i < median1.length; i++){
-        var high_index = []
-        for(let j = 0 ; j < temp_list[i].length; j++){
-            if(parseFloat(temp_list[i][j]) >= parseFloat(median1[i])){
-                console.log(temp_list[i][j], median1[i])
-                high_index.push(patient_list[j])
-            }
-        
-        }
-        high.push(high_index)
-      }
-      console.log(high)
-      i = 0
-      for (const [key, value] of targetArray){
-        let cur_target = key
-        let cur_median = median1[i]
-        res.set(cur_target, high[i])
-        i ++ 
-      }
-      limit = Math.ceil(res.size / 4)
-      draw(res)
-
-      function draw(res) {
-      if (res.size !== 0) {
-        pageIndex.text((page + 1) + "/" + limit)
-        if (page === 0) preBtn.prop("disabled", true)
-        else preBtn.prop("disabled", false)
-        if ((page + 1) == limit) nextBtn.prop("disabled", true)
-        else nextBtn.prop("disabled", false)
-      }
-      for (let i = 0; i < 4; i++) {
+    function draw(res, target_size) {
+      //let boxIndex = 0
+      p_val_array = []
+      var result_array = []
+      for (let i = 0; i < result_array.length; i++) {
         Plotly.purge("myDiv" + i)
       }
       let allKeys = Array.from(res.keys())
+      //console.log("page :" + page)
       let start = page * 4
-      allKeys = allKeys.slice(start, start + 4)
+      //allKeys = allKeys.slice(start, start + 4)
       allKeys.forEach((value, index) => {
         let data = res.get(value)
-        console.log(data)
+        //console.log(data)
         let pValue = 0
         let pText = ""
-        
-        plot_survival(data,"myDiv"+index, value)
+        result_array = plot_survival(data,"myDiv"+index, value, p_val_array, target_size)
         
       })
+      
+      /*p_val_array.sort(function(a, b){
+        return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
+      })*/
+
     }
-    preBtn.click(function () {
-      page--;
-      draw(res)
-    })
-
-    nextBtn.click(function () {
-      page++;
-      draw(res)
-    })
-
-    })
 
 
-    function plot_survival(data_high_list, location, title){
+function plot_survival(data_high_list, location, title, p_val_array, target_size){
 var min_date = 0
 //var max_date = d3.max(data, (d)=>d.time)
 var max_date = 11
 
-    d3.csv("http://127.0.0.1:5500/PDIAMOND/file/Overall_survivals.csv", function(raw_data){
+    d3.csv("http://127.0.0.1:5501/PDIAMOND/file/Overall_survivals.csv", function(raw_data){
 
 function filterHigh(obj){
     if (data_high_list.includes(obj.sample)){
@@ -434,16 +337,26 @@ data = raw_data.map(function(d){
     .sort(d => d.time)
     //.filter(filterLow)
 
+data_temp = data
 data_high = data.filter(filterHigh)
 data_low = data.filter(filterLow)
-        
+//console.log(data_high, data_low)
 var table_high = KM_Curve(data_high);
 kmsurv_high = table_high[0];
 censor_high = table_high[1];
 
+//console.log("high list =")
+//console.log(data_high_list)
+//console.log("kmsurv_high")
+//console.log(kmsurv_high)
+//console.log(censor_high)
 var table_low = KM_Curve(data_low);
 kmsurv_low = table_low[0]
 censor_low = table_low[1]
+
+//console.log("kmsurv_low")
+//console.log(kmsurv_low)
+//console.log(censor_low)
 
 //console.log(censor_low)
 
@@ -491,7 +404,7 @@ p_val = ChiSq(log_rank_test_val, 1).toFixed(4)
 
 
 trace1 = {
-  x: kmsurv_high.map((item) => item.t_i),
+  x: kmsurv_high.map((item) => item.t_i*12),
   y: kmsurv_high.map((item) => item.S_t),
   mode: 'lines',
   name: 'high',
@@ -500,7 +413,7 @@ trace1 = {
 };
 
 trace2 = {
-  x: kmsurv_low.map((item) => item.t_i),
+  x: kmsurv_low.map((item) => item.t_i*12),
   y: kmsurv_low.map((item) => item.S_t),
   mode: 'lines',
   name: 'low',
@@ -509,19 +422,17 @@ trace2 = {
 };
 
 trace3 = {
-  x: censor_low.map((item) => item.c_t),
+  x: censor_low.map((item) => item.c_t*12),
   y: censor_low.map((item) => item.c_s),
   mode: 'markers',
-  marker: { size: 6, color: 'blue', symbol : 142},
-  
+  marker: { size: 6, color: 'blue' },
   showlegend :false
 }
 trace4 = {
-  x: censor_high.map((item) => item.c_t),
+  x: censor_high.map((item) => item.c_t*12),
   y: censor_high.map((item) => item.c_s),
   mode: 'markers',
-  marker: { size: 6, color: 'red', symbol : 142 },
-  
+  marker: { size: 6, color: 'red' },
   showlegend :false
 }
 
@@ -539,6 +450,9 @@ var layout = {
         dtick: 0.25,
         range : [0,1]
     },
+  xaxis :{
+    title :'month'
+  },
   legend: {
     autosize : false,
     font: {size: 16},
@@ -546,7 +460,60 @@ var layout = {
     title : p_val
   }};
 
-Plotly.newPlot(location, data, layout);
+
+p_val_array.push({"title" : title, "location" : location, "data" : data, "layout" : layout, "p_val" :p_val})
+//console.log(p_val_array)
+//Plotly.newPlot(location, data, layout);
+result_array = p_val_array
+console.log(p_val_array)
+if(p_val_array.length == target_size){
+  if(sort_value == 1){
+    p_val_array = p_val_array.sort(function(a, b){
+      return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
+    })
+    let boxIndex = 0
+      for(let i = 0; i < p_val_array.length; i ++){
+        if ((boxIndex & 1) === 0) {
+          let newBox = $('<div class="box"></div>');
+          newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
+          charDiv = $('<div class="char-div"></div>');
+          charDiv.attr('id', `myDiv${boxIndex}`);
+          newBox.append(charDiv);
+          $('.container1').append(newBox);
+        } else {
+          let newBox = $('#box' + Math.floor(boxIndex / 2))
+          charDiv = $('<div class="char-div"></div>');
+          charDiv.attr('id', `myDiv${boxIndex}`);
+          newBox.append(charDiv);
+        }
+        Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+        boxIndex++;
+      }
+  }
+  else{
+    let boxIndex = 0
+      for(let i = 0; i < p_val_array.length; i ++){
+        if ((boxIndex & 1) === 0) {
+          let newBox = $('<div class="box"></div>');
+          newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
+          charDiv = $('<div class="char-div"></div>');
+          charDiv.attr('id', `myDiv${boxIndex}`);
+          newBox.append(charDiv);
+          $('.container1').append(newBox);
+        } else {
+          let newBox = $('#box' + Math.floor(boxIndex / 2))
+          charDiv = $('<div class="char-div"></div>');
+          charDiv.attr('id', `myDiv${boxIndex}`);
+          newBox.append(charDiv);
+        }
+        Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+        boxIndex++;
+      }
+  }
+}
+
+
+
 
 function KM_Curve(data){
     //Source http://stackoverflow.com/questions/11246758/how-to-get-unique-values-in-an-array
@@ -603,7 +570,7 @@ function KM_Curve(data){
     console.log(death_times)
     console.log("------------")
     */
-    j = 0
+    var j = 0
     var prev_km = 1
     var cur_km = 1
     //showing censored point in the plot using previous S_t
@@ -617,8 +584,8 @@ function KM_Curve(data){
             cur_km = km_table[i].S_t
         }
         while(true){
-            if (censored_times_sorted[j]<row.t_i){
-                censor_table[j] = {"c_t" : censored_times_sorted[j], "c_s" : prev_km}
+            if (censored_times_sorted[j]<=row.t_i){
+                censor_table[j] = {"c_t" : censored_times_sorted[j], "c_s" : last_S_t}
                 j ++;
             }
             else{
@@ -626,15 +593,15 @@ function KM_Curve(data){
             }
         }
     }
-    console.log(censor_table)
+    //console.log(censor_table)
     for(let i = j; i < censored_times_sorted.length; i++){
         censor_table[i] = {"c_t" : censored_times_sorted[i], "c_s" : cur_km}
     }
-    console.log(censor_table)
+    //console.log(censor_table)
     //console.log(km_table)
     //console.log(censor_table)
     
-
+    //console.log(km_table, censor_table)
     // console.table(km_table)
     km_table[km_table.length] = {"t_i": max_date, "d_i": max_date, "Y_i": max_date, "S_t": cur_km}
     return [km_table, censor_table];
@@ -701,10 +668,284 @@ function log_rank_Test(data,high,low){
 }
 
 })
-}	
+
+}
+    var res = new Map()
+    var page = 0
+    var limit = 0
+    var groupValue = ""
+
+
+    $("#apply-btn").click(function () {
+      sort_value = 0
+      $(".container1").empty();
+      targetValue = $('#select-tools').text();
+      if(prev_protein == ''){
+        prev_protein = targetValue
+        processed = 0
+      }
+      else if(prev_protein == targetValue){
+        processed = 1
+      }
+      else{
+        processed = 0
+      }
+      if(processed == 1){
+        p_val_array = result_array
+        if(sort_value == 1){
+          p_val_array = p_val_array.sort(function(a, b){
+            return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
+          })
+          let boxIndex = 0
+            for(let i = 0; i < p_val_array.length; i ++){
+              if ((boxIndex & 1) === 0) {
+                let newBox = $('<div class="box"></div>');
+                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+                $('.container1').append(newBox);
+              } else {
+                let newBox = $('#box' + Math.floor(boxIndex / 2))
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+              }
+              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+              boxIndex++;
+            }
+        }
+        else{
+          let boxIndex = 0
+            for(let i = 0; i < p_val_array.length; i ++){
+              if ((boxIndex & 1) === 0) {
+                let newBox = $('<div class="box"></div>');
+                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+                $('.container1').append(newBox);
+              } else {
+                let newBox = $('#box' + Math.floor(boxIndex / 2))
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+              }
+              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+              boxIndex++;
+            }
+        }
+        prev_protein = targetValue
+        return 0;
+      }
+      if(processed ==0 ){
+        processed = 1
+      }
+
+      res = new Map()
+      page = 0
+      groupValue = $('#select-tools1').text();
+      //let uniqueValue = allUniqueValue.get(groupValue);
+      //uniqueValue = uniqueValue.sort()
+      //console.log(uniqueValue)
+      //console.log(targetValue)
+      let targetArray = new Map();
+      let targetPatient = new Map();
+      if (allGene.has(targetValue)) {
+        targetArray.set(targetValue, allGene.get(targetValue))
+        targetPatient.set(targetValue, genePatient)
+      }
+      if (allProtein.has(targetValue)) {
+        targetArray.set(targetValue, allProtein.get(targetValue))
+        targetPatient.set(targetValue, proteinPatient)
+      }
+      //console.log(allAcetlysite)
+      for (const [key, value] of allAcetlysite) {
+        //console.log(key)
+        if (key == null | key == "") continue;
+        if (key.split("_")[0] !== targetValue) continue;
+        targetArray.set(key, value.slice(1))
+        targetPatient.set(key, acetlysitePatient.slice(1))
+      }
+      for (const [key, value] of allPhosphosite) {
+        if (key == null | key == "") continue;
+        if (key.split("_")[0] !== targetValue) continue;
+        targetArray.set(key, value.slice(1))
+        targetPatient.set(key, phosphositePatient.slice(1))
+      }
+      debugger
+    //   var newMap = {};
+      var temp_list = []
+      var iterator = targetArray.values()
+      for (let i = 0 ; i < targetArray.size; i++){
+        var temp = []
+        var temp_array = iterator.next().value
+        for(let j = 0; j < temp_array.length; j ++){
+            temp.push(temp_array[j])
+        }
+        temp_list.push(temp)
+      }
+      //console.log(temp_list)
+      
+      //console.log(targetArray.values().next().value)
+      //console.log(targetArray.length)
+    //   for(let i = 0 ; i < targetArray.values().next().value.length; i++){
+    //         temp.push((targetArray.values()[i], targetPatient.values()[i]))
+    //   }
+      
+      function median(array) {
+            return array.sort((a, b) => a - b)[Math.floor(array.length / 2)];
+      }
+      var patient_list = targetPatient.values().next().value
+      //console.log(targetArray)
+      //console.log(targetPatient)
+      //console.log(targetArray.values())
+      //console.log(temp_list)
+      
+      function deepCopy(obj) {
+        if (typeof obj !== "object" || obj === null) {
+          return obj;
+        }
+       
+        if (obj instanceof Date) {
+          return new Date(obj.getTime());
+        }
+       
+        if (obj instanceof Array) {
+          return obj.reduce((arr, item, i) => {
+            arr[i] = deepCopy(item);
+            return arr;
+          }, []);
+        }
+       
+        if (obj instanceof Object) {
+          if (obj instanceof Set) {
+            const copySet = new Set();
+            obj.forEach((value) => {
+              copySet.add(deepCopy(value));
+            });
+            return copySet;
+          }
+       
+          if (obj instanceof Map) {
+            const copyMap = new Map();
+            obj.forEach((key, value) => {
+              copyMap.set(deepCopy(key), deepCopy(value));
+            });
+            return copyMap;
+          }
+       
+          return Object.keys(obj).reduce((newObj, key) => {
+            newObj[key] = deepCopy(obj[key]);
+            return newObj;
+          }, {});
+        }
+      }
+      copy = deepCopy(targetArray)
+      debugger
+      var median_iter = copy.keys()
+      var median1 = []
+      debugger
+      for (let i = 0 ; i < targetArray.size; i++){
+      
+        var temp_array1 = median_iter.next().value
+        median1.push(median(temp_array1))
+      }
+      debugger
+      //console.log(median1)
+      var high = []
+      for(let i = 0; i < median1.length; i++){
+        var high_index = []
+        for(let j = 0 ; j < temp_list[i].length; j++){
+            if(parseFloat(temp_list[i][j]) >= parseFloat(median1[i])){
+                //console.log(temp_list[i][j], median1[i])
+                high_index.push(patient_list[j])
+            }
+        
+        }
+        high.push(high_index)
+      }
+      //console.log(high)
+      i = 0
+      //console.log(targetArray)
+      for (const [key, value] of targetArray){
+        let cur_target = key
+        let cur_median = median1[i]
+        res.set(cur_target, high[i])
+        i ++ 
+      }
+      limit = Math.ceil(res.size / 4)
+      
+        draw(res,targetArray.size)
+        prev_protein = targetValue
+        debugger
+    })
+
+    //click sort begin
+    $("#sort-btn").click(function () {
+      sort_value = 1
+      
+      $(".container1").empty();
+      if(processed == 1){
+        p_val_array = result_array
+        if(sort_value == 1){
+          p_val_array = p_val_array.sort(function(a, b){
+            return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
+          })
+          let boxIndex = 0
+            for(let i = 0; i < p_val_array.length; i ++){
+              if ((boxIndex & 1) === 0) {
+                let newBox = $('<div class="box"></div>');
+                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+                $('.container1').append(newBox);
+              } else {
+                let newBox = $('#box' + Math.floor(boxIndex / 2))
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+              }
+              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+              boxIndex++;
+            }
+        }
+        else{
+          let boxIndex = 0
+            for(let i = 0; i < p_val_array.length; i ++){
+              if ((boxIndex & 1) === 0) {
+                let newBox = $('<div class="box"></div>');
+                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+                $('.container1').append(newBox);
+              } else {
+                let newBox = $('#box' + Math.floor(boxIndex / 2))
+                charDiv = $('<div class="char-div"></div>');
+                charDiv.attr('id', `myDiv${boxIndex}`);
+                newBox.append(charDiv);
+              }
+              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+              boxIndex++;
+            }
+        }
+        return 0;
+      }
+      
+    })
+    //console.log(result_array)
+    //click sort end
+    
+
+
+
+//survival plot end
 
 
 </script>
 </body>
 
 </html>
+ 
