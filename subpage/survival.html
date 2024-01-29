@@ -1,40 +1,32 @@
-<html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Box Plot</title>
-
-</head>
-
-<style>
-  .container1 {
+ 
+<style type="text/css">
+  .survival_container1 {
     display: flex;
     flex-direction: column;
     height: 76vh;
   }
 
-  .box1,
-  .box2 {
+  .survival_box1,
+  .survival_box2 {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  .flex-hori {
+  .survival_flex-hori {
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .char-div {
+  .survival_char-div {
     width: 50%;
     height: 38vh;
   }
 </style>
 
-<body>
   <div class="layerPopup">
     <div class="spinner"></div>
   </div>
@@ -42,52 +34,32 @@
 
     <div style="display: flex;margin: auto;">
       <div style="width: 300px;">
-        <select id="select-tools" multiple placeholder="Target"></select>
+        <select id="survival_select-tools" multiple placeholder="Target"></select>
       </div>
-      <button id="apply-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
+      <button id="survival_apply-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
         Apply
       </button>
-      <button id="sort-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
-        SortBy
-      </button>
+     
+      <div style="width: 120px;margin-left: 10px;">
+        <select id="survival_select-tools2" multiple placeholder="Sort by"></select>
+      </div>
+      <div style="margin: auto;margin-left: 10px;">
+        <button id="survival_sort-icon" class="glyphicon glyphicon-sort" aria-hidden="true" style="height: 30px;"></button>
+      </div>
     </div>
   </div>
 
-  <div class="container1">
-    <!-- <div class="box1">
-      <div id="myDiv0" class="char-div"></div>
-      <div id="myDiv1" class="char-div"></div>
-    </div>
+  <div class="survival_container1">
 
-    <div class="box2">
-      <div id="myDiv2" class="char-div"></div>
-      <div id="myDiv3" class="char-div"></div>
-    </div> -->
 
   </div>
 
-  <!-- <div class="flex-hori">
-    <div id="page-index"></div>
-  </div>
-
-  <div class="flex-hori">
-    <button id="pre-btn" type="button" class="btn btn-primary">
-      Pre
-    </button>
-    <button id="next-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
-      Next
-    </button>
-  </div> -->
 
 
-  <script>
-    var preBtn = $("#pre-btn")
-    preBtn.prop("disabled", true)
-    var nextBtn = $("#next-btn")
-    nextBtn.prop("disabled", true)
-    var pageIndex = $("#page-index")
-    var container = document.getElementsByClassName('container1')
-    var $select = $('#select-tools').selectize({
+  <script type="text/javascript">
+    
+    var container = document.getElementsByClassName('survival_container1')
+    var $select = $('#survival_select-tools').selectize({
       plugins: ["remove_button"],
       maxItems: 1,
       maxOptions: 100,
@@ -97,9 +69,19 @@
       options: [],
       create: false,
     });
+    var $select2 = $('#survival_select-tools2').selectize({
+      plugins: ["remove_button"],
+      maxItems: 1,
+      maxOptions: 2,
+      valueField: 'id',
+      labelField: 'title',
+      searchField: 'title',
+      options: [],
+      create: false
+    });
 
-
-
+    var sortOptions = []
+    
 
     var allUniqueValue = new Map();
     var allPatient = new Map();
@@ -116,10 +98,12 @@
     var index = 1
     var sort_value = 0
     result_array = []
-    const Pi = 3.141592
     var processed = 0
     var prev_protein = ''
+    var sort_type = 0
+    var sortOrder = 1
 
+    // load csv file using ajax
     function getData() {
       showSpinner();
       const patientData = metaArray;
@@ -153,6 +137,7 @@
 
       $.ajax({
         type: "GET",
+        //url can be changed based on baseURL
         url: baseURL + "/file/Quantitation_proteins.csv",
         dataType: "text",
         cache: false,
@@ -163,20 +148,19 @@
             const row = data[i].split(",")
             allProtein.set(row[0], row.slice(2))
           }
-          //"RE-P231-T\r"
+          
           let last = proteinPatient[proteinPatient.length - 1]
           proteinPatient[proteinPatient.length - 1] = last.substring(0, last.length - 1)
           
-          // console.log(proteinPatient)
-          // console.log(allProtein)
+          
           for (const key of allProtein.keys()) {
             targetOptions.push({ id: index, title: key })
             index++;
           }
-          //console.log(allProtein)
+          
           $.ajax({
             type: "GET",
-            url: baseURL + "/file/Quantitation_acetyl.csv",
+            url: baseURL+"/file/Quantitation_acetyl.csv",
             dataType: "text",
             cache: false,
             success: function (data) {
@@ -187,12 +171,11 @@
                 allAcetlysite.set(row[0], row.slice(2))
                 allAcetlysite.set(row[2], row.slice(2))
               }
-              //"RE-P231-T\r"
+              
               let last = acetlysitePatient[acetlysitePatient.length - 1]
               acetlysitePatient[acetlysitePatient.length - 1] = last.substring(0, last.length - 1)
               
-              // console.log(acetlysitePatient)
-              // console.log(allAcetlysite)
+              
               for (const key of allAcetlysite.keys()) {
                 targetOptions.push({ id: index, title: key })
                 index++;
@@ -214,13 +197,12 @@
                   let last = phosphositePatient[phosphositePatient.length - 1]
                   phosphositePatient[phosphositePatient.length - 1] = last.substring(0, last.length - 1)
                   
-                  // console.log(phosphositePatient)
-                  // console.log(allPhosphosite)
+                  
                   for (const key of allPhosphosite.keys()) {
                     targetOptions.push({ id: index, title: key })
                     index++;
                   }
-                  //console.log(allPhosphosite)
+                  
                   $.ajax({
                     type: "GET",
                     url: baseURL + "/file/Quantitation_genes.csv",
@@ -233,10 +215,9 @@
                         const row = data[i].split(",")
                         allGene.set(row[0], row.slice(1))
                       }
-                      //去除多余空值
+                      
                       genePatient = genePatient.slice(0, genePatient.indexOf(''))
-                      // console.log(genePatient)
-                      // console.log(allGene)
+                      
                       for (const key of allGene.keys()) {
                         targetOptions.push({ id: index, title: key })
                         index++;
@@ -263,6 +244,7 @@
       });
     }
     
+    //load data
     getData()
 
 
@@ -278,7 +260,7 @@
       p_val_array = []
       var result_array = []
       for (let i = 0; i < result_array.length; i++) {
-        Plotly.purge("myDiv" + i)
+        Plotly.purge("survival_myDiv" + i)
       }
       let allKeys = Array.from(res.keys())
       //console.log("page :" + page)
@@ -289,301 +271,264 @@
         //console.log(data)
         let pValue = 0
         let pText = ""
-        result_array = plot_survival(data,"myDiv"+index, value, p_val_array, target_size)
+        result_array = plot_survival(data,"survival_myDiv"+index, value, p_val_array, target_size)
         
       })
-      
-      /*p_val_array.sort(function(a, b){
-        return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
-      })*/
 
     }
 
-
-function plot_survival(data_high_list, location, title, p_val_array, target_size){
-var min_date = 0
-//var max_date = d3.max(data, (d)=>d.time)
-var max_date = 11
-
-    d3.csv("http://127.0.0.1:5501/PDIAMOND/file/Overall_survivals.csv", function(raw_data){
-
-function filterHigh(obj){
-    if (data_high_list.includes(obj.sample)){
-        return obj.sample;
-    }
-    //console.log(data_high.includes(obj.sample)) 
-}
-
-function filterLow(obj){
-    if (data_high_list.includes(obj.sample)){
-    }
-    else{
-        return obj.sample;
-    }
-    
-    //console.log(data_high.includes(obj.sample)) 
-}
-
-//Data cleaning:
-data = raw_data.map(function(d){
-    var new_d = {}
-    // new_d.age_entry_year = +d.ageentry/12; //patient start
-    // new_d.age_year = +d.age/12;            //patient end
-    new_d.time = +d.os/12
-    new_d.death    = d.death  == "Y" ? true : false;
-    new_d.sample = d.Sample
-    return new_d;
-    })
-    .sort(d => d.time)
-    //.filter(filterLow)
-
-data_temp = data
-data_high = data.filter(filterHigh)
-data_low = data.filter(filterLow)
-//console.log(data_high, data_low)
-var table_high = KM_Curve(data_high);
-kmsurv_high = table_high[0];
-censor_high = table_high[1];
-
-//console.log("high list =")
-//console.log(data_high_list)
-//console.log("kmsurv_high")
-//console.log(kmsurv_high)
-//console.log(censor_high)
-var table_low = KM_Curve(data_low);
-kmsurv_low = table_low[0]
-censor_low = table_low[1]
-
-//console.log("kmsurv_low")
-//console.log(kmsurv_low)
-//console.log(censor_low)
-
-//console.log(censor_low)
-
-kmsurv_high.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
-kmsurv_low.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
-censor_high.unshift({"c_i": min_date, "c_s": 1})
-censor_low.unshift({"c_i": min_date, "c_s": 1})
-
-data_table = log_rank_Test(data,data_high,data_low)
-        //console.log(data_table)
-g1 = data_table[0]
-g2 = data_table[1]
-for(let i = 0; i < g1.length; i++){
-    g1[i].e_i = (g1[i].n_i/(g1[i].n_i + g2[i].n_i)) * (g1[i].m_i+g2[i].m_i)
-    g2[i].e_i = (g2[i].n_i/(g1[i].n_i + g2[i].n_i)) * (g1[i].m_i+g2[i].m_i)
-    }
-        
-for(let i = 0; i < g1.length; i++){
-    g1[i].o_i = g1[i].m_i - g1[i].e_i
-    g2[i].o_i = g2[i].m_i - g2[i].e_i
-    }
-        
-variance = 0
-for(let i = 0; i < g1.length; i++){
-    if (g1[i].n_i + g2[i].n_i == 1){
-        variance += 0
-        }
-    else{
-        variance += ((g1[i].n_i*g2[i].n_i)*(g1[i].m_i + g2[i].m_i)*(g1[i].n_i+g2[i].n_i - g1[i].m_i-g2[i].m_i))/((g1[i].n_i + g2[i].n_i)*(g1[i].n_i + g2[i].n_i)*(g1[i].n_i + g2[i].n_i-1))
-        }   
-    //console.log(variance)
-    }
-        
-sum_o = 0
-for(let i = 0; i < g1.length; i++){
-    sum_o += g2[i].o_i
-    }   
-        
-log_rank_test_val = sum_o**2/variance
-//console.log(g1)
-//console.log(log_rank_test_val)
-        //import myModule from './my-module';
-p_val = ChiSq(log_rank_test_val, 1).toFixed(4)
-//console.log(p_val)
-
-
-trace1 = {
-  x: kmsurv_high.map((item) => item.t_i*12),
-  y: kmsurv_high.map((item) => item.S_t),
-  mode: 'lines',
-  name: 'high',
-  
-  line: {shape: 'hv', color: 'red'},
-};
-
-trace2 = {
-  x: kmsurv_low.map((item) => item.t_i*12),
-  y: kmsurv_low.map((item) => item.S_t),
-  mode: 'lines',
-  name: 'low',
-  
-  line: {shape: 'hv', color: 'blue'},
-};
-
-trace3 = {
-  x: censor_low.map((item) => item.c_t*12),
-  y: censor_low.map((item) => item.c_s),
-  mode: 'markers',
-  marker: { size: 6, color: 'blue' },
-  showlegend :false
-}
-trace4 = {
-  x: censor_high.map((item) => item.c_t*12),
-  y: censor_high.map((item) => item.c_s),
-  mode: 'markers',
-  marker: { size: 6, color: 'red' },
-  showlegend :false
-}
-
-var data = [trace1, trace2, trace3, trace4];
-
-var layout = {
-    title : {
-        text : title+ "<br>P-value = " + p_val,
-    },
-
-   yaxis:{
-        autotick: false,
-        ticks: 'outside',
-        tick0: 0,
-        dtick: 0.25,
-        range : [0,1]
-    },
-  xaxis :{
-    title :'month'
-  },
-  legend: {
-    autosize : false,
-    font: {size: 16},
-    yref: 'paper',
-    title : p_val
-  }};
-
-
-p_val_array.push({"title" : title, "location" : location, "data" : data, "layout" : layout, "p_val" :p_val})
-//console.log(p_val_array)
-//Plotly.newPlot(location, data, layout);
-result_array = p_val_array
-console.log(p_val_array)
-if(p_val_array.length == target_size){
-  if(sort_value == 1){
-    p_val_array = p_val_array.sort(function(a, b){
-      return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
-    })
-    let boxIndex = 0
-      for(let i = 0; i < p_val_array.length; i ++){
-        if ((boxIndex & 1) === 0) {
-          let newBox = $('<div class="box"></div>');
-          newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-          charDiv = $('<div class="char-div"></div>');
-          charDiv.attr('id', `myDiv${boxIndex}`);
-          newBox.append(charDiv);
-          $('.container1').append(newBox);
-        } else {
-          let newBox = $('#box' + Math.floor(boxIndex / 2))
-          charDiv = $('<div class="char-div"></div>');
-          charDiv.attr('id', `myDiv${boxIndex}`);
-          newBox.append(charDiv);
-        }
-        Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
-        boxIndex++;
-      }
-  }
-  else{
-    let boxIndex = 0
-      for(let i = 0; i < p_val_array.length; i ++){
-        if ((boxIndex & 1) === 0) {
-          let newBox = $('<div class="box"></div>');
-          newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-          charDiv = $('<div class="char-div"></div>');
-          charDiv.attr('id', `myDiv${boxIndex}`);
-          newBox.append(charDiv);
-          $('.container1').append(newBox);
-        } else {
-          let newBox = $('#box' + Math.floor(boxIndex / 2))
-          charDiv = $('<div class="char-div"></div>');
-          charDiv.attr('id', `myDiv${boxIndex}`);
-          newBox.append(charDiv);
-        }
-        Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
-        boxIndex++;
-      }
-  }
-}
-
-
-
-
-function KM_Curve(data){
-    //Source http://stackoverflow.com/questions/11246758/how-to-get-unique-values-in-an-array
-    Array.prototype.contains = function(v) {
-        for(var i = 0; i < this.length; i++) {
-            if(this[i] === v) return true;
-        }
-        return false;
-    };
-    Array.prototype.unique = function() {
-        var arr = [];
-        for(var i = 0; i < this.length; i++) {
-            if(!arr.contains(this[i])) {
-                arr.push(this[i]);
+    //draw plot depends on p_val_array
+    function draw_plot(p_val_array){
+      let boxIndex = 0
+          for(let i = 0; i < p_val_array.length; i ++){
+            if ((boxIndex & 1) === 0) {
+              let newBox = $('<div class="survival_box"></div>');
+              newBox.attr('id', `survival_box${Math.floor(boxIndex / 2)}`);
+              charDiv = $('<div class="survival_char-div"></div>');
+              charDiv.attr('id', `survival_myDiv${boxIndex}`);
+              newBox.append(charDiv);
+              $('.survival_container1').append(newBox);
+            } else {
+              let newBox = $('#survival_box' + Math.floor(boxIndex / 2))
+              charDiv = $('<div class="survival_char-div"></div>');
+              charDiv.attr('id', `survival_myDiv${boxIndex}`);
+              newBox.append(charDiv);
             }
-        }
-        return arr;
+            Plotly.newPlot("survival_myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
+            boxIndex++;
+          }
     }
 
-    //get unique times of death.
-    var death_times = data.filter(d => d.death)
-        .map(d => d.time)
-        .sort()
-    var censored_times = data.filter(d => !d.death)
-        .map(d => parseFloat(d.time))
-        //censored_times = censored_times.map(v=>parseFloat(v))
-    
-    var censored_times_sorted = censored_times.sort(function(a, b)  {
-        return a - b;
-        });
-    
-    var km_table = death_times.map(t_i => {
-        var d_i = data.filter(d => d.time == t_i && d.death).length
+    //main function. 
+    // Kaplan Meier Curve for survival plot
+    // log rank test for p-value
+    function plot_survival(data_high_list, location, title, p_val_array, target_size){
+      var min_date = 0
+      //var max_date = d3.max(data, (d)=>d.time)
+      var max_date = 11
 
-        var Y_i = data.filter(d => d.time >= t_i).length
+      d3.csv(baseURL + "/file/Overall_survivals.csv", function(raw_data){
 
-        var s_t = 1 - (d_i/Y_i);
-
-        return {"t_i": t_i, "d_i": d_i, "Y_i": Y_i, "s_t": s_t}
-    })
-    
-    //console.log(km_table);
-    //console.log(km_table);
-    
-
-    var censor_table = []
-    /*console.log("censored_time")
-    console.log(censored_times)
-    console.log("---------------")
-    console.log("censored_time_sorted")
-    console.log(censored_times_sorted)
-    console.log("--------------")
-    console.log("death_time")
-    console.log(death_times)
-    console.log("------------")
-    */
-    var j = 0
-    var prev_km = 1
-    var cur_km = 1
-    //showing censored point in the plot using previous S_t
-    for (let [i, row] of km_table.entries()) {
-        var t = row.t_i,
-            s_t = row.s_t,
-            last_S_t = i != 0 ? km_table[i-1].S_t : 1;
-        km_table[i].S_t = last_S_t * s_t;
-        if (i>0){
-            prev_km = km_table[i-1].S_t
-            cur_km = km_table[i].S_t
+        function filterHigh(obj){
+          if (data_high_list.includes(obj.sample)){
+            return obj.sample;
+          }
+          
         }
-        while(true){
+
+        function filterLow(obj){
+            if (data_high_list.includes(obj.sample)){
+            }
+            else{
+                return obj.sample;
+            }
+            
+            
+        }
+
+      //Data cleaning:
+      data = raw_data.map(function(d){
+        var new_d = {}
+        new_d.time = +d.os/12
+        new_d.death    = d.death  == "Y" ? true : false;
+        new_d.sample = d.Sample
+        return new_d;
+      })
+      .sort(d => d.time)
+      
+
+      data_temp = data
+      data_high = data.filter(filterHigh)
+      data_low = data.filter(filterLow)
+      
+      var table_high = KM_Curve(data_high);
+      kmsurv_high = table_high[0];
+      censor_high = table_high[1];
+
+      var table_low = KM_Curve(data_low);
+      kmsurv_low = table_low[0]
+      censor_low = table_low[1]
+
+
+      kmsurv_high.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
+      kmsurv_low.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
+      censor_high.unshift({"c_i": min_date, "c_s": 1})
+      censor_low.unshift({"c_i": min_date, "c_s": 1})
+
+      data_table = log_rank_Test(data,data_high,data_low)
+    
+      g1 = data_table[0]
+      g2 = data_table[1]
+      for(let i = 0; i < g1.length; i++){
+        g1[i].e_i = (g1[i].n_i/(g1[i].n_i + g2[i].n_i)) * (g1[i].m_i+g2[i].m_i)
+        g2[i].e_i = (g2[i].n_i/(g1[i].n_i + g2[i].n_i)) * (g1[i].m_i+g2[i].m_i)
+      }
+        
+      for(let i = 0; i < g1.length; i++){
+        g1[i].o_i = g1[i].m_i - g1[i].e_i
+        g2[i].o_i = g2[i].m_i - g2[i].e_i
+      }
+        
+      variance = 0
+      for(let i = 0; i < g1.length; i++){
+        if (g1[i].n_i + g2[i].n_i == 1){
+          variance += 0
+        }
+        else{
+          variance += ((g1[i].n_i*g2[i].n_i)*(g1[i].m_i + g2[i].m_i)*(g1[i].n_i+g2[i].n_i - g1[i].m_i-g2[i].m_i))/((g1[i].n_i + g2[i].n_i)*(g1[i].n_i + g2[i].n_i)*(g1[i].n_i + g2[i].n_i-1))
+        }   
+          
+      }
+        
+      sum_o = 0
+      for(let i = 0; i < g1.length; i++){
+          sum_o += g2[i].o_i
+      }   
+        
+      log_rank_test_val = sum_o**2/variance
+  
+      p_val = ChiSq(log_rank_test_val, 1).toFixed(4)
+      
+
+      //elements for each survival plot
+      trace1 = {
+        x: kmsurv_high.map((item) => item.t_i*12),
+        y: kmsurv_high.map((item) => item.S_t),
+        mode: 'lines',
+        name: 'high',
+        
+        line: {shape: 'hv', color: 'red'},
+      };
+
+      trace2 = {
+        x: kmsurv_low.map((item) => item.t_i*12),
+        y: kmsurv_low.map((item) => item.S_t),
+        mode: 'lines',
+        name: 'low',
+        
+        line: {shape: 'hv', color: 'blue'},
+      };
+
+      trace3 = {
+        x: censor_low.map((item) => item.c_t*12),
+        y: censor_low.map((item) => item.c_s),
+        mode: 'markers',
+        
+        marker: { size: 6, color: 'blue', symbol : 142 },
+        showlegend :false
+      }
+      trace4 = {
+        x: censor_high.map((item) => item.c_t*12),
+        y: censor_high.map((item) => item.c_s),
+        mode: 'markers',
+        marker: { size: 6, color: 'red', symbol : 142 },
+        showlegend :false
+      }
+
+      var data = [trace1, trace2, trace3, trace4];
+
+      var layout = {
+          title : {
+              text : title+ "<br>P-value = " + p_val,
+          },
+
+        yaxis:{
+              autotick: false,
+              ticks: 'outside',
+              tick0: 0,
+              dtick: 0.25,
+              range : [0,1]
+          },
+        xaxis :{
+          title :'month'
+        },
+        legend: {
+          autosize : false,
+          font: {size: 16},
+          yref: 'paper',
+          title : p_val
+        }};
+
+
+      p_val_array.push({"title" : title, "location" : location, "data" : data, "layout" : layout, "p_val" :p_val})
+
+      result_array = p_val_array
+
+
+      if(p_val_array.length == target_size){
+        if(sort_value == 1){
+          p_val_array = p_val_array.sort(function(a, b){
+            return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
+          })
+          draw_plot(p_val_array)
+        }
+        else{
+          draw_plot(p_val_array)
+        }
+      }
+
+
+
+
+      function KM_Curve(data){
+        
+        Array.prototype.contains = function(v) {
+          for(var i = 0; i < this.length; i++) {
+              if(this[i] === v) return true;
+          }
+          return false;
+        };
+        Array.prototype.unique = function() {
+          var arr = [];
+          for(var i = 0; i < this.length; i++) {
+              if(!arr.contains(this[i])) {
+                  arr.push(this[i]);
+              }
+          }
+          return arr;
+        }
+
+        //get unique times of death.
+        var death_times = data.filter(d => d.death)
+          .map(d => d.time)
+          .sort()
+        var censored_times = data.filter(d => !d.death)
+          .map(d => parseFloat(d.time))
+          
+    
+        var censored_times_sorted = censored_times.sort(function(a, b)  {
+          return a - b;
+          });
+    
+        var km_table = death_times.map(t_i => {
+          var d_i = data.filter(d => d.time == t_i && d.death).length
+
+          var Y_i = data.filter(d => d.time >= t_i).length
+
+          var s_t = 1 - (d_i/Y_i);
+
+          return {"t_i": t_i, "d_i": d_i, "Y_i": Y_i, "s_t": s_t}
+        })
+    
+    
+          
+
+        var censor_table = []
+    
+        var j = 0
+        var prev_km = 1
+        var cur_km = 1
+        //showing censored point in the plot using previous S_t
+        for (let [i, row] of km_table.entries()) {
+          var t = row.t_i,
+          s_t = row.s_t,
+          last_S_t = i != 0 ? km_table[i-1].S_t : 1;
+          km_table[i].S_t = last_S_t * s_t;
+          if (i>0){
+              prev_km = km_table[i-1].S_t
+              cur_km = km_table[i].S_t
+          }
+          while(true){
             if (censored_times_sorted[j]<=row.t_i){
                 censor_table[j] = {"c_t" : censored_times_sorted[j], "c_s" : last_S_t}
                 j ++;
@@ -591,95 +536,93 @@ function KM_Curve(data){
             else{
                 break
             }
+          }
         }
-    }
-    //console.log(censor_table)
-    for(let i = j; i < censored_times_sorted.length; i++){
-        censor_table[i] = {"c_t" : censored_times_sorted[i], "c_s" : cur_km}
-    }
-    //console.log(censor_table)
-    //console.log(km_table)
-    //console.log(censor_table)
-    
-    //console.log(km_table, censor_table)
-    // console.table(km_table)
-    km_table[km_table.length] = {"t_i": max_date, "d_i": max_date, "Y_i": max_date, "S_t": cur_km}
-    return [km_table, censor_table];
-}
-
-function ChiSq(x,n) {
-    if(n==1 & x>1000) {return 0}
-    if(x>1000 | n>1000) {
-        var q=ChiSq((x-n)*(x-n)/(2*n),1)/2
-        if(x>n) {return q} {return 1-q}
+      
+        for(let i = j; i < censored_times_sorted.length; i++){
+            censor_table[i] = {"c_t" : censored_times_sorted[i], "c_s" : cur_km}
         }
-    var p=Math.exp(-0.5*x); if((n%2)==1) { p=p*Math.sqrt(2*x/Pi) }
-    var k=n; while(k>=2) { p=p*x/k; k=k-2 }
-    var t=p; var a=n; while(t>0.0000000001*p) { a=a+2; t=t*x/a; p=p+t }
-    return 1-p
-    }
+        km_table[km_table.length] = {"t_i": max_date, "d_i": max_date, "Y_i": max_date, "S_t": cur_km}
+        return [km_table, censor_table];
+      }
 
-function log_rank_Test(data,high,low){
+      function ChiSq(x,n) {
+        if(n==1 & x>1000) {return 0}
+        if(x>1000 | n>1000) {
+            var q=ChiSq((x-n)*(x-n)/(2*n),1)/2
+            if(x>n) {return q} {return 1-q}
+            }
+        var p=Math.exp(-0.5*x); if((n%2)==1) { p=p*Math.sqrt(2*x/Pi) }
+        var k=n; while(k>=2) { p=p*x/k; k=k-2 }
+        var t=p; var a=n; while(t>0.0000000001*p) { a=a+2; t=t*x/a; p=p+t }
+        return 1-p
+      }
 
-    death_times_high = high.filter(d => d.death)
-        .map(d => d.time)
-        .sort()
-    death_times_low = low.filter(d => d.death)
-        .map(d => d.time)
-        .sort()
-    
-    censored_times_high = high.filter(d => !d.death)
+      //for p-value, return group1 group2
+      function log_rank_Test(data,high,low){
+
+        death_times_high = high.filter(d => d.death)
+            .map(d => d.time)
+            .sort()
+        death_times_low = low.filter(d => d.death)
+            .map(d => d.time)
+            .sort()
+        
+        censored_times_high = high.filter(d => !d.death)
+            .map(d => parseFloat(d.time))
+            //censored_times = censored_times.map(v=>parseFloat(v))
+        
+        censored_times_sorted_high = censored_times_high.sort(function(a, b)  {
+            return a - b;
+        });
+        censored_times_low = low.filter(d => !d.death)
         .map(d => parseFloat(d.time))
         //censored_times = censored_times.map(v=>parseFloat(v))
     
-    censored_times_sorted_high = censored_times_high.sort(function(a, b)  {
-        return a - b;
+        censored_times_sorted_low = censored_times_low.sort(function(a, b)  {
+          return a - b;
         });
-    censored_times_low = low.filter(d => !d.death)
-        .map(d => parseFloat(d.time))
-        //censored_times = censored_times.map(v=>parseFloat(v))
-    
-    censored_times_sorted_low = censored_times_low.sort(function(a, b)  {
-        return a - b;
-        });
-    prev_t = 0
-    var group1 = data.map(t_i => {
-        var m_i = death_times_high.filter(d => d == t_i.time).length
+        prev_t = 0
+        var group1 = data.map(t_i => {
+          var m_i = death_times_high.filter(d => d == t_i.time).length
 
-        var n_i = high.filter(d => d.time >= t_i.time).length
-        
-        var q_i = censored_times_sorted_high.filter(d=>d <= t_i.time && d.time > prev_t).length
-        
-        prev_t = t_i.time
-        return {"t_i": t_i.time, "n_i": n_i, "m_i": m_i, "q_t": q_i}
-    })
-    var group2 = data.map(t_i => {
-        var m_i = death_times_low.filter(d => d == t_i.time).length
+          var n_i = high.filter(d => d.time >= t_i.time).length
+          
+          var q_i = censored_times_sorted_high.filter(d=>d <= t_i.time && d.time > prev_t).length
+          
+          prev_t = t_i.time
+          return {"t_i": t_i.time, "n_i": n_i, "m_i": m_i, "q_t": q_i}
+        })
+        var group2 = data.map(t_i => {
+          var m_i = death_times_low.filter(d => d == t_i.time).length
 
-        var n_i = low.filter(d => d.time >= t_i.time).length
-        
-        var q_i = censored_times_sorted_low.filter(d=>d <= t_i.time && d > prev_t).length
-        
-        prev_t = t_i.time
-        return {"t_i": t_i.time, "n_i": n_i, "m_i": m_i, "q_t": q_i}
-    })
+          var n_i = low.filter(d => d.time >= t_i.time).length
+          
+          var q_i = censored_times_sorted_low.filter(d=>d <= t_i.time && d > prev_t).length
+          
+          prev_t = t_i.time
+          return {"t_i": t_i.time, "n_i": n_i, "m_i": m_i, "q_t": q_i}
+        })
 
-    return [group1, group2]
-}
+        return [group1, group2]
+      }
 
-})
+      })
 
-}
+    }
+
+
+
     var res = new Map()
     var page = 0
     var limit = 0
     var groupValue = ""
 
-
-    $("#apply-btn").click(function () {
+    //survival apply bttn
+    $("#survival_apply-btn").click(function () {
       sort_value = 0
-      $(".container1").empty();
-      targetValue = $('#select-tools').text();
+      $(".survival_container1").empty();
+      targetValue = $('#survival_select-tools').text();
       if(prev_protein == ''){
         prev_protein = targetValue
         processed = 0
@@ -696,44 +639,10 @@ function log_rank_Test(data,high,low){
           p_val_array = p_val_array.sort(function(a, b){
             return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
           })
-          let boxIndex = 0
-            for(let i = 0; i < p_val_array.length; i ++){
-              if ((boxIndex & 1) === 0) {
-                let newBox = $('<div class="box"></div>');
-                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-                $('.container1').append(newBox);
-              } else {
-                let newBox = $('#box' + Math.floor(boxIndex / 2))
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-              }
-              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
-              boxIndex++;
-            }
+          draw_plot(p_val_array)
         }
         else{
-          let boxIndex = 0
-            for(let i = 0; i < p_val_array.length; i ++){
-              if ((boxIndex & 1) === 0) {
-                let newBox = $('<div class="box"></div>');
-                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-                $('.container1').append(newBox);
-              } else {
-                let newBox = $('#box' + Math.floor(boxIndex / 2))
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-              }
-              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
-              boxIndex++;
-            }
+          draw_plot(p_val_array)
         }
         prev_protein = targetValue
         return 0;
@@ -744,11 +653,8 @@ function log_rank_Test(data,high,low){
 
       res = new Map()
       page = 0
-      groupValue = $('#select-tools1').text();
-      //let uniqueValue = allUniqueValue.get(groupValue);
-      //uniqueValue = uniqueValue.sort()
-      //console.log(uniqueValue)
-      //console.log(targetValue)
+      groupValue = $('#survival_select-tools1').text();
+  
       let targetArray = new Map();
       let targetPatient = new Map();
       if (allGene.has(targetValue)) {
@@ -759,9 +665,9 @@ function log_rank_Test(data,high,low){
         targetArray.set(targetValue, allProtein.get(targetValue))
         targetPatient.set(targetValue, proteinPatient)
       }
-      //console.log(allAcetlysite)
+      
       for (const [key, value] of allAcetlysite) {
-        //console.log(key)
+        
         if (key == null | key == "") continue;
         if (key.split("_")[0] !== targetValue) continue;
         targetArray.set(key, value.slice(1))
@@ -773,8 +679,8 @@ function log_rank_Test(data,high,low){
         targetArray.set(key, value.slice(1))
         targetPatient.set(key, phosphositePatient.slice(1))
       }
-      debugger
-    //   var newMap = {};
+      
+    
       var temp_list = []
       var iterator = targetArray.values()
       for (let i = 0 ; i < targetArray.size; i++){
@@ -785,23 +691,14 @@ function log_rank_Test(data,high,low){
         }
         temp_list.push(temp)
       }
-      //console.log(temp_list)
       
-      //console.log(targetArray.values().next().value)
-      //console.log(targetArray.length)
-    //   for(let i = 0 ; i < targetArray.values().next().value.length; i++){
-    //         temp.push((targetArray.values()[i], targetPatient.values()[i]))
-    //   }
-      
+    
       function median(array) {
             return array.sort((a, b) => a - b)[Math.floor(array.length / 2)];
       }
       var patient_list = targetPatient.values().next().value
-      //console.log(targetArray)
-      //console.log(targetPatient)
-      //console.log(targetArray.values())
-      //console.log(temp_list)
       
+      //deep copy 
       function deepCopy(obj) {
         if (typeof obj !== "object" || obj === null) {
           return obj;
@@ -841,33 +738,36 @@ function log_rank_Test(data,high,low){
           }, {});
         }
       }
+
+      
       copy = deepCopy(targetArray)
-      debugger
+      
       var median_iter = copy.keys()
       var median1 = []
-      debugger
+      
       for (let i = 0 ; i < targetArray.size; i++){
       
         var temp_array1 = median_iter.next().value
         median1.push(median(temp_array1))
       }
-      debugger
-      //console.log(median1)
+      
+      //get index whose gene is larger than median gene
+      //high_index represents those who has more gene than median 
       var high = []
       for(let i = 0; i < median1.length; i++){
         var high_index = []
         for(let j = 0 ; j < temp_list[i].length; j++){
             if(parseFloat(temp_list[i][j]) >= parseFloat(median1[i])){
-                //console.log(temp_list[i][j], median1[i])
+                
                 high_index.push(patient_list[j])
             }
         
         }
         high.push(high_index)
       }
-      //console.log(high)
+      
       i = 0
-      //console.log(targetArray)
+      
       for (const [key, value] of targetArray){
         let cur_target = key
         let cur_median = median1[i]
@@ -878,74 +778,163 @@ function log_rank_Test(data,high,low){
       
         draw(res,targetArray.size)
         prev_protein = targetValue
-        debugger
+        
     })
 
     //click sort begin
-    $("#sort-btn").click(function () {
-      sort_value = 1
-      
-      $(".container1").empty();
+    //sort by p-value or gene name
+    var sortOptions = []
+    var selectizeControl2 = $select2[0].selectize;
+    sortOptions.push({ id: 1, title: 'P-Value' })
+    sortOptions.push({ id: 2, title: 'Gene Name' })
+    selectizeControl2.addOption(sortOptions);
+    selectizeControl2.on('change', function (value) {
+      if (value[0] === '1') {
+        sort_value = 1
+        sort_type = 1
+      $(".survival_container1").empty();
       if(processed == 1){
         p_val_array = result_array
         if(sort_value == 1){
           p_val_array = p_val_array.sort(function(a, b){
             return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
           })
-          let boxIndex = 0
-            for(let i = 0; i < p_val_array.length; i ++){
-              if ((boxIndex & 1) === 0) {
-                let newBox = $('<div class="box"></div>');
-                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-                $('.container1').append(newBox);
-              } else {
-                let newBox = $('#box' + Math.floor(boxIndex / 2))
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-              }
-              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
-              boxIndex++;
-            }
+          draw_plot(p_val_array)
         }
         else{
-          let boxIndex = 0
-            for(let i = 0; i < p_val_array.length; i ++){
-              if ((boxIndex & 1) === 0) {
-                let newBox = $('<div class="box"></div>');
-                newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-                $('.container1').append(newBox);
-              } else {
-                let newBox = $('#box' + Math.floor(boxIndex / 2))
-                charDiv = $('<div class="char-div"></div>');
-                charDiv.attr('id', `myDiv${boxIndex}`);
-                newBox.append(charDiv);
-              }
-              Plotly.newPlot("myDiv"+boxIndex, p_val_array[i].data, p_val_array[i].layout);
-              boxIndex++;
-            }
+          draw_plot(p_val_array)
         }
-        return 0;
       }
+      } else if (value[0] === '2') {
+        sort_value = 1
+        sort_type = 2
+        $(".survival_container1").empty();
+        if(processed == 1){
+          p_val_array = result_array
+          if(sort_value == 1){
+            p_val_array = p_val_array.sort(function(a, b){
+              
+              var nameA = a["title"].toUpperCase(); // ignore upper and lowercase
+              var nameB = b["title"].toUpperCase(); // ignore upper and lowercase
+              if (nameA < nameB) {
+                return -1;
+              }
+              if (nameA > nameB) {
+                return 1;
+              }
+              
+            })
+            draw_plot(p_val_array)
+          }
+          else{
+            draw_plot(p_val_array)
+          }
+        }
+      }
+
+    });
+
+
+    //sort reverse
+    var sortIcon = $('#survival_sort-icon')
+    sortIcon.click(function () {
+      sortOrder = sortOrder == 1 ? 0 : 1
+
+      if (sortOrder == 1){
+        if (sort_type == 1) {
+          
+          sort_value = 1
+        
+          $(".survival_container1").empty();
+          if(processed == 1){
+            p_val_array = result_array
+            if(sort_value == 1){
+              p_val_array = p_val_array.sort(function(a, b){
+                return parseFloat(a["p_val"]) - parseFloat(b["p_val"]);
+              })
+              draw_plot(p_val_array)
+            }
+            else{
+              draw_plot(p_val_array)
+            }
+          }
+        } else if (sort_type == 2) {
+        
+          sort_value = 1
       
-    })
-    //console.log(result_array)
-    //click sort end
-    
+          $(".survival_container1").empty();
+          if(processed == 1){
+            p_val_array = result_array
+            if(sort_value == 1){
+              p_val_array = p_val_array.sort(function(a, b){
+                
+                var nameA = a["title"].toUpperCase(); // ignore upper and lowercase
+                var nameB = b["title"].toUpperCase(); // ignore upper and lowercase
+                if (nameA < nameB) {
+                  return -1;
+                }
+                if (nameA > nameB) {
+                  return 1;
+                }
+                
+              })
+              draw_plot(p_val_array)
+            }
+            else{
+              draw_plot(p_val_array)
+            }
+          }
+        
+        }
+      }
 
+      if (sortOrder == 0 ){
+        if (sort_type == 1) {
+          
+          sort_value = 1
+        
+          $(".survival_container1").empty();
+          if(processed == 1){
+            p_val_array = result_array
+            if(sort_value == 1){
+              p_val_array = p_val_array.sort(function(a, b){
+                return parseFloat(b["p_val"]) - parseFloat(a["p_val"]);
+              })
+              draw_plot(p_val_array)
+            }
+            else{
+              draw_plot(p_val_array)
+            }
+          } 
+        } else if (sort_type === 2) {
+          sort_value = 1
+        
+          $(".survival_container1").empty();
+          if(processed == 1){
+            p_val_array = result_array
+            if(sort_value == 1){
+              p_val_array = p_val_array.sort(function(a, b){
+                
+                var nameA = a["title"].toUpperCase(); // ignore upper and lowercase
+                var nameB = b["title"].toUpperCase(); // ignore upper and lowercase
+                if (nameA < nameB) {
+                  return 1;
+                }
+                if (nameA > nameB) {
+                  return -1;
+                }
+                
+              })
+              draw_plot(p_val_array)
+            }
+            else{
+              draw_plot(p_val_array)
+            }
+          }
+      
+        }
+      } 
 
+    });
 
 //survival plot end
-
-
-</script>
-</body>
-
-</html>
- 
