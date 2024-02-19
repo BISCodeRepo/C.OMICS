@@ -1,0 +1,349 @@
+.component-ttl {
+  padding: 0px;
+}
+
+.custom-header {
+  width: 100%;
+  height: 70px;
+  background-color: #353749;
+  color: white;
+  z-index: 999;
+}
+
+.custom-header-inner {
+  max-width: 1280px;
+  width: 95%;
+  margin: 0 auto;
+  height: 100%;
+}
+
+.custom-header-nav-grp {
+  width: 100%;
+  height: 100%;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 50px;
+}
+
+.custom-header-nav {
+  position: relative;
+}
+
+.custom-header-nav .link {
+  color: #B8B9C0;
+  font-size: 18px;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+.custom-header-nav .link.active {
+  color: white;
+  font-weight: 500;
+}
+
+.custom-header-sub-nav-grp {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  padding-top: 37px;
+  width: max-content;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+
+.custom-header-sub-nav-grp ul {
+  padding: 0;
+  list-style: none;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eaeaea;
+}
+
+.custom-header-nav:hover .custom-header-sub-nav-grp {
+  opacity: 1;
+  top: 0;
+  pointer-events: visible;
+}
+
+.custom-header-sub-nav .sub-link {
+  color: #333;
+  display: inline-block;
+  padding: 7px;
+}
+
+.white-bd-box {
+  width: 100%;
+  border: 1px solid #E9E9E9;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 6px 4px rgba(0, 0, 0, 0.06);
+  padding: 0;
+}
+
+.search-01-box {
+  width: 95%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 13px;
+}
+
+.search-01-box .box-btn-wrap {
+  text-align: right;
+  width: 100%;
+}
+
+.search-01-box .green-btn {
+  min-width: 120px;
+}
+
+.custom-ttl {
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.3;
+  margin: 0;
+  color: #3B3B3B;
+}
+
+.search-result-box {
+  border: 1px solid #e9e9e9;
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  max-height: 150px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow: auto;
+}
+
+.word-badge {
+  border-radius: 100px;
+  background-color: #BEC4C8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  color: #53616C;
+  padding: 0 10px;
+  height: 34px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.word-badge:hover {
+  background-color: #aeb7bc;
+}
+
+.word-badge .word-txt {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.txt-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: polygon(0 0, 0 0, 0 0);
+}
+
+.green-btn {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+
+  background-color: #6AC99D;
+  color: white;
+  border-radius: 6px;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  height: 40px;
+  padding: 0 20px;
+  transition: all 0.3s;
+}
+
+.green-btn:hover {
+  background-color: #5bb78c;
+}
+
+.del-btn,
+.ico-btn {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.ico-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.ico-btn .ico {
+    width: 17px;
+}
+
+.ico-btn:hover {
+    background-color: #f3f3f3;
+}
+
+.search-02-box {
+    width: 95%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 15px;
+    text-align: center;
+}
+
+.search-02-box .box-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.custom-select {
+    min-width: 200px;
+    border: 1px solid rgb(233, 233, 233);
+    border-radius: 6px;
+    height: 40px;
+    padding: 0 10px;
+    font-size: 15px;
+    background-image: url(../images/ico-chevron-down.svg);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none /* 화살표 없애기 */;
+    background-repeat: no-repeat;
+    background-position: calc(100% - 8px) 50%;
+    background-size: 17px;
+    padding-right: 32px;
+}
+
+.custom-select.type-sm {
+    min-width: 120px;
+}
+
+.legend-box-area {
+    max-width: 400px;
+}
+
+.legend-box-area .box-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.legend-box-area .box-top .ico-btn {
+    margin-left: auto;
+}
+
+.legend-box-after {
+    border: 1px solid #E9E9E9;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 6px 4px rgba(0, 0, 0, 0.06);
+    padding: 8px 12px;
+}
+
+.custom-header-nav-grp {
+    padding: 0;
+}
+
+.legend-table {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: #f3f5fb;
+    border-radius: 6px;
+    border: 1px solid #cdd1db;
+}
+
+.legend-table-list {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.legend-table-list .ttl {
+    border-right: 1px solid #cdd1db;
+    flex: 1;
+    padding: 10px;
+    font-weight: 500;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.legend-table-list .content {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.legend-box-before {
+    border: 1px solid #E9E9E9;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 6px 4px rgba(0, 0, 0, 0.06);
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: none;
+    right:5rem;
+    position: relative;
+    z-index: 999;
+    width:100px;
+}
+
+.legend-box-before.active {
+  display: block;
+}
+
+.legend-box-before:hover {
+    background-color: #fbfbfb;
+}
+
+.legend-box-area .legend-box-after.active {
+    display: block;
+}
+
+.legend-box-after {
+  display: none;
+}

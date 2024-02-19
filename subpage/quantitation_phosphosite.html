@@ -6,11 +6,22 @@
   <div id="phosphoheatmapDiv" style="width: 95%; height: 600px;margin: auto;"></div>
 
   <div class="phosphoContainer">
-    <span style="font-size: 14px;font-family: fantasy;text-align: center;" id="phosphoFloatContainerBtn">Legend</span>
-    <span style="background: #008fd8;z-index: 999;height: 15px;width:0px;position: absolute;" id="phosphoFloatContainerRemoveBtn"></span>
-  </div>
-  <div class="phosphoContainer" style="overflow: auto;">
-    <div id="phosphoFloatContainer" style="font-size: 10px;"></div>
+    <div class="legend-box-area">
+      <div id="phosphoFloatContainerBtn" class="legend-box-before active">
+        <h6 class="custom-ttl">Legend</h6>
+      </div>
+
+      <div id="phospho-legend-after" class="legend-box-after">
+        <div class="box-top">
+          <h3 class="custom-ttl">Legend</h3>
+
+          <button id="phosphoFloatContainerRemoveBtn" type="button" class="ico-btn">
+            <span class="txt-hidden">닫기</span>
+            <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
+          </button>
+        </div>
+        <div id="phosphoFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:18.5rem;"></div>
+    </div>
   </div>
 
 </div>
@@ -18,11 +29,8 @@
 <style type="text/css">
   .phosphoContainer{
     width:0px;border-radius: 0 15px 15px 0;height: 25rem;
-    background: #f2f5fb;position: absolute; top: 130px;right: 0rem;z-index: 999;
+    background: #f2f5fb;position: absolute; top: 130px;right: 5rem;z-index: 999;
   }
- .phosphoContainer #phosphoFloatContainerBtn{display: block; background: #008fd8;width: 45px;
-    border-radius: 4px 4px 4px 4px;font-size: 20px;line-height: 30px;right:5rem;
-    position: relative;z-index: 999;}
 </style>
   
 
@@ -35,6 +43,28 @@
     var patientData = []
 
     showSpinner('phosphoContent');
+
+    
+    $('#phosphoFloatContainerBtn').click(function(){
+
+      $(this).removeClass('active');
+      $('#phospho-legend-after').addClass('active');
+
+      $('.phosphoContainer').css({right:'0px'});
+      $('.phosphoContainer').css({width:'24rem'});
+      $(".phosphoContainer").css("z-index","auto");
+      phosphoLayer();
+
+    });
+
+    $('#phosphoFloatContainerRemoveBtn').click(function(){
+      $('#phosphoFloatContainer').empty();
+      $('.phosphoContainer').css({width:'0px'});
+      $('.phosphoContainer').css({right:'5rem'});
+      $(".phosphoContainer").css("z-index","999");
+      $('#phosphoFloatContainerBtn').addClass('active');
+      $('#phospho-legend-after').removeClass('active');
+    });
 
     $.ajax({
       type: "GET",
@@ -138,31 +168,10 @@
       
     });
 
-
-    $('#phosphoFloatContainerBtn').click(function(){
-      $('.phosphoContainer').animate({right:'0px'});
-      $('.phosphoContainer').css({width:'24rem'});
-      $('#phosphoFloatContainerRemoveBtn').addClass("glyphicon glyphicon-remove");
-      $('#phosphoFloatContainerRemoveBtn').show();
-      $('#phosphoFloatContainerRemoveBtn').css({width:'15px'});
-      $('#phosphoFloatContainerBtn').hide();
-      $(".phosphoContainer").css("z-index","auto");
-      phosphoLayer();
-    });
-
-    $('#phosphoFloatContainerRemoveBtn').click(function(){
-      $('#phosphoFloatContainer').empty();
-      $('.phosphoContainer').css({width:'0px'});
-      $('#phosphoFloatContainerRemoveBtn').hide();
-      $('#phosphoFloatContainerBtn').show();
-      $('#phosphoFloatContainerRemoveBtn').css({width:'0px'});
-      $(".phosphoContainer").css("z-index","999");
-    });
-
     function phosphoLayer(){
    
       var colorMap = phosphoMorpheus.project.columnColorModel.vectorNameToColorMap.map;
-      var htmlStr="<div style='height: 5px;'></div><table style='font-size: 10px;'><tr>";
+      var htmlStr="<table style='font-size: 11px;border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
       var substr="";
       var i = 1;
       $.map(colorMap, function(k, v){
@@ -170,7 +179,7 @@
             htmlStr += "<td style='text-align: center;'>"+k.key+"</td>";
             var newArr = $.map(k.value,function(key,value){return key});
             var subArr = $.map(newArr[0],function(key,value){return key});
-            substr += "<td style='height: fit-content;'><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>";
+            substr += "<td style='height: fit-content;'><div style='height: 5px;'></div><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
             $.map(subArr,function(key,value){
               substr += "<tr><td bgcolor='"+key.value+"' height='15' width='15'></td>"+
                 "<td>"+key.key+"</td></tr>";

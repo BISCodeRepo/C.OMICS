@@ -26,100 +26,73 @@
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css" integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css" integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js" integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    -->
-
+   
     <script src="subpage/js/common_data.js"></script>
     <script src="subpage/js/common_function.js"></script>
-    
     <link rel="stylesheet" href="subpage/css/common.css">
-    <link rel="stylesheet" href="subpage/css/selectize.css">
-
-    <script src="subpage/js/selectize.min.js"></script>
     <link rel="stylesheet" href="subpage/css/component.css">
 
     <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.1.0/math.min.js"></script>
    
    <style type="text/css">
-    .btn:focus,
-    .btn:active:focus,
-    .btn.active:focus,
-    .btn.focus,
-    .btn:active.focus,
-    .btn.active.focus {
-      outline: none;
-    }
-
-    .m-5 {
-      margin: 3rem !important
-    }
-
-    .m-3 {
-      margin: 1rem !important
-    }
-
-    .th-text-align {
-      text-align: center
-    }
+        .btn:focus, .btn:active:focus, .btn.active:focus,
+        .btn.focus, .btn:active.focus, .btn.active.focus {
+            outline: none;
+        }
+        .m-5 {margin:3rem !important}
+        .m-3 {margin:1rem !important}
+        .th-text-align {text-align: center}
     </style>
 </head>
 <body>
-    <div class="components-page">
-        <div class="component-item">
-            <header class="custom-header">
-                <div class="custom-header-inner">
-                  <ul class="custom-header-nav-grp" id="mymenu">
-
-                    <li class="custom-header-nav">
-                      <a href="index.html" class="link active">HOME</a>
-                    </li>
-        
-                    <li class="custom-header-nav" name="NMF">
-                      <a href="#" class="link">NMF Cluster</a>
-                    </li>
-        
-                    <li class="custom-header-nav" name="IMMUNE">
-                      <a href="#" class="link">Immune Cluster</a>
-                    </li>
-        
-                    <li class="custom-header-nav" style="z-index: 999;">
-                      <a href="#" class="link">Quantitation</a>
-        
-                      <div class="custom-header-sub-nav-grp">
-                        <ul>
-                          <li class="custom-header-sub-nav" name="PROTEIN">
-                            <a href="#" class="sub-link">Protein</a>
-                          </li>
-                          <li class="custom-header-sub-nav" name="PHOSPHO">
-                            <a href="#" class="sub-link">Phosphosite</a>
-                          </li>
-                          <li class="custom-header-sub-nav" name="ACETYL">
-                            <a href="#" class="sub-link">Acetylsite</a>
-                          </li>
-                          <li class="custom-header-sub-nav" name="RNA">
-                            <a href="#" class="sub-link">RNA</a>
-                          </li>
+    <div class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            
+            <div class="navbar-header">
+                <button class="navbar-toggle" data-toggle="collapse" data-target="#mymeun">                 
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="index.html" class=" navbar-brand">Home</a>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="mymeun">
+                <ul class="nav navbar-nav">
+                    <li name="NMF"><a href="#">NMF Cluster</a></li> 
+                    <li name="IMMUNE"><a href="#">Immune Cluster</a></li>                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Quantitation</a>
+                        <ul class="dropdown-menu">
+                          <li name="PROTEIN"><a href="#">Protein</a></li>
+                          <li role="separator" class="divider"></li>
+                          <li name="PHOSPHO"><a href="#">Phosphosite</a></li>
+                          <li role="separator" class="divider"></li>
+                          <li name="ACETYL"><a href="#">Acetylsite</a></li>
+                          <li role="separator" class="divider"></li>
+                          <li name="RNA"><a href="#">RNA</a></li>
                         </ul>
-                      </div>
-                    </li>
-        
-                    <li class="custom-header-nav" name="COMPARISON">
-                      <a href="#" class="link">Group comparison</a>
-                    </li>
-        
-                    <li class="custom-header-nav" name="SURVIVAL">
-                      <a href="#" class="link">Survival analysis</a>
-                    </li>
-
-                    <li class="custom-header-nav" name="ABOUT">
-                        <a href="/subpage/nmf_help.html" target="_blank" class="link">About</a>
                       </li>
-                  </ul>
+                    <li name="COMPARISON"><a href="#" >Group comparison</a></li>
+                    <li name="SURVIVAL"><a href="#" >Survival analysis</a></li>
+                    <li name="ABOUT"><a href="/subpage/nmf_help.html" >About</a>
+                </ul>
+               <!--  <ul class="nav navbar-nav navbar-right">
+                    <li> <a href="#">Sign in</a> </li>
+                </ul>
+               <div class="navbar-form navbar-right">
+                    <div class="input-group">
+                        <input type="text" name="" id="" class="form-control">
+                        <div class="input-group-btn"><button class="btn btn-default form-control">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button></div> 
+                    </div>-->
                 </div>
-              </header>
-            </div>          
+            </div>
+           
         </div>
     </div>
     <div id="mainContent">
@@ -160,7 +133,7 @@
         }
         dropdownOpen();
 
-        $("#mymenu li").click(function(){
+        $("#mymeun li").click(function(){
             
             if($(this).attr('name') != undefined){
                 $('#NMFmainContent').hide();

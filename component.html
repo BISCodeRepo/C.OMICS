@@ -1,0 +1,229 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDIAMOND</title>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+    integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+
+  <link rel="stylesheet" href="https://software.broadinstitute.org/morpheus/css/morpheus-latest.min.css">
+  <script type="text/javascript"
+    src="https://software.broadinstitute.org/morpheus/js/morpheus-external-latest.min.js"></script>
+  <script src="https://software.broadinstitute.org/morpheus/js/morpheus-latest.min.js"></script>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
+    integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
+    integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="subpage/js/common_data.js"></script>
+  <script src="subpage/js/common_function.js"></script>
+  <link rel="stylesheet" href="subpage/css/common.css">
+  <link rel="stylesheet" href="subpage/css/component.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.1.0/math.min.js"></script>
+
+  <style type="text/css">
+    .btn:focus,
+    .btn:active:focus,
+    .btn.active:focus,
+    .btn.focus,
+    .btn:active.focus,
+    .btn.active.focus {
+      outline: none;
+    }
+
+    .m-5 {
+      margin: 3rem !important
+    }
+
+    .m-3 {
+      margin: 1rem !important
+    }
+
+    .th-text-align {
+      text-align: center
+    }
+  </style>
+</head>
+
+<body>
+  <div class="components-page">
+    <div class="component-item">
+      <h1 class="component-ttl">1. 헤더</h1>
+      <!-- TODO: 이쪽 요소만 활용하시면 됩니다! -->
+      <header class="custom-header">
+        <div class="custom-header-inner">
+          <ul class="custom-header-nav-grp">
+            <li class="custom-header-nav">
+              <!-- TODO: 해당 페이지일 경우 active 클래스가 추가됩니다. -->
+              <a href="#" class="link active">HOME</a>
+            </li>
+
+            <li class="custom-header-nav">
+              <a href="#" class="link">NMF Cluster</a>
+            </li>
+
+            <li class="custom-header-nav">
+              <a href="#" class="link">Immune Cluster</a>
+            </li>
+
+            <li class="custom-header-nav">
+              <a href="#" class="link">Quantitation</a>
+
+              <div class="custom-header-sub-nav-grp">
+                <ul>
+                  <li class="custom-header-sub-nav">
+                    <a href="#" class="sub-link">Protein</a>
+                  </li>
+                  <li class="custom-header-sub-nav">
+                    <a href="#" class="sub-link">Phosphosite</a>
+                  </li>
+                  <li class="custom-header-sub-nav">
+                    <a href="#" class="sub-link">Acetylsite</a>
+                  </li>
+                  <li class="custom-header-sub-nav">
+                    <a href="#" class="sub-link">RNA</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="custom-header-nav">
+              <a href="#" class="link">Group comparison</a>
+            </li>
+
+            <li class="custom-header-nav">
+              <a href="#" class="link">Survival analysis</a>
+            </li>
+          </ul>
+        </div>
+      </header>
+      <!-- END: 이쪽 요소만 활용하시면 됩니다! -->
+    </div>
+
+    <div class="component-item">
+      <h2 class="component-ttl">2. 검색조건 1</h2>
+      <!-- TODO: 이쪽 요소만 활용하시면 됩니다! -->
+      <div class="white-bd-box search-01-box">
+        <h3 class="custom-ttl">Genes of intereset (max, 10)</h3>
+        <div class="search-result-box">
+          <div class="word-badge">
+            <span class="word-txt">KRAS</span>
+            <button type="button" class="del-btn">
+              <span class="txt-hidden">삭제</span>
+              <img src="subpage/images/ico-x-navy.svg" alt="삭제 아이콘" class="ico">
+            </button>
+          </div>
+        </div>
+        <div class="box-btn-wrap">
+          <button type="button" class="green-btn">Apply</button>
+        </div>
+      </div>
+      <!-- END: 이쪽 요소만 활용하시면 됩니다! -->
+    </div>
+
+
+    <div class="component-item">
+      <h2 class="component-ttl">3. 검색조건 2</h2>
+      <!-- TODO: 이쪽 요소만 활용하시면 됩니다! -->
+      <div class="white-bd-box search-02-box">
+        <div class="box-inner">
+          <select class="custom-select">
+            <option value="">A0A024RAC6</option>
+            <option value="">A0A024RAC6</option>
+            <option value="">A0A024RAC6</option>
+          </select>
+
+          <select class="custom-select">
+            <option value="">Subtype</option>
+            <option value="">Subtype</option>
+            <option value="">Subtype</option>
+          </select>
+
+          <button type="button" class="green-btn">Apply</button>
+
+          <select class="custom-select type-sm">
+            <option value="">Sort by</option>
+          </select>
+
+          <button type="button" class="ico-btn">
+            <span class="txt-hidden">필터</span>
+            <img src="subpage/images/ico-arrows-down-up.svg" alt="필터 아이콘" class="ico">
+          </button>
+        </div>
+      </div>
+      <!-- END: 이쪽 요소만 활용하시면 됩니다! -->
+    </div>
+
+    <div class="component-item">
+      <h2 class="component-ttl">4. 레전드</h2>
+      <!-- TODO: 이쪽 요소만 활용하시면 됩니다! -->
+      <div class="legend-box-area">
+        <div id="legend-before" class="legend-box-before active">
+          <h3 class="custom-ttl">Legend</h3>
+        </div>
+
+        <div id="legend-after" class="legend-box-after">
+          <div class="box-top">
+            <h3 class="custom-ttl">Legend</h3>
+
+            <button id="legend-after-close-btn" type="button" class="ico-btn">
+              <span class="txt-hidden">닫기</span>
+              <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
+            </button>
+          </div>
+
+          <ul class="legend-table">
+            <li class="legend-table-list">
+              <div class="ttl">
+                Subtype
+              </div>
+              <div class="content">
+                <img src="" alt="">
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- END: 이쪽 요소만 활용하시면 됩니다! -->
+    </div>
+  </div>
+
+<script>
+  $("#legend-before").on('click', function(){
+$(this).removeClass('active');
+$('#legend-after').addClass('active');
+})
+
+$('#legend-after-close-btn').on('click', function(){
+$('#legend-before').addClass('active');
+$('#legend-after').removeClass('active');
+})
+</script>
+</body>
+
+</html>

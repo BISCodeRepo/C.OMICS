@@ -4,55 +4,55 @@
     flex-direction: column;
     height: 76vh;
   }
- 
- 
+
   .box {
     flex: 1;
     display: flex;
     /* justify-content: center;
     align-items: center; */
   }
- 
- 
- 
- 
+
+
   .char-div {
     width: 48%;
     height: 45vh;
   }
- </style>
- <div id="comparisonContent">
+</style>
+
   <div class="layerPopup">
     <div class="spinner"></div>
   </div>
-  <div class="component-item">
-    <h3 class="component-ttl"></h3>
-    <div class="white-bd-box search-02-box">
-      <div class="box-inner">
-        <select id="comparison-select-tools" multiple placeholder="Target" style="height: 40px; width:250px;"></select>
-        <select id="comparison-select-tools1" multiple placeholder="Group by" style="height: 40px;width:250px;"></select>
+  <div style="display: flex;margin: auto;">
 
-        <button type="button" class="green-btn" id="comparison-apply-btn">Apply</button>
+    <div style="display: flex;margin: auto;">
+      <div style="width: 250px;">
+        <select id="comparison-select-tools" multiple placeholder="Target"></select>
+      </div>
+      <div style="width: 250px;margin-left: 10px;">
+        <select id="comparison-select-tools1" multiple placeholder="Group by"></select>
+      </div>
+      <button id="comparison-apply-btn" type="button" class="btn btn-primary" style="margin-left: 10px;">
+        Apply
+      </button>
 
-        <select id="comparison-select-tools2" style="height: 40px;width:140px;"></select>
-
-        <button type="button" class="ico-btn" id="comparison-sort-icon">
-          <span class="txt-hidden">필터</span>
-          <img src="subpage/images/ico-arrows-down-up.svg" alt="필터 아이콘" class="ico">
-        </button>
+      <div style="width: 120px;margin-left: 10px;">
+        <select id="comparison-select-tools2" multiple placeholder="Sort by"></select>
+      </div>
+      <div style="margin: auto;margin-left: 10px;">
+        <button id="comparison-sort-icon" class="glyphicon glyphicon-sort" aria-hidden="true" style="height: 30px;"></button>
       </div>
     </div>
- 
+  </div>
+
   <div class="comparison-container1">
   </div>
- 
- 
- </div>
- 
- 
+
+
+
+
   <script type="text/javascript">
 
- 
+
     var $select = $('#comparison-select-tools').selectize({
       plugins: ["remove_button"],
       maxItems: 1,
@@ -63,8 +63,7 @@
       options: [],
       create: false,
     });
- 
- 
+
     var $select1 = $('#comparison-select-tools1').selectize({
       plugins: ["remove_button"],
       maxItems: 1,
@@ -75,8 +74,7 @@
       options: [],
       create: false
     });
- 
- 
+
     var $select2 = $('#comparison-select-tools2').selectize({
       plugins: ["remove_button"],
       maxItems: 1,
@@ -87,8 +85,7 @@
       options: [],
       create: false
     });
- 
- 
+
     var sortOptions = []
     var selectizeControl2 = $select2[0].selectize;
     sortOptions.push({ id: 1, title: 'P-Value' })
@@ -97,21 +94,19 @@
     selectizeControl2.on('change', function (value) {
       if (value[0] === '1') {
         sortKey = 1
-        comparisonDraw(res, allLayout, allPvalue)
+        draw(res, allLayout, allPvalue)
       } else if (value[0] === '2') {
         sortKey = 2
-        comparisonDraw(res, allLayout, allPvalue)
+        draw(res, allLayout, allPvalue)
       }
     });
- 
- 
+
     var sortIcon = $('#comparison-sort-icon')
     sortIcon.click(function () {
       sortOrder = sortOrder == 1 ? 0 : 1
-      comparisonDraw(res, allLayout, allPvalue)
+      draw(res, allLayout, allPvalue)
     });
- 
- 
+
     var allUniqueValue = new Map();
     var allPatient = new Map();
     var proteinPatient = []
@@ -130,19 +125,15 @@
     var allLayout = new Map()
     var allPvalue = new Map()
     var res = new Map()
- 
- 
- 
- 
- 
- 
-    function getComparisonData() {
-      showSpinner('comparisonContent');
+
+
+
+    function getData() {
+      showSpinner();
       const patientData = metaArray;
       const rowHeader = [];
-
       patientData.map((row) => {
-        const rowData = row.replace(/(\s*)/g, "").split(",");
+        const rowData = row.split(",");
         rowHeader.push(rowData[0]);
         let uniqueValue = unique(rowData.slice(1));
         allUniqueValue.set(rowData[0], uniqueValue);
@@ -163,10 +154,8 @@
       patientInfo.forEach((value) => {
         allPatient.set(value['Sample.ID'], value)
       });
- 
- 
- 
- 
+
+
       $.ajax({
         type: "GET",
         url: "../file/Quantitation_proteins.csv",
@@ -212,8 +201,7 @@
               //   targetOptions.push({ id: index, title: key })
               //   index++;
               // }
- 
- 
+
               $.ajax({
                 type: "GET",
                 url: "../file/Quantitation_phospho.csv",
@@ -236,8 +224,7 @@
                   //   targetOptions.push({ id: index, title: key })
                   //   index++;
                   // }
- 
- 
+
                   $.ajax({
                     type: "GET",
                     url: "../file/Quantitation_genes.csv",
@@ -258,8 +245,7 @@
                         targetOptions.push({ id: index, title: key })
                         index++;
                       }
- 
- 
+
                       let groupOptions = []
                       index = 1
                       for (const key of allUniqueValue.keys()) {
@@ -270,7 +256,7 @@
                       selectizeControl.addOption(targetOptions)
                       var selectizeControl1 = $select1[0].selectize;
                       selectizeControl1.addOption(groupOptions)
-                      hideSpinner('comparisonContent')
+                      hideSpinner()
                     },
                   });
                 },
@@ -280,28 +266,24 @@
         },
       });
     }
-    getComparisonData()
- 
- 
+    getData()
+
     function unique(array) {
       return array.filter((value, index, self) => {
         return value !== 'None' && value !== '' && self.indexOf(value) === index;
       });
     }
- 
- 
+
     var page = 0
     var groupValue = ""
     $("#comparison-apply-btn").click(function () {
-
       res = new Map()
       page = 0
       const targetValue = $('#comparison-select-tools').text();
       groupValue = $('#comparison-select-tools1').text();
       let uniqueValue = allUniqueValue.get(groupValue);
-      uniqueValue = uniqueValue.sort();
- 
- 
+      uniqueValue = uniqueValue.sort()
+
       let targetArray = new Map();
       let targetPatient = new Map();
       if (allGene.has(targetValue)) {
@@ -322,8 +304,7 @@
         targetArray.set(key, value)
         targetPatient.set(key, phosphositePatient)
       }
- 
- 
+
       for (const [key, value] of targetArray) {
         let curArray = value;
         let curTarget = key;
@@ -339,7 +320,6 @@
             },
           })
         }
-
         curArray.forEach((value, index) => {
           if (allPatient.has(curPatient[index])) {
             const curPatientInfo = allPatient.get(curPatient[index]);
@@ -355,22 +335,19 @@
       }
       cal(res)
     })
- 
- 
+
     function cal(res) {
       let allKeys = Array.from(res.keys())
       let promises = []
       allLayout = new Map()
       allPvalue = new Map()
- 
- 
+
       for (let i = 0; i < allKeys.length; i++) {
         let value = allKeys[i]
         let data = res.get(value)
         let pValue = 0
         let pText = ""
- 
- 
+
         let promise = computePValue(data).then(result => {
           pValue = result
           allPvalue.set(value, pValue)
@@ -381,10 +358,8 @@
           // }
           pValue = formatNumbers(pValue)
           pText = "p = " + pValue
- 
- 
- 
- 
+
+
           var layout = {
             title: value,
             xaxis: {
@@ -406,25 +381,20 @@
               }
             ]
           }
- 
- 
+
           allLayout.set(value, layout)
         })
- 
- 
+
         promises.push(promise)
       }
- 
- 
+
       Promise.all(promises).then(() => {
-        comparisonDraw(res, allLayout, allPvalue)
+        draw(res, allLayout, allPvalue)
       })
- 
- 
+
     }
- 
- 
-    function comparisonDraw(res, allLayout, allPvalue) {
+
+    function draw(res, allLayout, allPvalue) {
       $('.comparison-container1').empty();
       let boxIndex = 0
       let allKeys = Array.from(res.keys())
@@ -435,8 +405,7 @@
         } else {
           allKeys.sort(function (a, b) { return b.localeCompare(a) })
         }
- 
- 
+
       } else if (sortKey === 1) {
         //p值排序
         let mapEntry = Array.from(allPvalue)
@@ -450,16 +419,12 @@
           })
         }
         let sortedPvalue = new Map(mapEntry)
- 
- 
+
         allKeys = Array.from(sortedPvalue.keys())
       }
- 
- 
- 
- 
- 
- 
+
+
+
       allKeys.forEach((value, index) => {
         if ((boxIndex & 1) === 0) {
           // 创建一个新的 box1 元素
@@ -479,11 +444,9 @@
         Plotly.newPlot("myDiv" + boxIndex, res.get(value), allLayout.get(value));
         boxIndex++;
       })
- 
- 
+
     }
- 
- 
+
     function rankSum(data) {
       return new Promise((resolve, reject) => {
         let yArrays = data.map(item => item.y);
@@ -507,11 +470,9 @@
         });
       });
     }
- 
- 
+
     function formatNumbers(num) {
- 
- 
+
       // Check if the number is very close to 0 (but not 0)
       if (Math.abs(num) > 0 && Math.abs(num) < 1e-5) {
         // Use scientific notation
@@ -520,13 +481,10 @@
         // Otherwise, round to 5 decimal places
         return Number(num.toFixed(5));
       }
- 
- 
+
     }
- 
- 
- 
- 
+
+
     function kruskalWallisTest(data) {
       return new Promise((resolve, reject) => {
         let yArrays = data.map(item => item.y);
@@ -550,8 +508,7 @@
         });
       });
     }
- 
- 
+
     async function computePValue(data) {
       let pValue;
       if (data.length > 2) {
@@ -571,18 +528,9 @@
       }
       return pValue;
     }
- 
- 
- </script>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
+</script>
+
+
+
+

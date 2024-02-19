@@ -5,23 +5,30 @@
     </div>
 
     <div id="aceHeatmapDiv" style="width: 95%; height: 600px;margin: auto;"></div>
-
     <div class="acetylContainer">
-      <span style="font-size: 14px;font-family: fantasy;text-align: center;" id="acetylFloatContainerBtn">Legend</span>
-      <span style="background: #008fd8;z-index: 999;height: 15px;width:0px;position: absolute;" id="acetylFloatContainerRemoveBtn"></span>
-    </div>
-    <div class="acetylContainer" style="overflow: auto;">
-      <div id="acetylFloatContainer" style="font-size: 10px;"></div>
+      <div class="legend-box-area">
+        <div id="acetylFloatContainerBtn" class="legend-box-before active">
+          <h6 class="custom-ttl">Legend</h6>
+        </div>
+  
+        <div id="acetyl-legend-after" class="legend-box-after">
+          <div class="box-top">
+            <h3 class="custom-ttl">Legend</h3>
+  
+            <button id="acetylFloatContainerRemoveBtn" type="button" class="ico-btn">
+              <span class="txt-hidden">닫기</span>
+              <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
+            </button>
+          </div>
+          <div id="acetylFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:18.5rem;"></div>
+      </div>
     </div>
   </div>
   <style type="text/css">
     .acetylContainer{
       width:0px;border-radius: 0 15px 15px 0;height: 25rem;
-      background: #f2f5fb;position: absolute; top: 130px;right: 0rem;z-index: 999;
+      background: #f2f5fb;position: absolute; top: 130px;right: 5rem;z-index: 999;
     }
-   .acetylContainer #acetylFloatContainerBtn{display: block; background: #008fd8;width: 45px;
-      border-radius: 4px 4px 4px 4px;font-size: 20px;line-height: 30px;right:5rem;
-      position: relative;z-index: 999;}
   </style>
   <script type="text/javascript">
 
@@ -32,6 +39,25 @@
     var patientData = []
 
     showSpinner('acetylsiteContent');
+
+    $('#acetylFloatContainerBtn').click(function(){
+      $(this).removeClass('active');
+      $('#acetyl-legend-after').addClass('active');
+
+      $('.acetylContainer').css({right:'0px'});
+      $('.acetylContainer').css({width:'24rem'});
+      $(".acetylContainer").css("z-index","auto");
+      acetylLayer();
+    });
+
+    $('#acetylFloatContainerRemoveBtn').click(function(){
+      $('#acetylFloatContainer').empty();
+      $('.acetylContainer').css({width:'0px'});
+      $('.acetylContainer').css({right:'5rem'});
+      $(".acetylContainer").css("z-index","999");
+      $('#acetylFloatContainerBtn').addClass('active');
+      $('#acetyl-legend-after').removeClass('active');
+    });
 
     $.ajax({
       type: "GET",
@@ -136,30 +162,10 @@
       
     });
 
-    $('#acetylFloatContainerBtn').click(function(){
-      $('.acetylContainer').animate({right:'0px'});
-      $('.acetylContainer').css({width:'24rem'});
-      $('#acetylFloatContainerRemoveBtn').addClass("glyphicon glyphicon-remove");
-      $('#acetylFloatContainerRemoveBtn').show();
-      $('#acetylFloatContainerRemoveBtn').css({width:'15px'});
-      $('#acetylFloatContainerBtn').hide();
-      $(".acetylContainer").css("z-index","auto");
-      acetylLayer();
-    });
-
-    $('#acetylFloatContainerRemoveBtn').click(function(){
-      $('#acetylFloatContainer').empty();
-      $('.acetylContainer').css({width:'0px'});
-      $('#acetylFloatContainerRemoveBtn').hide();
-      $('#acetylFloatContainerBtn').show();
-      $('#acetylFloatContainerRemoveBtn').css({width:'0px'});
-      $(".acetylContainer").css("z-index","999");
-    });
-
     function acetylLayer(){
    
       var colorMap = acetylsiteMorpheus.project.columnColorModel.vectorNameToColorMap.map;
-      var htmlStr="<div style='height: 5px;'></div><table style='font-size: 10px;'><tr>";
+      var htmlStr="<table style='font-size: 11px; border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
       var substr="";
       var i = 1;
       $.map(colorMap, function(k, v){
@@ -167,7 +173,7 @@
             htmlStr += "<td style='text-align: center;'>"+k.key+"</td>";
             var newArr = $.map(k.value,function(key,value){return key});
             var subArr = $.map(newArr[0],function(key,value){return key});
-            substr += "<td style='height: fit-content;'><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>";
+            substr += "<td style='height: fit-content;'><div style='height: 5px;'></div><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
             $.map(subArr,function(key,value){
               substr += "<tr><td bgcolor='"+key.value+"' height='15' width='15'></td>"+
                 "<td>"+key.key+"</td></tr>";

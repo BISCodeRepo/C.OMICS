@@ -2,45 +2,49 @@
   <div class="layerPopup">
     <div class="spinner"></div>
   </div>
-  <div class="component-item">
-    <h3 class="component-ttl"></h3>
-    <div class="white-bd-box search-01-box">
-      <h3 class="custom-ttl">Genes of intereset (max, 10)</h3>
-      <div class="" style="width: 100%;max-height: 150px;">
-        <input type="text" id="ImmuneGenesOpt" data-width="95%" name="nmfGenesSelect" value="CSNK2A1,KRAS,ERBB2,XPO1,TP53,EGFR"/>
-      </div>
-      <div class="box-btn-wrap">
-        <button type="button" class="green-btn" id="ImmuneSelectBtn">Apply</button>
-      </div>
-    </div>
+  <div id = "select_menu" style="width:95%;margin:auto">
+      <table id="selectTable" class = "table table-bordered table-hover table-striped">
+        <thead>
+          <tr class="active">
+              <th class="th-text-align" style="width: 20%;">
+                  Genes of interest (max. 10)
+              </th>
+              <th>
+                <div class="control-group" style="width: 95%;">
+                  <input type="text" id="ImmuneGenesOpt" data-width="95%" name="ImmuneGenesSelect" value="CSNK2A1,KRAS,ERBB2,XPO1,TP53,EGFR"/>
+                </div>
+              </th>
+              <th style="width: 7%;">
+                  <div class="btn-toolbar">
+                      <input type="button" id="ImmuneSelectBtn" class="btn btn-primary" value="Apply" style="width: 90%;margin-right:5px;"/>
+                  </div>
+              </th>
+          </tr>
+        </thead>
+      </table>
+  </div>
+  <div id="legendDiv" style="float: right;margin-right: 3%;">
+   <!-- <button type="submit" class="btn btn-default" id="legendBtn"><span class="glyphicon glyphicon-adjust"></span> Legend</button>-->
+    <!--button type="submit" class="btn btn-default" id="helpBtn"><span class="glyphicon glyphicon-question-sign"></span> Help</button>-->
   </div>
   <div id="ImmuneHeatmapDiv" style="width:95%;margin:auto;"> </div>
-
   <div class="ImmuneContainer">
-    <div class="legend-box-area">
-      <div id="ImmuneFloatContainerBtn" class="legend-box-before active">
-        <h6 class="custom-ttl">Legend</h6>
-      </div>
-
-      <div id="immnun-legend-after" class="legend-box-after">
-        <div class="box-top">
-          <h3 class="custom-ttl">Legend</h3>
-
-          <button id="ImmuneFloatContainerRemoveBtn" type="button" class="ico-btn">
-            <span class="txt-hidden">닫기</span>
-            <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
-          </button>
-        </div>
-        <div id="ImmuneFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:40rem;"></div>
-    </div>
+    <span style="font-size: 14px;font-family: fantasy;text-align: center;" id="ImmuneFloatContainerBtn">Legend</span>
+    <span style="background: #008fd8;z-index: 999;height: 15px;width:0px;position: absolute;" id="ImmuneFloatContainerRemoveBtn"></span>
+  </div>
+  <div class="ImmuneContainer" style="overflow: auto;">
+    <div id="ImmuneFloatContainer" style="font-size: 10px;"></div>
   </div>
 </div>
 
 <style type="text/css">
   .ImmuneContainer{
-    width: 0px;border-radius: 0 15px 15px 0;height: 25rem;
-    background: #f2f5fb;position: absolute; top: 8.5rem;right: 5rem;z-index: 999;
+    width: 0px;border-radius: 0 15px 15px 0;height: 33rem;
+    background: #f2f5fb;position: absolute; top: 235px;right: 0rem;z-index: 999;
   }
+ .ImmuneContainer #ImmuneFloatContainerBtn{display: block; background: #008fd8;width: 45px;
+    border-radius: 4px 4px 4px 4px;font-size: 20px;line-height: 30px;right:5rem;
+    position: relative;z-index: 999;}
 </style>
 
 <script type="text/javascript">
@@ -61,22 +65,24 @@ var subGenArray = []
 
     $('#ImmuneFloatContainerBtn').click(function(){
 
-      $(this).removeClass('active');
-      $('#immnun-legend-after').addClass('active');
-
-      $('.ImmuneContainer').css({right:'0px'});
-      $('.ImmuneContainer').css({width:'25rem'});
+      $('.ImmuneContainer').animate({right:'0px'});
+      $('.ImmuneContainer').css({width:'24rem'});
+      $('#ImmuneFloatContainerRemoveBtn').addClass("glyphicon glyphicon-remove");
+      $('#ImmuneFloatContainerRemoveBtn').show();
+      $('#ImmuneFloatContainerRemoveBtn').css({width:'15px'});
+      $('#ImmuneFloatContainerBtn').hide();
       $(".ImmuneContainer").css("z-index","auto");
       ImmunLayer();
      });
 
     $('#ImmuneFloatContainerRemoveBtn').click(function(){
       $('#ImmuneFloatContainer').empty();
+        //$('.ImmuneContainer').animate({right:'-24rem'});
       $('.ImmuneContainer').css({width:'0px'});
-      $('.ImmuneContainer').css({right:'5rem'});
+      $('#ImmuneFloatContainerRemoveBtn').hide();
+      $('#ImmuneFloatContainerBtn').show();
+      $('#ImmuneFloatContainerRemoveBtn').css({width:'0px'});
       $(".ImmuneContainer").css("z-index","999");
-      $('#ImmuneFloatContainerBtn').addClass('active');
-      $('#immnun-legend-after').removeClass('active');
     });
 
     $.ajax({
@@ -194,7 +200,7 @@ var subGenArray = []
   function ImmunLayer(){
     //debugger;
     var colorMap = immunMorpheus.project.columnColorModel.vectorNameToColorMap.map;
-    var htmlStr="<table style='font-size: 11px;border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
+    var htmlStr="<div style='height: 5px;'></div><table style='font-size: 10px;'><tr>";
       var substr="";
       var i = 1;
       //debugger;
@@ -206,7 +212,7 @@ var subGenArray = []
           
           if(colo==null || colo=="" || colo==undefined){
             htmlStr += "<td style='text-align: center;'>"+k.key+"</td>";
-            substr += "<td style='height: fit-content;'><div style='height: 5px;'></div><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
+            substr += "<td style='height: fit-content;'><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>";
             $.map(subArr,function(key,value){        
               substr += "<tr><td bgcolor='"+key.value+"' height='15' width='15'></td>"+
                 "<td>"+key.key+"</td></tr>";
