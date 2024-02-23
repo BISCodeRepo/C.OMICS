@@ -4,19 +4,15 @@
     flex-direction: column;
     height: 76vh;
   }
- 
- 
-  .box {
+
+  .comparison-box {
     flex: 1;
     display: flex;
     /* justify-content: center;
     align-items: center; */
   }
- 
- 
- 
- 
-  .char-div {
+
+  .comparison-char-div {
     width: 48%;
     height: 45vh;
   }
@@ -425,6 +421,7 @@
  
  
     function comparisonDraw(res, allLayout, allPvalue) {
+
       $('.comparison-container1').empty();
       let boxIndex = 0
       let allKeys = Array.from(res.keys())
@@ -463,20 +460,20 @@
       allKeys.forEach((value, index) => {
         if ((boxIndex & 1) === 0) {
           // 创建一个新的 box1 元素
-          let newBox = $('<div class="box"></div>');
-          newBox.attr('id', `box${Math.floor(boxIndex / 2)}`);
-          charDiv = $('<div class="char-div"></div>');
-          charDiv.attr('id', `myDiv${boxIndex}`);
+          let newBox = $('<div class="comparison-box"></div>');
+          newBox.attr('id', `comparison-box${Math.floor(boxIndex / 2)}`);
+          charDiv = $('<div class="comparison-char-div"></div>');
+          charDiv.attr('id', `comparison-myDiv${boxIndex}`);
           newBox.append(charDiv);
           $('.comparison-container1').append(newBox);
         } else {
-          let newBox = $('#box' + Math.floor(boxIndex / 2))
-          charDiv = $('<div class="char-div"></div>');
-          charDiv.attr('id', `myDiv${boxIndex}`);
+          let newBox = $('#comparison-box' + Math.floor(boxIndex / 2))
+          charDiv = $('<div class="comparison-char-div"></div>');
+          charDiv.attr('id', `comparison-myDiv${boxIndex}`);
           newBox.append(charDiv);
         }
         // console.log(allLayout.get(value))
-        Plotly.newPlot("myDiv" + boxIndex, res.get(value), allLayout.get(value));
+        Plotly.newPlot("comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value));
         boxIndex++;
       })
  
