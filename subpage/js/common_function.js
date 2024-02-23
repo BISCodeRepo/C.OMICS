@@ -1,10 +1,12 @@
 ///////////////////////새로고침 화면 로드//////////////////////////////
 function showSpinner() {
-  document.getElementsByClassName('layerPopup')[0].style.display='block';
+  var lastIndex = document.getElementsByClassName('layerPopup').length-1;
+  document.getElementsByClassName('layerPopup')[lastIndex].style.display='block';
 }
 
 function hideSpinner() {
-  document.getElementsByClassName('layerPopup')[0].style.display='none';
+  var lastIndex = document.getElementsByClassName('layerPopup').length-1;
+  document.getElementsByClassName('layerPopup')[lastIndex].style.display='none';
 }
 
 /////////////////////// HeatMap 그리기//////////////////////////////
