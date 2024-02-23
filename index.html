@@ -165,6 +165,9 @@
         dropdownOpen();
 
         $("#mymenu li").click(function(){
+
+          $('#mymenu li a').removeClass('active');
+          $($(this).children()[0]).addClass('active');
             
             if($(this).attr('name') != undefined){
                 $('#NMFmainContent').hide();

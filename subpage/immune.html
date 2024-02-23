@@ -19,19 +19,19 @@
   <div class="ImmuneContainer">
     <div class="legend-box-area">
       <div id="ImmuneFloatContainerBtn" class="legend-box-before active">
-        <h6 class="custom-ttl">Legend</h6>
+        <h6 class="custom-ttp">Legend</h6>
       </div>
 
       <div id="immnun-legend-after" class="legend-box-after">
         <div class="box-top">
-          <h3 class="custom-ttl">Legend</h3>
+          <h3 class="custom-ttp">Legend</h3>
 
           <button id="ImmuneFloatContainerRemoveBtn" type="button" class="ico-btn">
             <span class="txt-hidden">닫기</span>
             <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
           </button>
         </div>
-        <div id="ImmuneFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:40rem;"></div>
+        <div id="ImmuneFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:30rem;"></div>
     </div>
   </div>
 </div>
@@ -39,7 +39,7 @@
 <style type="text/css">
   .ImmuneContainer{
     width: 0px;border-radius: 0 15px 15px 0;height: 25rem;
-    background: #f2f5fb;position: absolute; top: 8.5rem;right: 5rem;z-index: 999;
+    background: #f2f5fb;position: absolute; top: 31.5rem;right: 5rem;z-index: 999;
   }
 </style>
 
@@ -65,7 +65,7 @@ var subGenArray = []
       $('#immnun-legend-after').addClass('active');
 
       $('.ImmuneContainer').css({right:'0px'});
-      $('.ImmuneContainer').css({width:'25rem'});
+      $('.ImmuneContainer').css({width:'24rem'});
       $(".ImmuneContainer").css("z-index","auto");
       ImmunLayer();
      });
