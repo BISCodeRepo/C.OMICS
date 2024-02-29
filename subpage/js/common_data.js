@@ -55,8 +55,7 @@ var nmfMetaObj = {
     "vectors" :[]
   }
 
-
-var nmfData = []
+var allData = []
 var myPopup = null;
 
 var toolbarMenu = {

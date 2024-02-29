@@ -77,7 +77,7 @@
                   <ul class="custom-header-nav-grp" id="mymenu">
 
                     <li class="custom-header-nav">
-                      <a href="index.html" class="link active">HOME</a>
+                      <a href="mainindex.html" class="link active">HOME</a>
                     </li>
         
                     <li class="custom-header-nav" name="NMF">
@@ -251,6 +251,17 @@
               metaArray = data.split('\n');
             }
         });   
+
+        $.ajax({
+          type:"GET",    
+          url: "../file/tumer_nmf_all.csv", 
+          data:[],   
+          dataType:"text", 
+          cache:false,
+          success:function(data){   
+            allData = data.split('\n');
+          }
+      });
  
     });
    

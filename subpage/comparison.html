@@ -129,9 +129,6 @@
  
  
  
- 
- 
- 
     function getComparisonData() {
       showSpinner('comparisonContent');
       const patientData = metaArray;
@@ -161,7 +158,7 @@
       });
  
  
- 
+      
  
       $.ajax({
         type: "GET",
@@ -276,6 +273,8 @@
         },
       });
     }
+
+    hideSpinner('comparisonContent');
     getComparisonData()
  
  
@@ -490,7 +489,7 @@
         }
         const dataToSend = { allData };
         $.ajax({
-          url: 'http://localhost:8080/rank_sums',
+          url: 'http://166.104.110.34:5000/rank_sums',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(dataToSend),
@@ -533,7 +532,7 @@
         }
         const dataToSend = { allData };
         $.ajax({
-          url: 'http://localhost:8080/kruskal_wallis',
+          url: 'http://166.104.110.34:5000/kruskal_wallis',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(dataToSend),
