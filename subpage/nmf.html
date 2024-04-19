@@ -5,7 +5,7 @@
   <div class="component-item">
     <h3 class="component-ttl"></h3>
     <div class="white-bd-box search-01-box">
-      <h3 class="custom-ttl">Genes of intereset (max, 10)</h3>
+      <h3 class="custom-ttl">Genes of intereset (max. 10)</h3>
       <div class="" style="width: 100%;max-height: 150px;">
         <input type="text" id="nmfGenesOpt" data-width="95%" name="nmfGenesSelect" value="CSNK2A1,KRAS,ERBB2,XPO1,TP53,EGFR"/>
       </div>
@@ -19,8 +19,8 @@
 
   <div class="nmfContainer">
     <div class="legend-box-area">
-      <div id="nmfFloatContainerBtn" class="legend-box-before active">
-        <h6 class="custom-ttp">Legend</h6>
+      <div id="nmfFloatContainerBtn" class="legend-box-before active" style="background: #6AC99D;">
+        <h6 class="custom-ttp" style="color:#ffff">Legend</h6>
       </div>
 
       <div id="nmf-legend-after" class="legend-box-after">
@@ -180,7 +180,7 @@ var subGenArray = []
     var substr="";
     var i = 1;
     $.map(colorMap, function(k, v){
-        if(k.key !="Sample.ID"){
+        if(k.key !="Sample ID"){
           htmlStr += "<td style='text-align: center;'>"+k.key+"</td>";
           var newArr = $.map(k.value,function(key,value){return key});
           var subArr = $.map(newArr[0],function(key,value){return key});
@@ -328,7 +328,7 @@ function paintNmfHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaA
           for(var j=0;j<patientTmp.length;j++){
             putArray.push(tmpArray[patientTmp[j]]);
           }
-          if(colValue=='Sample.ID'){
+          if(colValue=='Sample ID'){
             metaList.push({
               'name':colValue,
               'array':subPatient

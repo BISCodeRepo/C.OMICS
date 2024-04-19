@@ -18,8 +18,8 @@
 
   <div class="ImmuneContainer">
     <div class="legend-box-area">
-      <div id="ImmuneFloatContainerBtn" class="legend-box-before active">
-        <h6 class="custom-ttp">Legend</h6>
+      <div id="ImmuneFloatContainerBtn" class="legend-box-before active" style="background: #6AC99D;">
+        <h6 class="custom-ttp" style="color:#ffff">Legend</h6>
       </div>
 
       <div id="immnun-legend-after" class="legend-box-after">
@@ -193,7 +193,7 @@ var subGenArray = []
       var i = 1;
       //debugger;
       $.map(colorMap, function(k, v){
-        if(k.key !="Sample.ID"){
+        if(k.key !="Sample ID"){
           var colo = immuneMetaGradientName[k.key];
           var newArr = $.map(k.value,function(key,value){return key});
           var subArr = $.map(newArr[0],function(key,value){return key});
@@ -371,7 +371,7 @@ function paintInmuneHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,me
           for(var j=0;j<patientTmp.length;j++){
             putArray.push(tmpArray[patientTmp[j]]);
           }
-          if(colValue=='Sample.ID'){
+          if(colValue=='Sample ID'){
             metaList.push({
               'name':colValue,
               'array':subPatient
@@ -394,7 +394,7 @@ function paintInmuneHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,me
     "columns": subPatient.length,
     "seriesArrays": [finalDataArray],
     "seriesDataTypes": ["Float32"],
-    "seriesNames": ["NMF"],
+    "seriesNames": ["Immune"],
     "rowMetadataModel": {
       "vectors": [{
         "name": "Gene",
