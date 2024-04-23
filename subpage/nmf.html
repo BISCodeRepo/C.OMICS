@@ -19,8 +19,8 @@
 
   <div class="nmfContainer">
     <div class="legend-box-area">
-      <div id="nmfFloatContainerBtn" class="legend-box-before active" style="background: #6AC99D;">
-        <h6 class="custom-ttp" style="color:#ffff">Legend</h6>
+      <div id="nmfFloatContainerBtn" class="legend-box-before">
+        <h6 class="custom-ttp">Legend</h6>
       </div>
 
       <div id="nmf-legend-after" class="legend-box-after">
@@ -68,37 +68,28 @@ var subGenArray = []
       NmfLayer();
     });
 
-  $('#nmfFloatContainerRemoveBtn').click(function(){
-    $('#nmfFloatContainer').empty();
-    $('.nmfContainer').css({width:'0px'});
-    $('.nmfContainer').css({right:'5rem'});
-    $(".nmfContainer").css("z-index","999");
-    $('#nmfFloatContainerBtn').addClass('active');
-    $('#nmf-legend-after').removeClass('active');
-  });
+    $('#nmfFloatContainerRemoveBtn').click(function(){
+      $('#nmfFloatContainer').empty();
+      $('.nmfContainer').css({width:'0px'});
+      $('.nmfContainer').css({right:'5rem'});
+      $(".nmfContainer").css("z-index","999");
+      $('#nmfFloatContainerBtn').addClass('active');
+      $('#nmf-legend-after').removeClass('active');
+    });
 
-  var nmfData = allData;
-  getNmfData(nmfData);
+    var nmfData = allData;
+    getNmfData(nmfData);
 
-  hideSpinner('nmfContent');
+    $('#nmf-legend-after').addClass('active');
 
+    $('.nmfContainer').css({right:'0px'});
+    $('.nmfContainer').css({width:'24rem'});
+    $(".nmfContainer").css("z-index","auto");
+  
+    hideSpinner('nmfContent');
 
-    /*$.ajax({
-      type:"GET",    
-      url: "../file/tumer_nmf_all.csv", 
-      data:[],   
-      dataType:"text", 
-      cache:false, 
-      //timeout:8000,
-      success:function(data){   
-        //debugger
-        nmfData = data.split('\n');
-        //load nmf data
-        getNmfData(nmfData)
+    NmfLayer();
 
-        hideSpinner()
-      }
-    });*/
 
     $('#nmfSelectBtn').click(function(){
 
@@ -277,6 +268,8 @@ var subGenArray = []
     }
     
     nmfMorpheus = paintNmfHeatMap(subUniprotArray,patientsArray,subDataArray,'nmfHeatmapDiv',metaArray,subLinkArray)
+
+    return nmfMorpheus
 
   }
 

@@ -67,75 +67,99 @@
     .th-text-align {
       text-align: center
     }
+    .progress-bar {
+      width:300px;
+      height:30px;
+      background-color:#f0f0f0;
+      border-radius:10px;
+      overflow:hidden;
+      margin-top:20%;
+      margin-left: 46%;
+    }
+    .progress-bar-inner{
+      height:100%;
+      background-color: #5bb78c;
+      width:0;
+      transition:width 0.5s;
+    }
     </style>
 </head>
 <body>
     <div class="components-page">
-        <div class="component-item">
-            <header class="custom-header">
-                <div class="custom-header-inner">
-                  <ul class="custom-header-nav-grp" id="mymenu">
+      <div class="component-item">
+          <header class="custom-header">
+              <div class="custom-header-inner">
+                <ul class="custom-header-nav-grp" id="mymenu">
 
-                    <li class="custom-header-nav">
-                      <a href="mainindex.html" class="link active">HOME</a>
-                    </li>
-        
-                    <li class="custom-header-nav" name="NMF">
-                      <a href="#" class="link">NMF Cluster</a>
-                    </li>
-        
-                    <li class="custom-header-nav" name="IMMUNE">
-                      <a href="#" class="link">Immune Cluster</a>
-                    </li>
-        
-                    <li class="custom-header-nav" style="z-index: 999;">
-                      <a href="#" class="link">Quantitation</a>
-        
-                      <div class="custom-header-sub-nav-grp">
-                        <ul>
-                          <li class="custom-header-sub-nav" name="PROTEIN">
-                            <a href="#" class="sub-link">Protein</a>
-                          </li>
-                          <li class="custom-header-sub-nav" name="PHOSPHO">
-                            <a href="#" class="sub-link">Phosphosite</a>
-                          </li>
-                          <li class="custom-header-sub-nav" name="ACETYL">
-                            <a href="#" class="sub-link">Acetylsite</a>
-                          </li>
-                          <li class="custom-header-sub-nav" name="RNA">
-                            <a href="#" class="sub-link">RNA</a>
-                          </li>
-                        </ul>
-                      </div>
-                    </li>
-        
-                    <li class="custom-header-nav" name="COMPARISON">
-                      <a href="#" class="link">Group comparison</a>
-                    </li>
-        
-                    <li class="custom-header-nav" name="SURVIVAL">
-                      <a href="#" class="link">Survival analysis</a>
-                    </li>
+                  <li class="custom-header-nav">
+                    <a href="mainindex.html" class="link active">HOME</a>
+                  </li>
+      
+                  <li class="custom-header-nav" name="NMF">
+                    <a href="#" class="link">NMF Cluster</a>
+                  </li>
+      
+                  <li class="custom-header-nav" name="IMMUNE">
+                    <a href="#" class="link">Immune Cluster</a>
+                  </li>
+      
+                  <li class="custom-header-nav" style="z-index: 999;">
+                    <a href="#" class="link">Quantitation</a>
+      
+                    <div class="custom-header-sub-nav-grp">
+                      <ul>
+                        <li class="custom-header-sub-nav" name="PROTEIN">
+                          <a href="#" class="sub-link">Protein</a>
+                        </li>
+                        <li class="custom-header-sub-nav" name="PHOSPHO">
+                          <a href="#" class="sub-link">Phosphosite</a>
+                        </li>
+                        <li class="custom-header-sub-nav" name="ACETYL">
+                          <a href="#" class="sub-link">Acetylsite</a>
+                        </li>
+                        <li class="custom-header-sub-nav" name="RNA">
+                          <a href="#" class="sub-link">RNA</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+      
+                  <li class="custom-header-nav" name="COMPARISON">
+                    <a href="#" class="link">Group comparison</a>
+                  </li>
+      
+                  <li class="custom-header-nav" name="SURVIVAL">
+                    <a href="#" class="link">Survival analysis</a>
+                  </li>
 
-                    <li class="custom-header-nav" name="ABOUT">
-                        <a href="/subpage/nmf_help.html" target="_blank" class="link">About</a>
-                      </li>
-                  </ul>
-                </div>
-              </header>
-            </div>          
+                  <li class="custom-header-nav" name="ABOUT">
+                      <a href="/subpage/nmf_help.html" target="_blank" class="link">About</a>
+                    </li>
+                </ul>
+              </div>
+            </header>
+          </div>          
+      </div>
+      <div id="homeContent" style="overflow: hidden;">
+        <div class="layerPopup">
+            <div class="progress-bar">
+              <span id="progressBarCount" style="position: absolute;margin-top: 3px;"></span>
+              <div class="progress-bar-inner"></div>
+            </div>
         </div>
-    </div>
-    <div id="mainContent">
-        <div id="NMFmainContent"></div>
-        <div id="IMMUNEmainContent"></div>
-        <div id="PROTEINmainContent"></div>
-        <div id="PHOSPHOmainContent"></div>
-        <div id="ACETYLmainContent"></div>
-        <div id="GENEmainContent"></div>
-        <div id="COMPARISONmainContent"></div>
-        <div id="SURVIVALmainContent"></div>
-    </div>
+        <div id="mainContent">
+          <div id="NMFmainContent"></div>
+          <div id="IMMUNEmainContent"></div>
+          <div id="PROTEINmainContent"></div>
+          <div id="PHOSPHOmainContent"></div>
+          <div id="ACETYLmainContent"></div>
+          <div id="GENEmainContent"></div>
+          <div id="COMPARISONmainContent"></div>
+          <div id="SURVIVALmainContent"></div>
+      </div>
+      </div>
+    
+  </div>
 </body>
 
 <script type="text/javascript">
@@ -240,6 +264,24 @@
             }
             
         });
+        showSpinner('homeContent');
+
+        var percentage= 0;
+        $(".progress-bar-inner").width(percentage+"%");
+        $("#progressBarCount").text("0%");
+
+        setInterval(function(){
+          percentage+=10;
+          $(".progress-bar-inner").width(percentage+"%");
+          $("#progressBarCount").text(percentage+"%");
+
+          if(percentage>=110){
+            $(".progress-bar-inner").width(0+"%");
+            $("#progressBarCount").text(0+"%");
+            clearInterval();
+            hideSpinner('homeContent');
+          }
+        },1500);
 
         $.ajax({
             type:"GET",    
@@ -261,8 +303,8 @@
           success:function(data){   
             allData = data.split('\n');
           }
-      });
- 
+        });
+        
     });
    
   </script>
