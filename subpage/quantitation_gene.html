@@ -45,7 +45,7 @@
     $('#gene-legend-after').addClass('active');
 
     $('.geneContainer').css({right:'0px'});
-    $('.geneContainer').css({width:'22rem'});
+    $('.geneContainer').css({width:'24rem'});
     $(".geneContainer").css("z-index","auto");
 
     $('#geneFloatContainerBtn').click(function(){
@@ -54,7 +54,7 @@
       $('#gene-legend-after').addClass('active');
 
       $('.geneContainer').css({right:'0px'});
-      $('.geneContainer').css({width:'22rem'});
+      $('.geneContainer').css({width:'24rem'});
       $(".geneContainer").css("z-index","auto");
       geneLayer();
     });
@@ -88,7 +88,7 @@
 
     let gene_rows = geneAllData.slice(1).map((row) => row.trim().split(","));
     gene_rows.map((row) => {
-      gene_rowHeader.push(row[1])
+      gene_rowHeader.push(row[2])
       //protein_link.push(row[1])
     });
     gene_rows.map((row) => {
