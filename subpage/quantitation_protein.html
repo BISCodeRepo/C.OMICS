@@ -4,7 +4,7 @@
     <div class="spinner"></div>
   </div>
 
-  <div id="proteinheatmapDiv" style="width: 95%; height: 600px;margin: auto;"></div>
+  <div id="proteinheatmapDiv" style="width: 95%; margin: auto;"></div>
 
   <div class="proteinContainer">
     <div class="legend-box-area">
@@ -34,13 +34,22 @@
   </style>
 
   <script type="text/javascript">
-    var matrix = []
-    var rowHeader = []
-    var link = []
-    var metaData = []
-    var patientData = []
+    var protein_matrix = []
+    var protein_rowHeader = []
+    var protein_link = []
+    var protein_metaData = []
+    var protein_patientData = []
+    var proteinMorpheus=null;
 
     showSpinner('proteinConent');
+
+    $('#protein-legend-after').addClass('active');
+ 
+ 
+    $('.proteinContainer').css({right:'0px'});
+    $('.proteinContainer').css({width:'24rem'});
+    $(".proteinContainer").css("z-index","auto");
+
 
     $('#proteinFloatContainerBtn').click(function(){
       $(this).removeClass('active');
@@ -61,45 +70,52 @@
       $('#protein-legend-after').removeClass('active');
     });
 
-
-    $.ajax({
-      type: "GET",
-      url: "../file/Quantitation_proteins.csv",
-      dataType: "text",
-      cache: false,
-      success: function (data) {
-        data = data.split("\n");
-        let seqPateint = data[0].split(",").slice(2)
-        let rows = data.slice(1).map((row) => row.split(","));
-        rows.map((row) => {
-          rowHeader.push(row[0])
-          link.push(row[0])
-        });
-        rows.map((row) => {
-          matrix.push(row.slice(2))
-        });
-        data = metaArray;
-        rows = data.map((row) => row.split(","));
-        rows = dataToArray(rows)
-        let tempRows = rows.slice(1)
-        tempRows = tempRows.filter((row) => seqPateint.includes(row[0]))
-        rows = rows.slice(0, 1)
-        tempRows.forEach(element => rows.push(element));
-        rows = dataToArray(rows)
-        const patientHeader = []
-        rows.map((row) => {
-          patientHeader.push(row[0])
-          patientData.push(row.slice(1))
-        });
-        for (let i = 0; i < patientHeader.length; i++) {
-          metaData.push({
-            name: patientHeader[i],
-            array: patientData[i]
-          })
-        }
-        drawProteinHeatMap();
-      },
+    var proteinAllData = []
+    var proteinTmp = allData
+    
+    $.each(proteinTmp,function(n,v){
+      var tmp = v.split(",");
+      if(n==0){
+        proteinAllData.push(v)
+      }
+      
+      if(tmp[0] == 'PROTEIN'){
+        proteinAllData.push(v)
+      }
     });
+
+    let protein_seqPateint = proteinAllData[0].trim().split(",").slice(4);
+
+    let protein_rows = proteinAllData.slice(1).map((row) => row.trim().split(","));
+    protein_rows.map((row) => {
+      protein_rowHeader.push(row[1])
+      protein_link.push(row[1])
+    });
+    protein_rows.map((row) => {
+      protein_matrix.push(row.slice(4))
+    });
+
+
+    data = metaArray;
+    protein_rows = data.map((row) => row.trim().split(","));
+    protein_rows = dataToArray(protein_rows);
+    var tempRows = protein_rows.slice(1)
+    tempRows = tempRows.filter((row) => protein_seqPateint.includes(row[0]));
+    protein_rows = protein_rows.slice(0, 1)
+    tempRows.forEach(element => protein_rows.push(element));
+    protein_rows = dataToArray(protein_rows)
+    var patientHeader = []
+    protein_rows.map((row) => {
+      patientHeader.push(row[0])
+      protein_patientData.push(row.slice(1))
+    });
+    for (let i = 0; i < patientHeader.length; i++) {
+      protein_metaData.push({
+        name: patientHeader[i],
+        array: protein_patientData[i]
+      })
+    }
+    drawProteinHeatMap();
 
 
     function dataToArray(array) {
@@ -116,29 +132,28 @@
       return transposed;
     }
 
-    var proteinMorpheus=null;
     //draw
     function drawProteinHeatMap() {
       let json = {
-        rows: rowHeader.length,
-        columns: patientData[0].length,
-        seriesArrays: [matrix],
+        rows: protein_rowHeader.length,
+        columns: protein_patientData[0].length,
+        seriesArrays: [protein_matrix],
         seriesDataTypes: ["Float32"],
         seriesNames: ["Protein"],
         rowMetadataModel: {
           vectors: [
             {
               name: "Protein",
-              array: rowHeader,
+              array: protein_rowHeader,
             },
             {
               name: "Link",
-              array: link,
+              array: protein_link,
             }
           ],
         },
         columnMetadataModel: {
-          vectors: metaData
+          vectors: protein_metaData
         },
       };
 
@@ -157,13 +172,18 @@
       if(event.currentTarget.className == 'morpheus'){
         if (proteinMorpheus.selectedRowTrackName == 'Link' && ((event.button == 0) || (event.which == 1))) {
           var index = proteinMorpheus.project.hoverRowIndex
-          var target = link[index]
+          var target = protein_link[index]
           window.open('https://www.uniprot.org/uniprotkb/'+target+'/entry', '_blank');          
         }
         proteinMorpheus.selectedRowTrackName = ''
       }
       
     });
+
+
+    setTimeout(function(){
+      proteinLayer();
+    },1000);
 
     function proteinLayer(){
       
@@ -196,5 +216,5 @@
 
       $('#proteinFloatContainer').append(htmlStr);
 
-  }
+    }
   </script>

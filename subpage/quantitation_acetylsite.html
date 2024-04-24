@@ -4,7 +4,7 @@
       <div class="spinner"></div>
     </div>
 
-    <div id="aceHeatmapDiv" style="width: 95%; height: 600px;margin: auto;"></div>
+    <div id="aceHeatmapDiv" style="width: 95%;margin: auto;"></div>
     <div class="acetylContainer">
       <div class="legend-box-area">
         <div id="acetylFloatContainerBtn" class="legend-box-before">
@@ -32,13 +32,20 @@
   </style>
   <script type="text/javascript">
 
-    var matrix = []
-    var rowHeader = []
-    var link = []
-    var metaData = []
-    var patientData = []
+    var acetyl_matrix = []
+    var acetyl_rowHeader = []
+    var acetyl_link = []
+    var acetyl_metaData = []
+    var acetyl_patientData = []
+    var acetylsiteMorpheus=null;
 
     showSpinner('acetylsiteContent');
+
+    $('#acetyl-legend-after').addClass('active');
+
+    $('.acetylContainer').css({right:'0px'});
+    $('.acetylContainer').css({width:'24rem'});
+    $(".acetylContainer").css("z-index","auto");
 
     $('#acetylFloatContainerBtn').click(function(){
       $(this).removeClass('active');
@@ -59,45 +66,52 @@
       $('#acetyl-legend-after').removeClass('active');
     });
 
-    $.ajax({
-      type: "GET",
-      url: "../file/Quantitation_acetyl.csv",
-      dataType: "text",
-      cache: false,
-      success: function (data) {
-        data = data.split("\n");
-        let seqPateint = data[0].split(",").slice(3)
-        let rows = data.slice(1).map((row) => row.split(","));
-        rows.map((row) => {
-          rowHeader.push(row[0])
-          link.push(row[0].split("_")[0])
-        });
-        rows.map((row) => {
-          matrix.push(row.slice(3))
-        });
-        data = metaArray;
-        rows = data.map((row) => row.split(","));
-        rows = dataToArray(rows)
-        let tempRows = rows.slice(1)
-        tempRows = tempRows.filter((row) => seqPateint.includes(row[0]))
-        rows = rows.slice(0, 1)
-        tempRows.forEach(element => rows.push(element));
-        rows = dataToArray(rows)
-        const patientHeader = []
-        rows.map((row) => {
-          patientHeader.push(row[0])
-          patientData.push(row.slice(1))
-        });
-        for (let i = 0; i < patientHeader.length; i++) {
-          metaData.push({
-            name: patientHeader[i],
-            array: patientData[i]
-          })
-        }
-
-        drawAcetylHeatMap(matrix, rowHeader);
-      },
+    var acetylAllData = []
+    var acetylTmp = allData
+    
+    $.each(acetylTmp,function(n,v){
+      var tmp = v.split(",");
+      if(n==0){
+        acetylAllData.push(v)
+      }
+      
+      if(tmp[0] == 'ACETYL'){
+        acetylAllData.push(v)
+      }
     });
+
+    let acetyl_seqPateint = acetylAllData[0].trim().split(",").slice(4);
+
+    let acetyl_rows = acetylAllData.slice(1).map((row) => row.trim().split(","));
+    acetyl_rows.map((row) => {
+      acetyl_rowHeader.push(row[1]);
+      acetyl_link.push(row[1].split('_')[0])
+    });
+    acetyl_rows.map((row) => {
+      acetyl_matrix.push(row.slice(4))
+    });
+
+    data = metaArray;
+    acetyl_rows = data.map((row) => row.trim().split(","));
+    acetyl_rows = dataToArray(acetyl_rows);
+    var tempRows = acetyl_rows.slice(1)
+    tempRows = tempRows.filter((row) => acetyl_seqPateint.includes(row[0]));
+    acetyl_rows = acetyl_rows.slice(0, 1)
+    tempRows.forEach(element => acetyl_rows.push(element));
+    acetyl_rows = dataToArray(acetyl_rows)
+    var patientHeader = []
+    acetyl_rows.map((row) => {
+      patientHeader.push(row[0])
+      acetyl_patientData.push(row.slice(1))
+    });
+    for (let i = 0; i < patientHeader.length; i++) {
+      acetyl_metaData.push({
+        name: patientHeader[i],
+        array: acetyl_patientData[i]
+      })
+    }
+
+    drawAcetylHeatMap();
 
     
     function dataToArray(array) {
@@ -113,29 +127,29 @@
       }
       return transposed;
     }
-    var acetylsiteMorpheus=null;
+    
     //draw
     function drawAcetylHeatMap() {
       let json = {
-        rows: rowHeader.length,
-        columns: patientData[0].length,
-        seriesArrays: [matrix],
+        rows: acetyl_rowHeader.length,
+        columns: acetyl_patientData[0].length,
+        seriesArrays: [acetyl_matrix],
         seriesDataTypes: ["Float32"],
-        seriesNames: ["acetylsite"],
+        seriesNames: ["Acetylsite"],
         rowMetadataModel: {
           vectors: [
             {
-              name: "acetylsite",
-              array: rowHeader,
+              name: "Acetylsite",
+              array: acetyl_rowHeader,
             },
             {
               name: "Link",
-              array: link,
+              array: acetyl_link,
             },
           ],
         },
         columnMetadataModel: {
-          vectors: metaData
+          vectors: acetyl_metaData
         },
       };
 
@@ -154,13 +168,17 @@
       if(event.currentTarget.className == 'morpheus'){
         if (acetylsiteMorpheus.selectedRowTrackName == 'Link' && ((event.button == 0) || (event.which == 1))) {
           var index = acetylsiteMorpheus.project.hoverRowIndex
-          var target = link[index]
+          var target = acetyl_link[index]
           window.open('https://www.uniprot.org/uniprotkb/'+target+'/entry', '_blank');          
         }
         acetylsiteMorpheus.selectedRowTrackName = ''
       }
       
     });
+
+    setTimeout(function(){
+      acetylLayer();
+    },1000);
 
     function acetylLayer(){
    

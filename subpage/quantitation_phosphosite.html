@@ -3,7 +3,7 @@
     <div class="spinner"></div>
   </div>
 
-  <div id="phosphoheatmapDiv" style="width: 95%; height: 600px;margin: auto;"></div>
+  <div id="phosphoheatmapDiv" style="width: 95%;margin: auto;"></div>
 
   <div class="phosphoContainer">
     <div class="legend-box-area">
@@ -36,13 +36,20 @@
 
   <script type="text/javascript">
 
-    var matrix = []
-    var rowHeader = []
-    var link= []
-    var metaData = []
-    var patientData = []
+    var phospho_matrix = []
+    var phospho_rowHeader = []
+    var phospho_link= []
+    var phospho_metaData = []
+    var phospho_patientData = []
+    var phosphoMorpheus=null;
 
     showSpinner('phosphoContent');
+
+    $('#phospho-legend-after').addClass('active');
+
+    $('.phosphoContainer').css({right:'0px'});
+    $('.phosphoContainer').css({width:'24rem'});
+    $(".phosphoContainer").css("z-index","auto");
 
     
     $('#phosphoFloatContainerBtn').click(function(){
@@ -66,45 +73,53 @@
       $('#phospho-legend-after').removeClass('active');
     });
 
-    $.ajax({
-      type: "GET",
-      url: "../file/Quantitation_phospho.csv",
-      dataType: "text",
-      cache: false,
-      success: function (data) {
-        data = data.split("\n");
-        let seqPateint = data[0].split(",").slice(3)
-        let rows = data.slice(1).map((row) => row.split(","));
-        rows.map((row) => {
-          rowHeader.push(row[0])
-          link.push(row[0].split("_")[0])
-        });
-        rows.map((row) => {
-          matrix.push(row.slice(3))
-        });
-        data = metaArray;
-        rows = data.map((row) => row.split(","));
-        rows = dataToArray(rows)
-        let tempRows = rows.slice(1)
-        tempRows = tempRows.filter((row) => seqPateint.includes(row[0]))
-        rows = rows.slice(0, 1)
-        tempRows.forEach(element => rows.push(element));
-        rows = dataToArray(rows)
-        const patientHeader = []
-        rows.map((row) => {
-          patientHeader.push(row[0])
-          patientData.push(row.slice(1))
-        });
-        for (let i = 0; i < patientHeader.length; i++) {
-          metaData.push({
-            name: patientHeader[i],
-            array: patientData[i]
-          })
-        }
 
-        drawPhosphoHeatMap();
-      },
+    var phosphoAllData = []
+    var proteinTmp = allData
+    
+    $.each(proteinTmp,function(n,v){
+      var tmp = v.split(",");
+      if(n==0){
+        phosphoAllData.push(v)
+      }
+      
+      if(tmp[0] == 'PHOSPHO'){
+        phosphoAllData.push(v)
+      }
     });
+
+    let phospho_seqPateint = phosphoAllData[0].trim().split(",").slice(4);
+
+    let phospho_rows = phosphoAllData.slice(1).map((row) => row.trim().split(","));
+    phospho_rows.map((row) => {
+      phospho_rowHeader.push(row[1])
+      phospho_link.push(row[1].split('_')[0])
+    });
+    phospho_rows.map((row) => {
+      phospho_matrix.push(row.slice(4))
+    });
+
+
+    data = metaArray;
+    phospho_rows = data.map((row) => row.trim().split(","));
+    phospho_rows = dataToArray(phospho_rows);
+    var tempRows = phospho_rows.slice(1)
+    tempRows = tempRows.filter((row) => phospho_seqPateint.includes(row[0]));
+    phospho_rows = phospho_rows.slice(0, 1)
+    tempRows.forEach(element => phospho_rows.push(element));
+    phospho_rows = dataToArray(phospho_rows)
+    var patientHeader = []
+    phospho_rows.map((row) => {
+      patientHeader.push(row[0])
+      phospho_patientData.push(row.slice(1))
+    });
+    for (let i = 0; i < patientHeader.length; i++) {
+      phospho_metaData.push({
+        name: patientHeader[i],
+        array: phospho_patientData[i]
+      })
+    }
+    drawPhosphoHeatMap();
 
     function dataToArray(array) {
       const rows = array.length;
@@ -119,29 +134,29 @@
       }
       return transposed;
     }
-    var phosphoMorpheus=null;
+    
     //draw
     function drawPhosphoHeatMap() {
       let json = {
-        rows: rowHeader.length,
-        columns: patientData[0].length,
-        seriesArrays: [matrix],
+        rows: phospho_rowHeader.length,
+        columns: phospho_patientData[0].length,
+        seriesArrays: [phospho_matrix],
         seriesDataTypes: ["Float32"],
-        seriesNames: ["phosphorylation"],
+        seriesNames: ["Phosphorylation"],
         rowMetadataModel: {
           vectors: [
             {
-              name: "phosphorylation",
-              array: rowHeader,
+              name: "Phosphorylation",
+              array: phospho_rowHeader,
             },
             {
               name: "Link",
-              array: link,
+              array: phospho_link,
             },
           ],
         },
         columnMetadataModel: {
-          vectors: metaData
+          vectors: phospho_metaData
         },
       };
 
@@ -160,13 +175,17 @@
       if(event.currentTarget.className == 'morpheus'){
         if (phosphoMorpheus.selectedRowTrackName == 'Link' && ((event.button == 0) || (event.which == 1))) {
           var index = phosphoMorpheus.project.hoverRowIndex
-          var target = link[index]
+          var target = phospho_link[index]
           window.open('https://www.uniprot.org/uniprotkb/'+target+'/entry', '_blank');          
         }
         phosphoMorpheus.selectedRowTrackName = ''
       }
       
     });
+
+    setTimeout(function(){
+      phosphoLayer();
+    },1000);
 
     function phosphoLayer(){
    

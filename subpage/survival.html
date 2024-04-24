@@ -146,8 +146,8 @@
         let uniqueValue = unique(rowData.slice(1));
         allUniqueValue.set(rowData[0], uniqueValue);
       });
-      allUniqueValue.delete('Sample.ID');
-      allUniqueValue.delete('Subtype Membership');
+      allUniqueValue.delete('Sample ID');
+      allUniqueValue.delete('Subtype membership');
       allUniqueValue.delete('Age');
 
       //console.log(allUniqueValue)
@@ -163,7 +163,7 @@
         }
       }
       patientInfo.forEach((value) => {
-        allPatient.set(value['Sample.ID'], value)
+        allPatient.set(value['Sample ID'], value)
       });
       //console.log(allPatient)
 

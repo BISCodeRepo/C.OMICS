@@ -1,5 +1,5 @@
-var baseURL = "http://127.0.0.1:5500/";
-//var baseURL = "http://166.104.110.34:8080/";
+var baseURL = "http://127.0.0.1:5000/";
+//var baseURL = "http://166.104.112.65:5000/";
 
 var nmfMetaSortData = ['Subtype','Subtype Core','Subtype Membership','Histology','Age','Sex','Smoking','TNM stage','Pathologic-N',
 'Adjuvant Treatment','Recurrence Status','TIL pattern','Immune Cluster','Whole Genome Doubling','TP53','Other Tumor Suppressor genes',

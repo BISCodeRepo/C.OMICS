@@ -4,7 +4,7 @@
     <div class="spinner"></div>
   </div>
 
-  <div id="geneheatmapDiv" style="width: 80%; height: 600px;margin: auto;"></div>
+  <div id="geneheatmapDiv" style="width: 80%; margin: auto;"></div>
 
   <div class="geneContainer">
     <div class="legend-box-area">
@@ -34,12 +34,19 @@
 
   <script type="text/javascript">
 
-    var matrix = []
-    var rowHeader = []
-    var metaData = []
-    var patientData = []
+    var gene_matrix = []
+    var gene_rowHeader = []
+    var gene_metaData = []
+    var gene_patientData = []
+    var genesiteMorpheus=null;
 
     showSpinner('geneContent');
+
+    $('#gene-legend-after').addClass('active');
+
+    $('.geneContainer').css({right:'0px'});
+    $('.geneContainer').css({width:'22rem'});
+    $(".geneContainer").css("z-index","auto");
 
     $('#geneFloatContainerBtn').click(function(){
 
@@ -47,7 +54,7 @@
       $('#gene-legend-after').addClass('active');
 
       $('.geneContainer').css({right:'0px'});
-      $('.geneContainer').css({width:'24rem'});
+      $('.geneContainer').css({width:'22rem'});
       $(".geneContainer").css("z-index","auto");
       geneLayer();
     });
@@ -62,43 +69,53 @@
 
     });
 
-    $.ajax({
-      type: "GET",
-      url: "../file/Quantitation_genes.csv",
-      dataType: "text",
-      cache: false,
-      success: function (data) {
-        data = data.split("\n");
-        let seqPateint = data[0].split(",").slice(1)
-        let rows = data.slice(1).map((row) => row.split(","));
-        rows.map((row) => {
-          rowHeader.push(row[0])
-        });
-        rows.map((row) => {
-          matrix.push(row.slice(1))
-        });
-        data = metaArray;
-        rows = data.map((row) => row.split(","));
-        rows = dataToArray(rows)
-        let tempRows = rows.slice(1)
-        tempRows = tempRows.filter((row) => seqPateint.includes(row[0]))
-        rows = rows.slice(0, 1)
-        tempRows.forEach(element => rows.push(element));
-        rows = dataToArray(rows)
-        const patientHeader = []
-        rows.map((row) => {
-          patientHeader.push(row[0])
-          patientData.push(row.slice(1))
-        });
-        for (let i = 0; i < patientHeader.length; i++) {
-          metaData.push({
-            name: patientHeader[i],
-            array: patientData[i]
-          })
-        }
-        drawGeneHeatMap();
-      },
+
+    var geneAllData = []
+    var proteinTmp = allData
+    
+    $.each(proteinTmp,function(n,v){
+      var tmp = v.split(",");
+      if(n==0){
+        geneAllData.push(v)
+      }
+      
+      if(tmp[0] == 'RNA'){
+        geneAllData.push(v)
+      }
     });
+
+    let gene_seqPateint = geneAllData[0].trim().split(",").slice(4);
+
+    let gene_rows = geneAllData.slice(1).map((row) => row.trim().split(","));
+    gene_rows.map((row) => {
+      gene_rowHeader.push(row[1])
+      //protein_link.push(row[1])
+    });
+    gene_rows.map((row) => {
+      gene_matrix.push(row.slice(4))
+    });
+
+
+    data = metaArray;
+    gene_rows = data.map((row) => row.trim().split(","));
+    gene_rows = dataToArray(gene_rows);
+    var tempRows = gene_rows.slice(1)
+    tempRows = tempRows.filter((row) => gene_seqPateint.includes(row[0]));
+    gene_rows = gene_rows.slice(0, 1)
+    tempRows.forEach(element => gene_rows.push(element));
+    gene_rows = dataToArray(gene_rows)
+    var patientHeader = []
+    gene_rows.map((row) => {
+      patientHeader.push(row[0])
+      gene_patientData.push(row.slice(1))
+    });
+    for (let i = 0; i < patientHeader.length; i++) {
+      gene_metaData.push({
+        name: patientHeader[i],
+        array: gene_patientData[i]
+      })
+    }
+    drawGeneHeatMap();
 
     function dataToArray(array) {
       const rows = array.length;
@@ -114,26 +131,25 @@
       return transposed;
     }
 
-    var genesiteMorpheus=null;
 
     //draw
     function drawGeneHeatMap() {
       let json = {
-        rows: rowHeader.length,
-        columns: patientData[0].length,
-        seriesArrays: [matrix],
+        rows: gene_rowHeader.length,
+        columns: gene_patientData[0].length,
+        seriesArrays: [gene_matrix],
         seriesDataTypes: ["Float32"],
         seriesNames: ["Gene"],
         rowMetadataModel: {
           vectors: [
             {
               name: "Gene",
-              array: rowHeader,
+              array: gene_rowHeader,
             },
           ],
         },
         columnMetadataModel: {
-          vectors: metaData
+          vectors: gene_metaData
         },
       };
 
@@ -148,6 +164,10 @@
 
       hideSpinner('geneContent')
     }
+
+    setTimeout(function(){
+      geneLayer();
+    },1000);
 
     function geneLayer(){
       //debugger;

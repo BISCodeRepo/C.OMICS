@@ -48,6 +48,18 @@
  
   <script type="text/javascript">
 
+    var boxPlotColor =[
+      'rgba(93, 164, 214, 0.5)', 
+      'rgba(255, 144, 14, 0.5)', 
+      'rgba(44, 160, 101, 0.5)', 
+      'rgba(255, 65, 54, 0.5)', 
+      'rgba(207, 114, 255, 0.5)', 
+      'rgba(127, 96, 0, 0.5)', 
+      'rgba(255, 140, 184, 0.5)', 
+      'rgba(79, 90, 117, 0.5)', 
+      'rgba(222, 223, 0, 0.5)'
+    ]
+
  
     var $select = $('#comparison-select-tools').selectize({
       plugins: ["remove_button"],
@@ -130,19 +142,21 @@
  
  
     function getComparisonData() {
+
       showSpinner('comparisonContent');
       const patientData = metaArray;
-      const rowHeader = [];
+      const rowHeader = []
 
       patientData.map((row) => {
-        const rowData = row.replace(/(\s*)/g, "").split(",");
+        const rowData = row.trimEnd().split(",");
         rowHeader.push(rowData[0]);
         let uniqueValue = unique(rowData.slice(1));
         allUniqueValue.set(rowData[0], uniqueValue);
       });
-      allUniqueValue.delete('Sample.ID');
-      allUniqueValue.delete('Subtype Membership');
-      allUniqueValue.delete('Age');
+ 
+      allUniqueValue.delete('Sample ID');
+      //allUniqueValue.delete('Subtype membership');
+      //allUniqueValue.delete('Age');
       //get patientInfo
       for (let i = 1; i < patientData[0].split(",").length; i++) {
         patientInfo.push(new PatientMetaData());
@@ -154,10 +168,9 @@
         }
       }
       patientInfo.forEach((value) => {
-        allPatient.set(value['Sample.ID'], value)
+        allPatient.set(value['Sample ID'], value)
       });
- 
- 
+
       
  
       $.ajax({
@@ -318,7 +331,6 @@
         targetPatient.set(key, phosphositePatient)
       }
  
- 
       for (const [key, value] of targetArray) {
         let curArray = value;
         let curTarget = key;
@@ -330,7 +342,7 @@
             type: "box",
             name: uniqueValue[i],
             marker: {
-              color: color[i],
+              color: boxPlotColor[i],
             },
           })
         }
@@ -489,7 +501,7 @@
         }
         const dataToSend = { allData };
         $.ajax({
-          url: 'http://166.104.112.65:5000/rank_sums',
+          url: baseURL+'rank_sums',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(dataToSend),
@@ -524,6 +536,7 @@
  
  
     function kruskalWallisTest(data) {
+
       return new Promise((resolve, reject) => {
         let yArrays = data.map(item => item.y);
         let allData = [];
@@ -532,7 +545,7 @@
         }
         const dataToSend = { allData };
         $.ajax({
-          url: 'http://166.104.112.65:5000/kruskal_wallis',
+          url: baseURL+'kruskal_wallis',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(dataToSend),
