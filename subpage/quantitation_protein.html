@@ -84,7 +84,7 @@
       }
     });
 
-    let protein_seqPateint = proteinAllData[0].trim().split(",").slice(4);
+    let protein_seqPateint = proteinAllData[0].trimEnd().split(",").slice(4);
 
     let protein_rows = proteinAllData.slice(1).map((row) => row.trim().split(","));
     protein_rows.map((row) => {

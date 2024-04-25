@@ -14,7 +14,7 @@
 
   .comparison-char-div {
     width: 48%;
-    height: 45vh;
+    height: 46vh;
   }
  </style>
  <div id="comparisonContent">
@@ -140,8 +140,9 @@
     var res = new Map()
  
  
- 
     function getComparisonData() {
+
+      var comAllData = allData
 
       showSpinner('comparisonContent');
       const patientData = metaArray;
@@ -171,124 +172,118 @@
         allPatient.set(value['Sample ID'], value)
       });
 
+      //separate data by type(protein,rna,acetyl,phospho)
+
+      //protein
+      var proteinAllData = []
       
- 
-      $.ajax({
-        type: "GET",
-        url: "../file/Quantitation_proteins.csv",
-        dataType: "text",
-        cache: false,
-        success: function (data) {
-          data = data.split("\n");
-          proteinPatient = data[0].split(",").slice(2);
-          for (let i = 1; i < data.length; i++) {
-            const row = data[i].split(",")
-            allProtein.set(row[0], row.slice(2))
-          }
-          //"RE-P231-T\r"
-          let last = proteinPatient[proteinPatient.length - 1]
-          proteinPatient[proteinPatient.length - 1] = last.substring(0, last.length - 1)
-          // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
-          // console.log(proteinPatient)
-          // console.log(allProtein)
-          for (const key of allProtein.keys()) {
-            targetOptions.push({ id: index, title: key })
-            index++;
-          }
-          $.ajax({
-            type: "GET",
-            url: "../file/Quantitation_acetyl.csv",
-            dataType: "text",
-            cache: false,
-            success: function (data) {
-              data = data.split("\n");
-              acetlysitePatient = data[0].split(",").slice(2);
-              for (let i = 1; i < data.length; i++) {
-                const row = data[i].split(",")
-                allAcetlysite.set(row[0], row.slice(2))
-                allAcetlysite.set(row[2], row.slice(2))
-              }
-              //"RE-P231-T\r"
-              let last = acetlysitePatient[acetlysitePatient.length - 1]
-              acetlysitePatient[acetlysitePatient.length - 1] = last.substring(0, last.length - 1)
-              // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
-              // console.log(acetlysitePatient)
-              // console.log(allAcetlysite)
-              // for (const key of allAcetlysite.keys()) {
-              //   targetOptions.push({ id: index, title: key })
-              //   index++;
-              // }
- 
- 
-              $.ajax({
-                type: "GET",
-                url: "../file/Quantitation_phospho.csv",
-                dataType: "text",
-                cache: false,
-                success: function (data) {
-                  data = data.split("\n");
-                  phosphositePatient = data[0].split(",").slice(2);
-                  for (let i = 1; i < data.length; i++) {
-                    const row = data[i].split(",")
-                    allPhosphosite.set(row[0], row.slice(2))
-                    allPhosphosite.set(row[2], row.slice(2))
-                  }
-                  let last = phosphositePatient[phosphositePatient.length - 1]
-                  phosphositePatient[phosphositePatient.length - 1] = last.substring(0, last.length - 1)
-                  // 这里的样本包含正常样本，但是meta数据只有癌症患者，所以在分类数据时去除正常患者
-                  // console.log(phosphositePatient)
-                  // console.log(allPhosphosite)
-                  // for (const key of allPhosphosite.keys()) {
-                  //   targetOptions.push({ id: index, title: key })
-                  //   index++;
-                  // }
- 
- 
-                  $.ajax({
-                    type: "GET",
-                    url: "../file/Quantitation_genes.csv",
-                    dataType: "text",
-                    cache: false,
-                    success: function (data) {
-                      data = data.split("\n");
-                      genePatient = data[0].split(",").slice(1);
-                      for (let i = 1; i < data.length; i++) {
-                        const row = data[i].split(",")
-                        allGene.set(row[0], row.slice(1))
-                      }
-                      //去除多余空值
-                      genePatient = genePatient.slice(0, genePatient.indexOf(''))
-                      // console.log(genePatient)
-                      // console.log(allGene)
-                      for (const key of allGene.keys()) {
-                        targetOptions.push({ id: index, title: key })
-                        index++;
-                      }
- 
- 
-                      let groupOptions = []
-                      index = 1
-                      for (const key of allUniqueValue.keys()) {
-                        groupOptions.push({ id: index, title: key })
-                        index++;
-                      }
-                      var selectizeControl = $select[0].selectize;
-                      selectizeControl.addOption(targetOptions)
-                      var selectizeControl1 = $select1[0].selectize;
-                      selectizeControl1.addOption(groupOptions)
-                      hideSpinner('comparisonContent')
-                    },
-                  });
-                },
-              });
-            },
-          });
-        },
+      $.each(comAllData,function(n,v){
+        var tmp = v.split(",");
+        if(n==0){
+          proteinAllData.push(v)
+        }
+        
+        if(tmp[0] == 'PROTEIN'){
+          proteinAllData.push(v)
+        }
       });
+
+      proteinPatient = proteinAllData[0].trimEnd().split(",").slice(4);
+
+      for (let i = 1; i < proteinAllData.length; i++) {
+        const row = proteinAllData[i].trimEnd().split(",")
+        allProtein.set(row[1], row.slice(4))
+      }
+
+      for (const key of allProtein.keys()) {
+        targetOptions.push({ id: index, title: key })
+        index++;
+      }
+
+      //acetyl
+      var acetylAllData = []
+      
+      $.each(comAllData,function(n,v){
+        var tmp = v.split(",");
+        if(n==0){
+          acetylAllData.push(v)
+        }
+        
+        if(tmp[0] == 'ACETYL'){
+          acetylAllData.push(v)
+        }
+      });
+
+      acetlysitePatient = acetylAllData[0].trimEnd().split(",").slice(4);
+
+      for (let i = 1; i < acetylAllData.length; i++) {
+        const row = acetylAllData[i].trimEnd().split(",")
+        allAcetlysite.set(row[1], row.slice(4))
+        allAcetlysite.set(row[3], row.slice(4))
+      }
+      //phospho
+      var phosphoAllData = []
+      
+      $.each(comAllData,function(n,v){
+        var tmp = v.split(",");
+        if(n==0){
+          phosphoAllData.push(v)
+        }
+        
+        if(tmp[0] == 'PHOSPHO'){
+          phosphoAllData.push(v)
+        }
+      });
+
+      phosphositePatient = phosphoAllData[0].trimEnd().split(",").slice(4);
+
+      for (let i = 1; i < phosphoAllData.length; i++) {
+        const row = phosphoAllData[i].trimEnd().split(",")
+        allPhosphosite.set(row[1], row.slice(4))
+        allPhosphosite.set(row[3], row.slice(4))
+      }
+
+      //rna
+      var geneAllData = []
+      
+      $.each(comAllData,function(n,v){
+        var tmp = v.split(",");
+        if(n==0){
+          geneAllData.push(v)
+        }
+        
+        if(tmp[0] == 'RNA'){
+          geneAllData.push(v)
+        }
+      });
+
+      genePatient = geneAllData[0].trimEnd().split(",").slice(4);
+
+      for (let i = 1; i < geneAllData.length; i++) {
+        const row = geneAllData[i].trimEnd().split(",")
+        allGene.set(row[2], row.slice(4))
+      }
+
+      for (const key of allGene.keys()) {
+        targetOptions.push({ id: index, title: key })
+        index++;
+      }
+
+      let groupOptions = []
+      index = 1
+      for (const key of allUniqueValue.keys()) {
+        groupOptions.push({ id: index, title: key })
+        index++;
+      }
+      var selectizeControl = $select[0].selectize;
+      selectizeControl.addOption(targetOptions)
+      var selectizeControl1 = $select1[0].selectize;
+      selectizeControl1.addOption(groupOptions);
+
+      hideSpinner('comparisonContent');
     }
 
-    hideSpinner('comparisonContent');
-    getComparisonData()
+    getComparisonData();
  
  
     function unique(array) {
