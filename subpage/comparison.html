@@ -156,8 +156,8 @@
       });
  
       allUniqueValue.delete('Sample ID');
-      //allUniqueValue.delete('Subtype membership');
-      //allUniqueValue.delete('Age');
+      allUniqueValue.delete('Subtype Membership');
+      allUniqueValue.delete('Age');
       //get patientInfo
       for (let i = 1; i < patientData[0].split(",").length; i++) {
         patientInfo.push(new PatientMetaData());

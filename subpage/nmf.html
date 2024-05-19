@@ -65,7 +65,7 @@
  
  
     showSpinner('nmfContent');
- 
+    NmfLayer();
  
     $('#nmfFloatContainerBtn').click(function(){
  
@@ -154,6 +154,7 @@
  
  
       nmfMorpheus = paintNmfHeatMap(subUniprotArray,patientsArray,subDataArray,'nmfHeatmapDiv',metaArray,subLinkArray);
+
     });
  
  
@@ -182,40 +183,60 @@
  
  
   });
- 
 
-  setTimeout(function(){
-    NmfLayer();
-  },1500);
 
    function NmfLayer(){
     //debugger;
-    var colorMap = nmfMorpheus.project.columnColorModel.vectorNameToColorMap.map;
-    var htmlStr="<table style='font-size: 11px; border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
-    var substr="";
-    var i = 1;
-    $.map(colorMap, function(k, v){
-        if(k.key !="Sample ID"){
-          htmlStr += "<td style='text-align: center;'>"+k.key+"</td>";
-          var newArr = $.map(k.value,function(key,value){return key});
-          var subArr = $.map(newArr[0],function(key,value){return key});
-          substr += "<td style='height: fit-content;'><div style='height: 5px;'></div><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
-          $.map(subArr,function(key,value){
-            substr += "<tr><td bgcolor='"+key.value+"' height='15' width='15'></td>"+
-              "<td>"+key.key+"</td></tr>";
+    var colorMap = nmfMetaColorNameMap
+    var htmlStr="<table style='font-size: 11px;border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
+      var substr="";
+      var i = 1;
+      //debugger;
+      $.map(colorMap, function(k, v){
+
+        if(v=='Subtype Membership'){
+          htmlStr += "<td style='text-align: center;'>Subtype Membership</td>";
+          htmlStr += "<td style='height: fit-content;'>" +
+          "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>"+
+            "<tr><td>"+
+              "<div style='height:20px;width:98px;margin:auto; background : linear-gradient(to right,#FFFFFF,#FF6600);'></div>"+
+            "</td></tr>"+
+            "<tr><td>"+
+              "<div style='float: left;margin-left:2px'>0.3</div><div style='float:right;margin-right:2px'>1</div>"+
+            "</td></tr></table>"+
+          "<div style='height: 5px;'></div></td>" ;
+        } else if(v=='Age'){
+          htmlStr += "<td style='text-align: center;'>Age</td>";
+          htmlStr += "<td style='height: fit-content;'>" +
+          "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>"+
+            "<tr><td>"+
+              "<div style='height:20px;width:98px;margin:auto; background : linear-gradient(to right,#FFFFFF,#333333);'></div>"+
+            "</td></tr>"+
+            "<tr><td>"+
+              "<div style='float: left;margin-left:2px'>40</div><div style='float:right;margin-right:2px'>90</div>"+
+            "</td></tr></table>"+
+          "<div style='height: 5px;'></div></td>" ;
+        } else{
+          htmlStr += "<td style='text-align: center;'>"+v+"</td>";
+          substr += "<td style='height: fit-content;'><div style='height: 5px;'></div>"+
+            "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
+          $.map(k,function(key,value){        
+            substr += "<tr><td bgcolor='"+key+"' height='15' width='15'></td>"+
+              "<td>"+value+"</td></tr>";
           });
           substr += "</table><div style='height: 5px;'></div></td>";
-          if(i%1==0){
-            htmlStr += substr;
-            htmlStr +="</tr><tr>";
-            substr = "";
-          }
-          i++;
         }
-       
-    });
-    htmlStr += substr;
-    htmlStr += "</tr><tr></table>";
+
+        if(i%1==0){
+          htmlStr += substr;
+          htmlStr +="</tr><tr>";
+          substr = "";
+        }
+        i++;
+      });
+      htmlStr += substr;
+      htmlStr += "</tr><tr>";
+      htmlStr += "</table><div style='height: 5px;'></div>";
  
  
     $('#nmfFloatContainer').append(htmlStr);
@@ -566,67 +587,42 @@
   //////////////// 색상 gradient ////////////////
  function getColumnColorModel(metaList){
  
- 
-  //debugger
   let returnMap = {};
- 
- 
-  var yelloList = []
-  var greenList = []
- 
- 
-  for(var i =0;i<metaList.length;i++){
+  var orangeList = [];
+  var grayList = [];
+
+  for(var i=0;i<metaList.length;i++){
     var tmp = metaList[i];
-    var colo = immuneMetaGradientName[tmp['name']];
- 
- 
-    if(colo == 'yellow'){
-      yelloList = yelloList.concat(tmp['array'])
-    } else if(colo == 'green'){
-      greenList = greenList.concat(tmp['array'])
+    if(tmp['name']!='Subtype Membership'&&tmp['name']!='Age'){
+      var colors = nmfMetaColorNameMap[tmp['name']];
+      returnMap[tmp['name']] = colors;
+    }
+    if(tmp['name']=='Subtype Membership'){
+      orangeList = orangeList.concat(tmp['array'])
+    }
+    if(tmp['name']=='Age'){
+      grayList = grayList.concat(tmp['array'])
     }
   }
- 
- 
-  var yellowSortList = yelloList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
-  var greenSortList = greenList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
- 
- 
-  var yellowColorList = gradient_two('#0000ff','#ff0000',yellowSortList);
-  var greenColorList = gradient('#FFFFFF','#ff0000',greenSortList.length);
- 
- 
-  for(var i =0;i<metaList.length;i++){
-    var tmp = metaList[i];
-    var tmpMap = {};
-    var colo = immuneMetaGradientName[tmp['name']];
-    if(colo == 'yellow'){
-      $.each(tmp['array'],function(i,v){
-        var index = yellowSortList.indexOf(v);
-        tmpMap[v]=yellowColorList[index]
-      })
-    } else if(colo == 'green'){
-      $.each(tmp['array'],function(i,v){
-        var index = greenSortList.indexOf(v);
-        tmpMap[v]=greenColorList[index]
-      })
-    }
- 
- 
-    if(tmp['name'] == "Cell type-based IC"){
-      returnMap[tmp['name']]={'NAT-enriched':'#d8b365','CTE':'#2ca02c','HTE':'#1f77b4'};
-    } else if(tmp['name'] == 'Other Oncogene Alteration'){
-      returnMap[tmp['name']]={'None':'#ffffff','KRAS':'#aec7e8','RET':'#ff7f0e','ALK':'#ffbb78',
-                            'ERBB2':'#2ca02c','PIK3CA':'#98df8a','MET':'#d62728','KRAS_PIK3CA':'#ff9896'};
-    } else if(tmp['name'] == "Recurrence Status"){
-      returnMap[tmp['name']]={'0':'#d8b365','1':'#2ca02c','':'#ffffff'};
-    }else{
-      returnMap[tmp['name']]=tmpMap;
-    }
- 
- 
-  }
- 
+
+  var orangeSortList = orangeList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+  var graySortList = grayList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+
+  var orangeColorList = gradient('#FFFFFF','#FF6600',orangeSortList.length);
+  var grayColorList = gradient('#FFFFFF','#333333',graySortList.length);
+
+  var tmpMap = {};
+  $.each(orangeList,function(i,v){
+    var index = orangeSortList.indexOf(parseFloat(v.trim()).toFixed(3));
+    tmpMap[v]=orangeColorList[index]
+  })
+  returnMap['Subtype Membership']=tmpMap;
+  tmpMap = {};
+  $.each(grayList,function(i,v){
+    var index = graySortList.indexOf(parseFloat(v.trim()).toFixed(3));
+    tmpMap[v]=grayColorList[index]
+  })
+  returnMap['Age']=tmpMap;
  
   return returnMap;
  }

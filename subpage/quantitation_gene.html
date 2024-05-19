@@ -134,6 +134,9 @@
 
     //draw
     function drawGeneHeatMap() {
+
+      var columnColorMap = getGeneColumnColorModel(gene_metaData);
+
       let json = {
         rows: gene_rowHeader.length,
         columns: gene_patientData[0].length,
@@ -159,48 +162,176 @@
         colorScheme: {
           type: 'fixed',
         },
+        menu:toolbarMenu,
+        columnColorModel:columnColorMap
       });
       //menu: toolbarMenu
 
       hideSpinner('geneContent')
-    }
-
-    setTimeout(function(){
       geneLayer();
-    },1000);
+    }
 
     function geneLayer(){
       //debugger;
-      var colorMap = genesiteMorpheus.project.columnColorModel.vectorNameToColorMap.map;
+      var colorMap = nmfMetaColorNameMap
       var htmlStr="<table style='font-size: 11px;border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
-      var substr="";
-      var i = 1;
-      $.map(colorMap, function(k, v){
-          if(k.key !="Sample.ID"){
-            htmlStr += "<td style='text-align: center;'>"+k.key+"</td>";
-            var newArr = $.map(k.value,function(key,value){return key});
-            var subArr = $.map(newArr[0],function(key,value){return key});
-            substr += "<td style='height: fit-content;'><div style='height: 5px;'></div><table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
-            $.map(subArr,function(key,value){
-              substr += "<tr><td bgcolor='"+key.value+"' height='15' width='15'></td>"+
-                "<td>"+key.key+"</td></tr>";
+        var substr="";
+        var i = 1;
+        //debugger;
+        $.map(colorMap, function(k, v){
+  
+          if(v=='Subtype Membership'){
+            htmlStr += "<td style='text-align: center;'>Subtype Membership</td>";
+            htmlStr += "<td style='height: fit-content;'>" +
+            "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>"+
+              "<tr><td>"+
+                "<div style='height:20px;width:98px;margin:auto; background : linear-gradient(to right,#FFFFFF,#FF6600);'></div>"+
+              "</td></tr>"+
+              "<tr><td>"+
+                "<div style='float: left;margin-left:2px'>0.3</div><div style='float:right;margin-right:2px'>1</div>"+
+              "</td></tr></table>"+
+            "<div style='height: 5px;'></div></td>" ;
+          } else if(v=='Age'){
+            htmlStr += "<td style='text-align: center;'>Age</td>";
+            htmlStr += "<td style='height: fit-content;'>" +
+            "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>"+
+              "<tr><td>"+
+                "<div style='height:20px;width:98px;margin:auto; background : linear-gradient(to right,#FFFFFF,#333333);'></div>"+
+              "</td></tr>"+
+              "<tr><td>"+
+                "<div style='float: left;margin-left:2px'>40</div><div style='float:right;margin-right:2px'>90</div>"+
+              "</td></tr></table>"+
+            "<div style='height: 5px;'></div></td>" ;
+          } else{
+            htmlStr += "<td style='text-align: center;'>"+v+"</td>";
+            substr += "<td style='height: fit-content;'><div style='height: 5px;'></div>"+
+              "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
+            $.map(k,function(key,value){        
+              substr += "<tr><td bgcolor='"+key+"' height='15' width='15'></td>"+
+                "<td>"+value+"</td></tr>";
             });
             substr += "</table><div style='height: 5px;'></div></td>";
-            if(i%1==0){
-              htmlStr += substr;
-              htmlStr +="</tr><tr>";
-              substr = "";
-            }
-            i++;
           }
-          
-      });
-      htmlStr += substr;
-      htmlStr += "</tr><tr></table>";
-
+  
+          if(i%1==0){
+            htmlStr += substr;
+            htmlStr +="</tr><tr>";
+            substr = "";
+          }
+          i++;
+        });
+        htmlStr += substr;
+        htmlStr += "</tr><tr>";
+        htmlStr += "</table><div style='height: 5px;'></div>";
       $('#geneFloatContainer').append(htmlStr);
     }
 
 
-
+    function getGeneColumnColorModel(metaList){
+ 
+      let returnMap = {};
+      var orangeList = [];
+      var grayList = [];
+    
+      for(var i=0;i<metaList.length;i++){
+        var tmp = metaList[i];
+        if(tmp['name']!='Subtype Membership'&&tmp['name']!='Age'){
+          var colors = nmfMetaColorNameMap[tmp['name']];
+          returnMap[tmp['name']] = colors;
+        }
+        if(tmp['name']=='Subtype Membership'){
+          orangeList = orangeList.concat(tmp['array'])
+        }
+        if(tmp['name']=='Age'){
+          grayList = grayList.concat(tmp['array'])
+        }
+      }
+    
+      var orangeSortList = orangeList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+      var graySortList = grayList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+    
+      var orangeColorList = gradient('#FFFFFF','#FF6600',orangeSortList.length);
+      var grayColorList = gradient('#FFFFFF','#333333',graySortList.length);
+    
+      var tmpMap = {};
+      $.each(orangeList,function(i,v){
+        var index = orangeSortList.indexOf(parseFloat(v.trim()).toFixed(3));
+        tmpMap[v]=orangeColorList[index]
+      })
+      returnMap['Subtype Membership']=tmpMap;
+      tmpMap = {};
+      $.each(grayList,function(i,v){
+        var index = graySortList.indexOf(parseFloat(v.trim()).toFixed(3));
+        tmpMap[v]=grayColorList[index]
+      })
+      returnMap['Age']=tmpMap;
+     
+      return returnMap;
+     }
+     
+     
+     function ascOrder (a, b) {
+      return a - b
+     }
+     
+     
+     function rgbToHex(r, g, b){
+      var hex = ((r << 16) | (g << 8) | b).toString(16);
+      return "#" + new Array(Math.abs(hex.length - 7)).join("0") + hex;
+     }
+     // hex to rgb
+     function hexToRgb(hex){
+       var rgb = [];
+       for (var i = 1; i < 7; i += 2){
+          rgb.push(parseInt("0x" + hex.slice(i, i + 2)));
+       }
+       return rgb;
+     }
+     
+     
+     function gradient(startColor, endColor, step){
+        var sColor = hexToRgb(startColor),
+       eColor = hexToRgb(endColor);
+     
+     
+       var rStep = (eColor[0] - sColor[0]) / step,
+          gStep = (eColor[1] - sColor[1]) / step,
+          bStep = (eColor[2] - sColor[2]) / step;
+     
+     
+      var gradientColorArr = [];
+      for (var i = 0;i < step;i++){
+          gradientColorArr.push(rgbToHex(parseInt(rStep * i + sColor[0]), parseInt(gStep * i + sColor[1]), parseInt(bStep * i + sColor[2])));
+      }
+      return gradientColorArr;
+     }
+     
+     
+     function gradient_two(startColor, endColor, sortList){
+     
+     
+      var upZeroList = []
+      var downZeroList = []
+      var k = 0
+      var j = 0
+     
+     
+      $.each(sortList,function(i,v){
+        if(v>=0){
+          upZeroList[k] = v;
+          k++;
+        }else{
+          downZeroList[j] = v;
+          j++
+        }
+      });
+     
+     
+      upZeroColorArr = gradient('#FFFFFF',endColor,upZeroList.length);
+      downZeroColorArr = gradient(startColor,'#FFFFFF',downZeroList.length);
+     
+     
+     var gradientColorArr = $.merge(downZeroColorArr, upZeroColorArr)
+     return gradientColorArr;
+     }
   </script>

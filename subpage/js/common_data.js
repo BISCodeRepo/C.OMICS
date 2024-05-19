@@ -1,5 +1,5 @@
-var baseURL = "http://127.0.0.1:5000/";
-//var baseURL = "http://166.104.112.65:5000/";
+//var baseURL = "http://127.0.0.1:5000/";
+var baseURL = "http://166.104.112.65:5000/";
 
 var nmfMetaSortData = ['Subtype','Subtype Core','Subtype Membership','Histology','Age','Sex','Smoking','TNM stage','Pathologic-N',
 'Adjuvant Treatment','Recurrence Status','TIL pattern','Immune Cluster','Whole Genome Doubling','TP53','Other Tumor Suppressor genes',
@@ -134,6 +134,29 @@ class PatientMetaData {
   }
 }
 
+var nmfMetaColorNameMap = {
+  'Subtype':{'1':'#FF6666','2':'#99CCFF','3':'#FFCC33','4':'#00FF99','5':'#00CCFF'},
+  'Subtype Core':{'Y':'#000000','N':'#FFFFFF'},
+  'Subtype Membership':{'start':'#FFFFFF','end':'#FF6600'},
+  'Histology':{'AD':'#99FF99','SC':'#FF9900','NC':'#FF66CC','MA':'#6600CC','Others':'#003300'},
+  'Age':{'start':'#FFFFFF','end':'#333333'},
+  'Sex':{'F':'#3399FF','M':'#660099'},
+  'Smoking':{'Cr':'#660033','Ex':'#FF9900','N':'#CCCCCC','NA':'#666666'},
+  'TNMstage':{'IA1':'#FFFF66','IA2':'#CCFF33','IA3':'#99FF66','IB':'#33FF00',
+    'IIA':'#33CC66','IIB':'#009933','IIIA':'#009966','IIIB':'#006633','IVA':'#660099'},
+  'Pathologic_N':{'N0':'#CCCCCC','N1':'#CCCC00','N2':'#CC66CC'},
+  'Adjuvant Treatment':{'None':'#999999','CTx':'#0033FF','RTx':'#CC0000','CTx & RTX':'#9900CC'},
+  'Recurrence Status':{'NA':'#CCCCCC','0':'#666666','1':'#CC3399'},
+  'TIL_pattern':{'Unknown':'#CCCCCC','absent':'#FFFFCC','non−brisk multifocal':'#CCCC99','brisk band-Like':'#666633','brisk diffuse':'#333300'},
+  'Immune Cluster':{'Cold':'#3333FF','Hot':'#FF66CC'},
+  'Whole Genome Doubling':{'Y':'#000000','N':'#FFFFFF'},
+  'TP53':{'Not altered':'#FFFFFF','CNV.loss':'#CC6699','Mutation':'#FFCC66','Mut+CNV.loss':'#663300'},
+  'Other Tumor Suppressor genes':{'Not altered':'#FFFFFF','CNV.loss':'#CC6699','Mutation':'#FFCC66','Mut+CNV.loss':'#663300'},
+  'EGFR':{'None':'#FFFFFF','Others_Indel':'#FF9900','Others_SNV':'#0033FF','L858R':'#CCFF99','exon19_del':'#990033'},
+  'Other oncogene alteration':{'ERBB2':'#660099','KRAS':'#003300','PIK3CA':'#FF6600','KRAS_PIK3CA':'#993300',
+    'MET':'#333333','ALK':'#663333','ROS1':'#003399','RET':'#333300'}
+}
+
 
 var immuneMetaGradientName = {
   'CD8 T cells':'yellow',
@@ -152,7 +175,9 @@ var immuneMetaGradientName = {
   'Inhibitor cells':'green',
   'Priming and activation':'green',
   'T cell immunity':'green',
-  'Inhibitory molecules':'green'
+  'Inhibitory molecules':'green',
+  'Subtype Membership':'red',
+  'Age':'green'
 }
 
 const Pi = 3.141592
