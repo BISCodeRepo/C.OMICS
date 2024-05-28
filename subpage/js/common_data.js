@@ -1,5 +1,5 @@
 //var baseURL = "http://127.0.0.1:5000/";
-var baseURL = "http://166.104.112.65:5000/";
+var baseURL = "http://166.104.110.31:5000/";
 
 var nmfMetaSortData = ['Subtype','Subtype Core','Subtype Membership','Histology','Age','Sex','Smoking','TNM stage','Pathologic-N',
 'Adjuvant Treatment','Recurrence Status','TIL pattern','Immune Cluster','Whole Genome Doubling','TP53','Other Tumor Suppressor genes',
@@ -51,9 +51,6 @@ var nmfMetaDataJson = {
     "Other Oncogene Alteration":[]
 }
 
-var nmfMetaObj = {
-    "vectors" :[]
-  }
 
 var allData = []
 var myPopup = null;
@@ -158,26 +155,31 @@ var nmfMetaColorNameMap = {
 }
 
 
-var immuneMetaGradientName = {
-  'CD8 T cells':'yellow',
-  'CD4 T cells':'yellow',
-  'Tregs':'yellow',
-  'B cells':'yellow',
-  'NK cells':'yellow',
-  'Neutrophils':'yellow',
-  'DC':'yellow',
-  'Monocytes':'yellow',
-  'Macrophages':'yellow',
-  'Epithelial cells':'yellow',
-  'Recognition of tumor cells':'green',
-  'Trafficking and infiltration':'green',
-  'Checkpoint expression':'green',
-  'Inhibitor cells':'green',
-  'Priming and activation':'green',
-  'T cell immunity':'green',
-  'Inhibitory molecules':'green',
-  'Subtype Membership':'red',
-  'Age':'green'
+var immuneMetaColorNameMap = {
+  'Pathway-based IC':{'HTE':'#CC0000','CTE':'#0033CC'},
+  'TIL pattern':{'unknown':'#CCCCCC','absent':'#FFFFCC','non-brisk multifocal':'#CCCC66','brisk band-diffuse':'#CC9933','brisk diffuse':'#663300'},
+  'Histology':{'AD':'#99FF99','SC':'#FF9900','NC':'#FF66CC','MA':'#6600CC','Others':'#003300'},
+  'Multi-omics subtype':{'1':'#FF6666','2':'#99CCFF','3':'#FFCC33','4':'#00FF99','5':'#00CCFF'},
+  'Stage':{'1':'#FFFF66','2':'#CCFF33','3':'#99FF66','4':'#33FF00'},
+  'Tissue':{'Tumor':'#FF0000','Normal':'#FF9999'},
+  'Cell type-based IC':{'HTE':'#CC0000','CTE':'#0033CC','NAT-enriched':'#339900'},
+  'CD8 T cells':{'start':'#0033FF','end':'#FF0000'},
+  'CD4 T cells':{'start':'#0033FF','end':'#FF0000'},
+  'Tregs':{'start':'#0033FF','end':'#FF0000'},
+  'B cells':{'start':'#0033FF','end':'#FF0000'},
+  'NK cells':{'start':'#0033FF','end':'#FF0000'},
+  'Neutrophils':{'start':'#0033FF','end':'#FF0000'},
+  'DC':{'start':'#0033FF','end':'#FF0000'},
+  'Monocytes':{'start':'#0033FF','end':'#FF0000'},
+  'Macrophages':{'start':'#0033FF','end':'#FF0000'},
+  'Epithelial cells':{'start':'#0033FF','end':'#FF0000'},
+  'Recognition of tumor cells':{'start':'#0033FF','end':'#FF0000'},
+  'Trafficking and infiltration':{'start':'#0033FF','end':'#FF0000'},
+  'Checkpoint expression':{'start':'#0033FF','end':'#FF0000'},
+  'Inhibitor cells':{'start':'#0033FF','end':'#FF0000'},
+  'Priming and activation':{'start':'#0033FF','end':'#FF0000'},
+  'T cell immunity':{'start':'#0033FF','end':'#FF0000'},
+  'Inhibitory molecules':{'start':'#0033FF','end':'#FF0000'}
 }
 
 const Pi = 3.141592
