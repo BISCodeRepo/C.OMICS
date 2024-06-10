@@ -25,12 +25,17 @@
     <h3 class="component-ttl"></h3>
     <div class="white-bd-box search-02-box">
       <div class="box-inner">
+        <h3 class="custom-ttl2">Gene name</h3>
         <select id="comparison-select-tools" multiple placeholder="Target" style="height: 40px; width:250px;"></select>
+
+        <h3 class="custom-ttl2">Meta column</h3>
         <select id="comparison-select-tools1" multiple placeholder="Group by" style="height: 40px;width:250px;"></select>
 
         <button type="button" class="green-btn" id="comparison-apply-btn">Apply</button>
 
-        <select id="comparison-select-tools2" style="height: 40px;width:140px;"></select>
+        <!--<select id="comparison-select-tools2" style="height: 40px;width:140px;"></select>-->
+
+        <h3 class="custom-ttl2" style="margin-left: 25px;margin-right: -10px;">P-value sorting</h3>
 
         <button type="button" class="ico-btn" id="comparison-sort-icon">
           <span class="txt-hidden">필터</span>
@@ -97,7 +102,7 @@
     });
  
  
-    var sortOptions = []
+    /*var sortOptions = []
     var selectizeControl2 = $select2[0].selectize;
     sortOptions.push({ id: 1, title: 'P-Value' })
     sortOptions.push({ id: 2, title: 'Gene Name' })
@@ -110,7 +115,7 @@
         sortKey = 2
         comparisonDraw(res, allLayout, allPvalue)
       }
-    });
+    });*/
  
  
     var sortIcon = $('#comparison-sort-icon')
@@ -131,7 +136,7 @@
     var allAcetlysite = new Map();
     var allPhosphosite = new Map();
     var patientInfo = [];
-    var targetOptions = []
+    var targetOptions = [];
     var index = 1
     var sortKey = 0
     var sortOrder = 0
@@ -142,7 +147,8 @@
  
     function getComparisonData() {
 
-      var comAllData = allData
+      var comAllData = allData;
+      var targetSet = new Set();
 
       showSpinner('comparisonContent');
       const patientData = metaArray;
@@ -192,11 +198,14 @@
 
       for (let i = 1; i < proteinAllData.length; i++) {
         const row = proteinAllData[i].trimEnd().split(",")
-        allProtein.set(row[1], row.slice(4))
+        //allProtein.set(row[1], row.slice(4))
+        //genename_protein
+        allProtein.set(row[2]+'_'+row[1], row.slice(4))
       }
 
       for (const key of allProtein.keys()) {
-        targetOptions.push({ id: index, title: key })
+        var tmp = key.split("_")[0]
+        targetSet.add({ id: index, title: tmp })
         index++;
       }
 
@@ -265,7 +274,7 @@
       }
 
       for (const key of allGene.keys()) {
-        targetOptions.push({ id: index, title: key })
+        targetSet.add({ id: index, title: tmp })
         index++;
       }
 
@@ -275,6 +284,8 @@
         groupOptions.push({ id: index, title: key })
         index++;
       }
+
+      targetOptions = Array.from(targetSet);
       var selectizeControl = $select[0].selectize;
       selectizeControl.addOption(targetOptions)
       var selectizeControl1 = $select1[0].selectize;
@@ -301,25 +312,41 @@
       page = 0
       const targetValue = $('#comparison-select-tools').text();
       groupValue = $('#comparison-select-tools1').text();
+
+      if(targetValue == null || targetValue == ""){
+        alert("Select the gene name!")
+        return;
+      }
+
+      if(groupValue == null || groupValue == ""){
+        alert("Select the meta column to group by!")
+        return;
+      }
+
       let uniqueValue = allUniqueValue.get(groupValue);
       uniqueValue = uniqueValue.sort();
  
- 
+      debugger;
+
       let targetArray = new Map();
       let targetPatient = new Map();
       if (allGene.has(targetValue)) {
         targetArray.set(targetValue, allGene.get(targetValue))
         targetPatient.set(targetValue, genePatient)
       }
-      if (allProtein.has(targetValue)) {
-        targetArray.set(targetValue, allProtein.get(targetValue))
-        targetPatient.set(targetValue, proteinPatient)
+
+      for(const [key, value] of allProtein){
+        if (key.split("_")[0] !== targetValue) continue;
+        targetArray.set(key, value)
+        targetPatient.set(key, proteinPatient)
       }
+
       for (const [key, value] of allAcetlysite) {
         if (key.split("_")[0] !== targetValue) continue;
         targetArray.set(key, value)
         targetPatient.set(key, acetlysitePatient)
       }
+      
       for (const [key, value] of allPhosphosite) {
         if (key.split("_")[0] !== targetValue) continue;
         targetArray.set(key, value)

@@ -21,15 +21,15 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                                      "allow_headers": ["Content-Type"]
                                      }
                      }) 
-"""CORS(app, resources={r"/kruskal_wallis": {"origins": "http://166.104.112.65",
+"""CORS(app, resources={r"/kruskal_wallis": {"origins": "http://166.104.110.31:7000",
                                           "methods": ["POST"],
                                           "allow_headers": ["Content-Type"]
                                           },
-                     r"/rank_sums": {"origins": "http://166.104.112.65",
+                     r"/rank_sums": {"origins": "http://166.104.110.31:7000",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/getnmf": {"origins": "http://166.104.112.65",
+                     r"/getnmf": {"origins": "http://166.104.110.31:7000",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      }

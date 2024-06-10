@@ -326,17 +326,23 @@
 
 
        $.ajax({
-         type:"GET",   
-         url: "../file/tumer_nmf_all.csv",
-         data:[],  
-         dataType:"text",
-         cache:false,
-         success:function(data){  
-           allData = data.split('\n');
-           hideSpinner('nmfContent');
-           hideSpinner('ImmuneContent');
-         }
-       });
+        type:"GET",   
+        url: "../file/tumer_nmf_all.csv",
+        data:[],  
+        dataType:"text",
+        cache:false,
+        success:function(data){  
+          allData = data.split('\n');
+          hideSpinner('nmfContent');
+          hideSpinner('ImmuneContent');
+          hideSpinner('comparisonContent');
+          hideSpinner('survivalContent');
+          hideSpinner('acetylsiteContent');
+          hideSpinner('phosphoContent');
+          hideSpinner('proteinConent');
+          hideSpinner('geneContent');
+        }
+      });
       
    });
  
