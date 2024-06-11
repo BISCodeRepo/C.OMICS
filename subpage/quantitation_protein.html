@@ -4,7 +4,7 @@
     <div class="spinner"></div>
   </div>
 
-  <div id="proteinheatmapDiv" style="width: 95%; margin: auto;"></div>
+  <div id="proteinheatmapDiv" style="width:95%;margin:auto;background-color: white"></div>
 
   <div class="proteinContainer">
     <div class="legend-box-area">
@@ -21,14 +21,14 @@
             <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
           </button>
         </div>
-        <div id="proteinFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:18.5rem;"></div>
+        <div id="proteinFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:22rem;"></div>
     </div>
   </div>
-</div>
-  
+  </div>
+</div>  
   <style type="text/css">
     .proteinContainer{
-      width:0px;border-radius: 0 15px 15px 0;height: 18.5rem;
+      width:0px;border-radius: 0 15px 15px 0;height: 27.5rem;
       background: #f2f5fb;position: absolute; top: 130px;right: 5rem;z-index: 999;
     }
   </style>
@@ -47,7 +47,7 @@
  
  
     $('.proteinContainer').css({right:'0px'});
-    $('.proteinContainer').css({width:'24rem'});
+    $('.proteinContainer').css({width:'23rem'});
     $(".proteinContainer").css("z-index","auto");
 
 
@@ -56,7 +56,7 @@
       $('#protein-legend-after').addClass('active');
 
       $('.proteinContainer').css({right:'0px'});
-      $('.proteinContainer').css({width:'24rem'});
+      $('.proteinContainer').css({width:'23rem'});
       $(".proteinContainer").css("z-index","auto");
       proteinLayer();
     });

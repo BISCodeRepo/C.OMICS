@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     height: 76vh;
+    overflow: auto;
   }
 
   .comparison-box {
@@ -14,28 +15,35 @@
 
   .comparison-char-div {
     width: 48%;
-    height: 46vh;
+    height: 50vh;
+    margin-right: 20px;
+    margin-bottom: 20px;
+  }
+  .comparisonPlot {
+    margin-left: 2%;
   }
  </style>
+
  <div id="comparisonContent">
   <div class="layerPopup">
     <div class="spinner"></div>
   </div>
+
   <div class="component-item">
     <h3 class="component-ttl"></h3>
     <div class="white-bd-box search-02-box">
       <div class="box-inner">
         <h3 class="custom-ttl2">Gene name</h3>
-        <select id="comparison-select-tools" multiple placeholder="Target" style="height: 40px; width:250px;"></select>
+        <select id="comparison-select-tools" multiple placeholder="Target" style="height: 40px; width:230px;"></select>
 
         <h3 class="custom-ttl2">Meta column</h3>
-        <select id="comparison-select-tools1" multiple placeholder="Group by" style="height: 40px;width:250px;"></select>
+        <select id="comparison-select-tools1" multiple placeholder="Group by" style="height: 40px;width:285px;"></select>
 
         <button type="button" class="green-btn" id="comparison-apply-btn">Apply</button>
 
         <!--<select id="comparison-select-tools2" style="height: 40px;width:140px;"></select>-->
 
-        <h3 class="custom-ttl2" style="margin-left: 25px;margin-right: -10px;">P-value sorting</h3>
+        <h3 class="custom-ttl2" style="margin-left: 20px;">P-value sorting</h3>
 
         <button type="button" class="ico-btn" id="comparison-sort-icon">
           <span class="txt-hidden">필터</span>
@@ -43,16 +51,15 @@
         </button>
       </div>
     </div>
- 
-  <div class="comparison-container1">
   </div>
- 
+  <div class="comparison-container1"></div>
  
  </div>
  
  
   <script type="text/javascript">
 
+    //box color
     var boxPlotColor =[
       'rgba(93, 164, 214, 0.5)', 
       'rgba(255, 144, 14, 0.5)', 
@@ -65,66 +72,6 @@
       'rgba(222, 223, 0, 0.5)'
     ]
 
- 
-    var $select = $('#comparison-select-tools').selectize({
-      plugins: ["remove_button"],
-      maxItems: 1,
-      maxOptions: 100,
-      valueField: 'id',
-      labelField: 'title',
-      searchField: 'title',
-      options: [],
-      create: false,
-    });
- 
- 
-    var $select1 = $('#comparison-select-tools1').selectize({
-      plugins: ["remove_button"],
-      maxItems: 1,
-      maxOptions: 100,
-      valueField: 'id',
-      labelField: 'title',
-      searchField: 'title',
-      options: [],
-      create: false
-    });
- 
- 
-    var $select2 = $('#comparison-select-tools2').selectize({
-      plugins: ["remove_button"],
-      maxItems: 1,
-      maxOptions: 2,
-      valueField: 'id',
-      labelField: 'title',
-      searchField: 'title',
-      options: [],
-      create: false
-    });
- 
- 
-    /*var sortOptions = []
-    var selectizeControl2 = $select2[0].selectize;
-    sortOptions.push({ id: 1, title: 'P-Value' })
-    sortOptions.push({ id: 2, title: 'Gene Name' })
-    selectizeControl2.addOption(sortOptions);
-    selectizeControl2.on('change', function (value) {
-      if (value[0] === '1') {
-        sortKey = 1
-        comparisonDraw(res, allLayout, allPvalue)
-      } else if (value[0] === '2') {
-        sortKey = 2
-        comparisonDraw(res, allLayout, allPvalue)
-      }
-    });*/
- 
- 
-    var sortIcon = $('#comparison-sort-icon')
-    sortIcon.click(function () {
-      sortOrder = sortOrder == 1 ? 0 : 1
-      comparisonDraw(res, allLayout, allPvalue)
-    });
- 
- 
     var allUniqueValue = new Map();
     var allPatient = new Map();
     var proteinPatient = []
@@ -140,19 +87,121 @@
     var index = 1
     var sortKey = 0
     var sortOrder = 0
-    var allLayout = new Map()
-    var allPvalue = new Map()
-    var res = new Map()
+    var groupValue = "";
+
+    $(function(){
+
+      getComparisonData();
+
+      //sorting button event
+      $('#comparison-sort-icon').click(function () {
+
+        if(sortOrder == 0){
+          sortOrder = 1
+        } else{
+          sortOrder = 0
+        }
+        comparsionClickEvent();
+      });
+
+
+      //apply button event
+      $("#comparison-apply-btn").click(function () {
+
+        sortOrder = 0
+        comparsionClickEvent();
+  
+      });
+    });
+
+
+    function comparsionClickEvent(){
+
+      res = new Map()
+      const targetValue = $('#comparison-select-tools').text();
+      groupValue = $('#comparison-select-tools1').text();
+
+      if(targetValue == null || targetValue == ""){
+        alert("Select the gene name!")
+        return;
+      }
+
+      if(groupValue == null || groupValue == ""){
+        alert("Select the meta column to group by!")
+        return;
+      }
+
+      let uniqueValue = allUniqueValue.get(groupValue);
+      uniqueValue = uniqueValue.sort();
+
+      drawComparisonPlot(targetValue,uniqueValue);
+
+    }
  
+    /*var $select2 = $('#comparison-select-tools2').selectize({
+      plugins: ["remove_button"],
+      maxItems: 1,
+      maxOptions: 2,
+      valueField: 'id',
+      labelField: 'title',
+      searchField: 'title',
+      options: [],
+      create: false
+    });
+ 
+ 
+    var sortOptions = []
+    var selectizeControl2 = $select2[0].selectize;
+    sortOptions.push({ id: 1, title: 'P-Value' })
+    sortOptions.push({ id: 2, title: 'Gene Name' })
+    selectizeControl2.addOption(sortOptions);
+    selectizeControl2.on('change', function (value) {
+      if (value[0] === '1') {
+        sortKey = 1
+        comparisonDraw(res, allLayout, allPvalue)
+      } else if (value[0] === '2') {
+        sortKey = 2
+        comparisonDraw(res, allLayout, allPvalue)
+      }
+    });*/
  
     function getComparisonData() {
 
       var comAllData = allData;
-      var targetSet = new Set();
 
       showSpinner('comparisonContent');
+
       const patientData = metaArray;
-      const rowHeader = []
+      const rowHeader = [];
+
+      var geneTmp = getComparsionGeneList(comAllData);
+ 
+      $.each(geneTmp,function(n,value) {
+        targetOptions.push({id:value,title:value})
+      });
+
+      var $select = $('#comparison-select-tools').selectize({
+        plugins: ["remove_button"],
+        maxItems: 1,
+        maxOptions: 100,
+        valueField: 'id',
+        labelField: 'title',
+        searchField: 'title',
+        options: targetOptions,
+        create: false,
+      });
+   
+   
+      var $select1 = $('#comparison-select-tools1').selectize({
+        plugins: ["remove_button"],
+        maxItems: 1,
+        maxOptions: 100,
+        valueField: 'id',
+        labelField: 'title',
+        searchField: 'title',
+        options: [],
+        create: false
+      });
 
       patientData.map((row) => {
         const rowData = row.trimEnd().split(",");
@@ -201,12 +250,6 @@
         //allProtein.set(row[1], row.slice(4))
         //genename_protein
         allProtein.set(row[2]+'_'+row[1], row.slice(4))
-      }
-
-      for (const key of allProtein.keys()) {
-        var tmp = key.split("_")[0]
-        targetSet.add({ id: index, title: tmp })
-        index++;
       }
 
       //acetyl
@@ -273,11 +316,6 @@
         allGene.set(row[2], row.slice(4))
       }
 
-      for (const key of allGene.keys()) {
-        targetSet.add({ id: index, title: tmp })
-        index++;
-      }
-
       let groupOptions = []
       index = 1
       for (const key of allUniqueValue.keys()) {
@@ -285,16 +323,11 @@
         index++;
       }
 
-      targetOptions = Array.from(targetSet);
-      var selectizeControl = $select[0].selectize;
-      selectizeControl.addOption(targetOptions)
       var selectizeControl1 = $select1[0].selectize;
       selectizeControl1.addOption(groupOptions);
 
       hideSpinner('comparisonContent');
     }
-
-    getComparisonData();
  
  
     function unique(array) {
@@ -302,57 +335,77 @@
         return value !== 'None' && value !== '' && self.indexOf(value) === index;
       });
     }
- 
- 
-    var page = 0
-    var groupValue = ""
-    $("#comparison-apply-btn").click(function () {
 
-      res = new Map()
-      page = 0
-      const targetValue = $('#comparison-select-tools').text();
-      groupValue = $('#comparison-select-tools1').text();
+    function drawComparisonPlot(targetValue,uniqueValue){
 
-      if(targetValue == null || targetValue == ""){
-        alert("Select the gene name!")
-        return;
-      }
+      $('.comparison-container1').empty();
 
-      if(groupValue == null || groupValue == ""){
-        alert("Select the meta column to group by!")
-        return;
-      }
+      var targetArray = new Map();
+      var targetPatient = new Map();
 
-      let uniqueValue = allUniqueValue.get(groupValue);
-      uniqueValue = uniqueValue.sort();
- 
-      debugger;
-
-      let targetArray = new Map();
-      let targetPatient = new Map();
+      //RNA
       if (allGene.has(targetValue)) {
         targetArray.set(targetValue, allGene.get(targetValue))
-        targetPatient.set(targetValue, genePatient)
+        targetPatient.set(targetValue, genePatient);
+        $('.comparison-container1').append("<div id='ComparisonRNAPlot' class='comparisonPlot'><h3 class='custom-ttl3'>RNA</h3>");
+        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonRNAPlot')
+        $('.comparison-container1').append("</div>");
       }
 
+      targetArray = new Map();
+      targetPatient = new Map();
+
+      //PROTEIN
       for(const [key, value] of allProtein){
         if (key.split("_")[0] !== targetValue) continue;
         targetArray.set(key, value)
         targetPatient.set(key, proteinPatient)
       }
 
+      if(targetArray!=null && targetArray.size>0){
+        $('.comparison-container1').append("<div id='ComparisonProteinPlot' class='comparisonPlot'><h3 class='custom-ttl3'>Protein</h3>");
+        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonProteinPlot')
+        $('.comparison-container1').append("</div>");
+      }
+
+      targetArray = new Map();
+      targetPatient = new Map();
+
+      //Acetyl
       for (const [key, value] of allAcetlysite) {
         if (key.split("_")[0] !== targetValue) continue;
         targetArray.set(key, value)
         targetPatient.set(key, acetlysitePatient)
       }
+
+      if(targetArray!=null && targetArray.size>0){
+        $('.comparison-container1').append("<div id='ComparisonAcetylPlot' class='comparisonPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
+        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonAcetylPlot')
+        $('.comparison-container1').append("</div>");
+      }
       
+      targetArray = new Map();
+      targetPatient = new Map();
+
+      //Phospho
       for (const [key, value] of allPhosphosite) {
         if (key.split("_")[0] !== targetValue) continue;
         targetArray.set(key, value)
         targetPatient.set(key, phosphositePatient)
       }
- 
+
+      if(targetArray!=null && targetArray.size>0){
+        $('.comparison-container1').append("<div id='ComparisonPhosphoPlot' class='comparisonPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
+        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonPhosphoPlot')
+       $('.comparison-container1').append("</div>");
+      }
+
+    }
+
+    function drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,plotName){
+
+      var res = new Map()
+
       for (const [key, value] of targetArray) {
         let curArray = value;
         let curTarget = key;
@@ -382,40 +435,32 @@
         })
         res.set(curTarget, data)
       }
-      cal(res)
-    })
+      cal(res,plotName)
+    }
  
  
-    function cal(res) {
+    function cal(res,plotName) {
       let allKeys = Array.from(res.keys())
       let promises = []
-      allLayout = new Map()
-      allPvalue = new Map()
+      var allLayout = new Map()
+      var allPvalue = new Map()
  
  
       for (let i = 0; i < allKeys.length; i++) {
         let value = allKeys[i]
         let data = res.get(value)
         let pValue = 0
-        let pText = ""
  
  
         let promise = computePValue(data).then(result => {
           pValue = result
           allPvalue.set(value, pValue)
-          // if (pValue < 0.01) {
-          //   pText = "p < 0.01"
-          // } else {
-          //   pText = "p = " + parseFloat(pValue.toFixed(2))
-          // }
+
           pValue = formatNumbers(pValue)
-          pText = "p = " + pValue
- 
- 
- 
+          //pText = "P-value = " + pValue 
  
           var layout = {
-            title: value,
+            title: value + "<br>P-value = "+pValue,
             xaxis: {
               title: {
                 text: groupValue,
@@ -427,7 +472,7 @@
                 y: 1.1,
                 xref: 'paper',
                 yref: 'paper',
-                text: pText,
+                text: "",
                 showarrow: false,
                 font: {
                   size: 12
@@ -440,76 +485,54 @@
           allLayout.set(value, layout)
         })
  
- 
         promises.push(promise)
       }
- 
- 
+
       Promise.all(promises).then(() => {
-        comparisonDraw(res, allLayout, allPvalue)
+        comparisonDraw(res, allLayout, allPvalue,plotName)
       })
  
  
     }
  
  
-    function comparisonDraw(res, allLayout, allPvalue) {
+    function comparisonDraw(res, allLayout, allPvalue,plotName) {
 
-      $('.comparison-container1').empty();
       let boxIndex = 0
-      let allKeys = Array.from(res.keys())
-      if (sortKey === 2) {
-        // 字典序排序
-        if (sortOrder === 0) {
-          allKeys.sort()
-        } else {
-          allKeys.sort(function (a, b) { return b.localeCompare(a) })
-        }
- 
- 
-      } else if (sortKey === 1) {
-        //p值排序
-        let mapEntry = Array.from(allPvalue)
-        if (sortOrder === 0) {
-          mapEntry.sort(function (a, b) {
-            return a[1] - b[1]
-          })
-        } else {
-          mapEntry.sort(function (a, b) {
-            return b[1] - a[1]
-          })
-        }
-        let sortedPvalue = new Map(mapEntry)
- 
- 
-        allKeys = Array.from(sortedPvalue.keys())
+      
+      var mapEntry = Array.from(allPvalue)
+      if(sortOrder==0){ //default acs
+        mapEntry.sort(function (a, b) {
+          return a[1] - b[1]
+        })
+      } else { //desc
+        mapEntry.sort(function (a, b) {
+          return b[1] - a[1]
+        })
       }
- 
- 
- 
- 
- 
- 
+      
+      var sortedPvalue = new Map(mapEntry)
+      let allKeys = Array.from(sortedPvalue.keys())
+
       allKeys.forEach((value, index) => {
         if ((boxIndex & 1) === 0) {
           // 创建一个新的 box1 元素
           let newBox = $('<div class="comparison-box"></div>');
-          newBox.attr('id', `comparison-box${Math.floor(boxIndex / 2)}`);
+          newBox.attr('id', plotName+'_comparison-box'+Math.floor(boxIndex / 2));
           charDiv = $('<div class="comparison-char-div"></div>');
-          charDiv.attr('id', `comparison-myDiv${boxIndex}`);
+          charDiv.attr('id',plotName +'_comparison-myDiv'+boxIndex);
           newBox.append(charDiv);
-          $('.comparison-container1').append(newBox);
+          $('#'+plotName).append(newBox);
         } else {
-          let newBox = $('#comparison-box' + Math.floor(boxIndex / 2))
+          let newBox = $('#'+plotName+'_comparison-box' + Math.floor(boxIndex / 2))
           charDiv = $('<div class="comparison-char-div"></div>');
-          charDiv.attr('id', `comparison-myDiv${boxIndex}`);
+          charDiv.attr('id', plotName +'_comparison-myDiv'+boxIndex);
           newBox.append(charDiv);
         }
         // console.log(allLayout.get(value))
-        Plotly.newPlot("comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value));
+        Plotly.newPlot(plotName+"_comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value));
         boxIndex++;
       })
- 
  
     }
  
@@ -537,24 +560,6 @@
         });
       });
     }
- 
- 
-    function formatNumbers(num) {
- 
- 
-      // Check if the number is very close to 0 (but not 0)
-      if (Math.abs(num) > 0 && Math.abs(num) < 1e-5) {
-        // Use scientific notation
-        return num.toExponential(5);
-      } else {
-        // Otherwise, round to 5 decimal places
-        return Number(num.toFixed(5));
-      }
- 
- 
-    }
- 
- 
  
  
     function kruskalWallisTest(data) {
@@ -602,6 +607,42 @@
       }
       return pValue;
     }
+
+    function formatNumbers(num) {
+ 
+ 
+      // Check if the number is very close to 0 (but not 0)
+      if (Math.abs(num) > 0 && Math.abs(num) < 1e-5) {
+        // Use scientific notation
+        return num.toExponential(5);
+      } else {
+        // Otherwise, round to 5 decimal places
+        return Number(num.toFixed(5));
+      }
+ 
+    }
+
+
+    function getComparsionGeneList(nmfData){
+ 
+      var geneList = []
+     
+     
+      //Genens
+      for(var i = 1; i<nmfData.length-1;i++) {
+          var tmp = nmfData[i]
+          geneList.push(tmp.split(',')[3].split("_")[0])
+      }
+     
+     
+      let patSet = new Set(geneList);
+      geneList = Array.from(patSet).sort();
+     
+     
+      return geneList
+     
+     
+     }
  
  
  </script>

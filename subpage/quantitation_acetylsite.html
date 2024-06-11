@@ -4,7 +4,7 @@
       <div class="spinner"></div>
     </div>
 
-    <div id="aceHeatmapDiv" style="width: 95%;margin: auto;"></div>
+    <div id="aceHeatmapDiv" style="width: 95%;margin: auto;background-color: white"></div>
     <div class="acetylContainer">
       <div class="legend-box-area">
         <div id="acetylFloatContainerBtn" class="legend-box-before">
@@ -20,13 +20,14 @@
               <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
             </button>
           </div>
-          <div id="acetylFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:18.5rem;"></div>
+          <div id="acetylFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:22rem;"></div>
+        </div>
       </div>
     </div>
   </div>
   <style type="text/css">
     .acetylContainer{
-      width:0px;border-radius: 0 15px 15px 0;height: 25rem;
+      width:0px;border-radius: 0 15px 15px 0;height: 27.5rem;
       background: #f2f5fb;position: absolute; top: 130px;right: 5rem;z-index: 999;
     }
   </style>
@@ -44,7 +45,7 @@
     $('#acetyl-legend-after').addClass('active');
 
     $('.acetylContainer').css({right:'0px'});
-    $('.acetylContainer').css({width:'24rem'});
+    $('.acetylContainer').css({width:'26rem'});
     $(".acetylContainer").css("z-index","auto");
 
     $('#acetylFloatContainerBtn').click(function(){
@@ -52,7 +53,7 @@
       $('#acetyl-legend-after').addClass('active');
 
       $('.acetylContainer').css({right:'0px'});
-      $('.acetylContainer').css({width:'24rem'});
+      $('.acetylContainer').css({width:'26rem'});
       $(".acetylContainer").css("z-index","auto");
       acetylLayer();
     });

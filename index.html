@@ -104,9 +104,10 @@
    <div class="components-page">
      <div class="component-item">
          <header class="custom-header">
+           <img src="/subpage/images/logo.png" class="header-logo">
+
              <div class="custom-header-inner">
                <ul class="custom-header-nav-grp" id="mymenu">
-
 
                  <li class="custom-header-nav">
                    <a href="#" class="link active">HOME</a>
@@ -149,10 +150,9 @@
                    <a href="#" class="link">Survival analysis</a>
                  </li>
 
-
-                 <li class="custom-header-nav" name="ABOUT">
-                     <a href="/subpage/nmf_help.html" target="_blank" class="link">About</a>
-                   </li>
+                 <li class="custom-header-nav" name="HELP">
+                     <a href="/subpage/nmf_help.html" target="_blank" class="link">Help</a>
+                 </li>
                </ul>
              </div>
            </header>
@@ -166,14 +166,14 @@
            </div>
        </div>
        <div id="mainContent">
-         <div id="NMFmainContent" style="margin-top: -13px;"></div>
-         <div id="IMMUNEmainContent" style="margin-top: -13px;"></div>
-         <div id="PROTEINmainContent" style="margin-top: 10px;"></div>
-         <div id="PHOSPHOmainContent" style="margin-top: 10px;"></div>
-         <div id="ACETYLmainContent" style="margin-top: 10px;"></div>
-         <div id="GENEmainContent" style="margin-top: 10px;"></div>
-         <div id="COMPARISONmainContent" style="overflow: auto;"></div>
-         <div id="SURVIVALmainContent" style="overflow: auto;"></div>
+         <div id="NMFmainContent" ></div>
+         <div id="IMMUNEmainContent" ></div>
+         <div id="PROTEINmainContent" ></div>
+         <div id="PHOSPHOmainContent"></div>
+         <div id="ACETYLmainContent"></div>
+         <div id="GENEmainContent"></div>
+         <div id="COMPARISONmainContent" style="margin-top:-20px"></div>
+         <div id="SURVIVALmainContent" style="margin-top:-20px"></div>
      </div>
      </div>
   
@@ -281,7 +281,7 @@
                        $('#SURVIVALmainContent').show();
                        if(survivalPage){
                            survivalPage = false
-                           $('#SURVIVALmainContent').load('/subpage/survival.html')
+                           $('#SURVIVALmainContent').load('/subpage/survival_new.html')
                        }
                    break;
                }  
@@ -289,14 +289,14 @@
           
        });
 
-       showSpinner('homeContent');
+      /*showSpinner('homeContent');
 
        var percentage= 0;
        $(".progress-bar-inner").width(percentage+"%");
        $("#progressBarCount").text("0%");
 
 
-       var interval = setInterval(function(){
+      var interval = setInterval(function(){
          percentage+=10;
          $(".progress-bar-inner").width(percentage+"%");
          $("#progressBarCount").text(percentage+"%");
@@ -311,7 +311,7 @@
 
        if(percentage>=110){
         clearInterval(interval);
-       }
+       }*/
 
        $.ajax({
            type:"GET",   

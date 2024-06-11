@@ -4,7 +4,7 @@
     <div class="spinner"></div>
   </div>
 
-  <div id="geneheatmapDiv" style="width: 80%; margin: auto;"></div>
+  <div id="geneheatmapDiv" style="width: 81%; margin: auto;background-color: white"></div>
 
   <div class="geneContainer">
     <div class="legend-box-area">
@@ -21,13 +21,14 @@
             <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
           </button>
         </div>
-        <div id="geneFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:18.5rem;"></div>
+        <div id="geneFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:22rem;"></div>
+      </div>
     </div>
+  </div>
 </div>
-
 <style type="text/css">
   .geneContainer{
-    width:0px;border-radius: 0 15px 15px 0;height: 25rem;
+    width:0px;border-radius: 0 15px 15px 0;height: 27.5rem;
     background: #f2f5fb;position: absolute; top: 130px;right: 5rem;z-index: 999;
   }
 </style>
@@ -45,7 +46,7 @@
     $('#gene-legend-after').addClass('active');
 
     $('.geneContainer').css({right:'0px'});
-    $('.geneContainer').css({width:'24rem'});
+    $('.geneContainer').css({width:'22rem'});
     $(".geneContainer").css("z-index","auto");
 
     $('#geneFloatContainerBtn').click(function(){
@@ -54,7 +55,7 @@
       $('#gene-legend-after').addClass('active');
 
       $('.geneContainer').css({right:'0px'});
-      $('.geneContainer').css({width:'24rem'});
+      $('.geneContainer').css({width:'22rem'});
       $(".geneContainer").css("z-index","auto");
       geneLayer();
     });
