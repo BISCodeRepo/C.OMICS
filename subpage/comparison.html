@@ -1,29 +1,3 @@
-<style type="text/css">
-  .comparison-container1 {
-    display: flex;
-    flex-direction: column;
-    height: 76vh;
-    overflow: auto;
-  }
-
-  .comparison-box {
-    flex: 1;
-    display: flex;
-    /* justify-content: center;
-    align-items: center; */
-  }
-
-  .comparison-char-div {
-    width: 48%;
-    height: 50vh;
-    margin-right: 20px;
-    margin-bottom: 20px;
-  }
-  .comparisonPlot {
-    margin-left: 2%;
-  }
- </style>
-
  <div id="comparisonContent">
   <div class="layerPopup">
     <div class="spinner"></div>
@@ -117,7 +91,6 @@
 
     function comparsionClickEvent(){
 
-      res = new Map()
       const targetValue = $('#comparison-select-tools').text();
       groupValue = $('#comparison-select-tools1').text();
 

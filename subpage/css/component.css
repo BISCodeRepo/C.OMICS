@@ -387,3 +387,66 @@ body {
 .legend-box-after {
   display: none;
 }
+
+.comparison-container1 {
+  display: flex;
+  flex-direction: column;
+  height: 76vh;
+  overflow: auto;
+}
+
+.comparison-box {
+  flex: 1;
+  display: flex;
+  /* justify-content: center;
+  align-items: center; */
+}
+
+.comparison-char-div {
+  width: 48%;
+  height: 50vh;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.comparisonPlot {
+  margin-left: 2%;
+}
+
+.survival_container1 {
+  display: flex;
+  flex-direction: column;
+  height: 76vh;
+  overflow: auto;
+  width: 82%;
+}
+
+.survival_box1,
+.survival_box2,.survival_box {
+  flex: 1;
+  display: flex;
+  /*justify-content: center;
+  align-items: center;*/
+}
+
+.survival_flex-hori {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.survival_char-div {
+  width: 48%;
+  height: 46vh;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.survival-number-input {
+  width: 75px;
+  height: 30px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .05), inset 0 1px 0 rgba(255, 255, 255, .8);
+  background-color: #f9f9f9;
+  background-repeat: repeat-x;
+  border: 1px solid rgb(233, 233, 233);
+  border-radius: 6px;
+  font-size: 15px;
+}
