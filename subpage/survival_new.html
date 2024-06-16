@@ -67,17 +67,14 @@
     var sur_targetOptions = []
     var sur_sortOrder = 0
     var subPavlueList = [];
-
-    var sur_index = 1
-    var sur_sort_value = 0
-    var sur_result_array = []
-    var sur_processed = 0
-    var sur_prev_protein = ''
-    var sur_sort_type = 0
-    //var sortOptions = [];
-    var container = document.getElementsByClassName('survival_container1');
+    var sur_selectval='';
+    var min_date = 0;
+    //var max_date = d3.max(data, (d)=>d.time)
+    var max_date = 11;
 
     $(function(){
+
+      showSpinner('survivalContent');
 
         $.ajax({
             type:"GET",   
@@ -92,12 +89,13 @@
 
         $.ajax({
             type:"GET",   
-            url: "../file/tmp.csv",
+            url: "../file/survival_pvalue.csv",
             data:[],  
             dataType:"text",
             cache:false,
             success:function(data){  
                 allPvalueList = data.split('\n');
+                hideSpinner('survivalContent');
             }
         }); 
 
@@ -119,7 +117,7 @@
             } else{
                 sur_sortOrder = 0
             }
-            survivalClickEvent();
+            genenNameClick('sort');
         });
 
         $('#survival_geneName_list').css('display','none');
@@ -129,65 +127,68 @@
 
     function survivalClickEvent(){
 
-        const targetValue = $('#survival_select-tools').text();
-        const typeValue = $('#survival_type-tools').text();
-        const pvalueStart = $('#pvalue-start').val();
-        const pvalueEnd = $('#pvalue-end').val();
+      const targetValue = $('#survival_select-tools').text();
+      const typeValue = $('#survival_type-tools').val();
+      const pvalueStart = $('#pvalue-start').val();
+      const pvalueEnd = $('#pvalue-end').val();
 
-        if(isEmpty(targetValue) && isEmpty(pvalueStart) && isEmpty(pvalueEnd)){
-            alert("Select the gene name or enter the P-value range value!");
-            return;
-        }
+      if(isEmpty(targetValue) && isEmpty(pvalueStart) && isEmpty(pvalueEnd)){
+          alert("Select the gene name or enter the P-value range value!");
+          return;
+      }
 
-        if(!isEmpty(pvalueStart) || !isEmpty(pvalueEnd)){
-            if(pvalueStart < 0 || pvalueStart > 1){
-                alert("Enter a number between 0 and 1.");
-                return;
-            }
+      if(!isEmpty(pvalueStart) || !isEmpty(pvalueEnd)){
+          if(pvalueStart < 0 || pvalueStart > 1){
+              alert("Enter a number between 0 and 1.");
+              return;
+          }
 
-            if(pvalueEnd < 0 || pvalueEnd > 1){
-                alert("Enter a number between 0 and 1.");
-                return;
-            }
+          if(pvalueEnd < 0 || pvalueEnd > 1){
+              alert("Enter a number between 0 and 1.");
+              return;
+          }
 
-            if(pvalueStart > pvalueEnd){
-                alert("The first value must be smaller than the second value.");
-                return;
-            }
-            
-        }
+          if(pvalueStart > pvalueEnd){
+              alert("The first value must be smaller than the second value.");
+              return;
+          }
+          
+      }
 
-        if(isEmpty(targetValue) && pvalueStart==0 && pvalueEnd==1){
-            alert("Select the gene name when selecting the entire p-value range!");
-            return;
-        }
+      if(isEmpty(targetValue) && pvalueStart==0 && pvalueEnd==1){
+          alert("Select the gene name when selecting the entire p-value range!");
+          return;
+      }
 
 
-        getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue);
+      getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue);
     }
 
     function getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue){
-
+        
         $('#survival_geneName_list').css('display','block');
-        //debugger
+        
         subPavlueList = [];
         var tmpList = []
         if(!isEmpty(targetValue)){ // target is existed
             tmpList = allPvalueList.filter((value, index, self) => {
-                return index>0 && (value.trimEnd().split(",")[1]!="RNA"? value.trimEnd().split(",")[0].split('_')[0]==targetValue:value.trimEnd().split(",")[0] == targetValue)
-                && value.trimEnd().split(",")[2]<=pvalueEnd && value.trimEnd().split(",")[2]>=pvalueStart;
+              //console.log(index)
+              return index>0 && (value.trimEnd().split(",")[1].indexOf("_")>-1? value.trimEnd().split(",")[1].split('_')[0]==targetValue:value.trimEnd().split(",")[1] == targetValue)
+              && parseFloat(value.trimEnd().split(",")[2])<=parseFloat(pvalueEnd) 
+              && parseFloat(value.trimEnd().split(",")[2])>=parseFloat(pvalueStart);
               });
         } else { //target is null
             tmpList = allPvalueList.filter((value, index, self) => {
-                return index>0 && value.trimEnd().split(",")[2]<=pvalueEnd && value.trimEnd().split(",")[2]>=pvalueStart;
+                return index>0 && parseFloat(value.trimEnd().split(",")[2])<=parseFloat(pvalueEnd)
+                 && parseFloat(value.trimEnd().split(",")[2])>=parseFloat(pvalueStart);
               });
             
         }
         if(!isEmpty(typeValue)){ //Type is existed
             $.each(tmpList,function(n,v){
                 var tmp = v.trimEnd().split(",");
-                if(tmp[1]==typeValue){
-                    subPavlueList.putsh(v.trimEnd());
+                if(tmp[0]==typeValue){
+                    subPavlueList.push(v.trimEnd());
                 }
 
             });
@@ -201,14 +202,15 @@
     function drawGeneTable(subPavlueList){
 
         $('#geneNameListUl').empty();
+        $('.survival_container1').empty();
         
         var liSet = new Set()
-        for (var i = 1; i < subPavlueList.length; i++) {
+        for (var i = 0; i < subPavlueList.length; i++) {
             var tmp = subPavlueList[i].trimEnd().split(',');
-            if(tmp[1]!="RNA"){
-                liSet.add(tmp[0].split('_')[0]);
+            if(tmp[1].indexOf('_')>-1){
+                liSet.add(tmp[1].split('_')[0]);
             } else{
-                liSet.add(tmp[0]);
+                liSet.add(tmp[1]);
             }   
         }
         var liList = Array.from(liSet).sort();
@@ -219,79 +221,232 @@
             listr+="<li class='list-group-item' name='"+tmp[0]+"' onclick='genenNameClick(this);'><a href='#'>"+tmp[0]+"</a></li>";
         }
 
+        listr+="</ul>";
+        listr+="<div style='float:right'><span>Total: "+liList.length+"</span></div>";
+
         $('#geneNameListUl').append(listr);
     }
 
 
     //click gene name list
     function genenNameClick(e){
-        
-        debugger
-        var geneName = $(e).attr('name');
-        var drawList = []
-        subPavlueList
-        drawSurvivalPlot(drawList)
+
+      $('.survival_container1').empty();
+      var targetArray = new Map();
+
+      if(e !='sort'){
+        sur_selectval = $(e).attr('name');
+      }
+      
+        //RNA
+      if (sur_allGene.has(sur_selectval) && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'RNA' && v.split(',')[1] == sur_selectval }).length > 0) {
+        targetArray.set(sur_selectval, sur_allGene.get(sur_selectval));
+        $('.survival_container1').append("<div id='SurvivalRNAPlot' class='comparisonPlot'><h3 class='custom-ttl3'>RNA</h3>");
+        preDrawSurvivalPlot(targetArray,sur_genePatient,'SurvivalRNAPlot','RNA')
+        $('.survival_container1').append("</div>");
+      }
+
+      targetArray = new Map();
+
+      //PROTEIN
+      for(const [key, value] of sur_allProtein){
+        if (key.split("_")[0] !== sur_selectval) continue;
+        targetArray.set(key, value)
+      }
+
+      if(targetArray!=null && targetArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'PROTEIN' && targetArray.has(v.split(',')[1])}).length > 0){
+        $('.survival_container1').append("<div id='SurvivalProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
+        preDrawSurvivalPlot(targetArray,sur_proteinPatient,'SurvivalProteinPlot','PROTEIN')
+        $('.survival_container1').append("</div>");
+      }
+
+      targetArray = new Map();
+
+      //Acetyl
+      for (const [key, value] of sur_allAcetlysite) {
+        if (key.split("_")[0] !== sur_selectval) continue;
+        targetArray.set(key, value)
+      }
+
+      if(targetArray!=null && targetArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'ACETYL'&& targetArray.has(v.split(',')[1])}).length > 0){
+        $('.survival_container1').append("<div id='SurvivalAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
+        preDrawSurvivalPlot(targetArray,sur_acetlysitePatient,'SurvivalAcetylPlot','ACETYL')
+        $('.survival_container1').append("</div>");
+      }
+      
+      targetArray = new Map();
+
+      //Phospho
+      for (const [key, value] of sur_allPhosphosite) {
+        if (key.split("_")[0] !== sur_selectval) continue;
+        targetArray.set(key, value)
+      }
+
+      if(targetArray!=null && targetArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'PHOSPHO'&& targetArray.has(v.split(',')[1])}).length > 0){
+        $('.survival_container1').append("<div id='SurvivalPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
+        preDrawSurvivalPlot(targetArray,sur_phosphositePatient,'SurvivalPhosphoPlot','PHOSPHO')
+        $('.survival_container1').append("</div>");
+      }
     }
 
 
-    function drawSurvivalPlot(drawList){
-        var layout = {
-            title : {
-                text : title+ "<br>P-value = " + p_val,
-            },
-           yaxis:{
-                autotick: false,
-                ticks: 'outside',
-                tick0: 0,
-                dtick: 0.25,
-                range : [0,1]
-            },
-          xaxis :{
-            title :'month'
-          },
-          legend: {
-            autosize : false,
-            font: {size: 16},
-            yref: 'paper',
-            title : p_val
+    function preDrawSurvivalPlot(targetArray,targetPatient,plotName,type){
+
+      //debugger
+      var p_val_array = []
+      for(const [key, value] of targetArray){
+        var tmp = subPavlueList.filter((v, index, self) => {
+          return v.split(',')[0] == type && v.split(',')[1] == key;
+        });
+        high_patients = []
+        low_patients = []
+        if(tmp!=null && tmp.length > 0){ //geneName
+
+          var median = tmp[0].trimEnd().split(',')[3]
+          var p_val = tmp[0].trimEnd().split(',')[2]
+          var title = tmp[0].trimEnd().split(',')[1]
+
+          for(var i =0;i<value.length;i++){
+            if(parseFloat(value[i]) > parseFloat(median)){
+              high_patients.push(targetPatient[i])
+            } else{
+              low_patients.push(targetPatient[i])
+            }
           }
-        };
-        trace1 = {
+
+          data_highs = []
+          data_lows = []
+          for(var i=1;i<overallList.length;i++){ //find the death,os
+
+            var tmp = overallList[i].trimEnd().split(",");
+            if( high_patients.filter((v, index, self) => {
+              return tmp[0] == v;
+            }).length >0){
+              data_highs.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+            } 
+            if( low_patients.filter((v, index, self) => {
+              return tmp[0] == v;
+            }).length >0){
+              data_lows.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+            } 
+          }
+
+          // plot : x,y
+          var table_high = KM_Curve(data_highs);
+          kmsurv_high = table_high[0];
+          censor_high = table_high[1];
+
+          var table_low = KM_Curve(data_lows);
+          kmsurv_low = table_low[0]
+          censor_low = table_low[1]
+
+
+          kmsurv_high.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
+          kmsurv_low.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
+          censor_high.unshift({"c_i": min_date, "c_s": 1})
+          censor_low.unshift({"c_i": min_date, "c_s": 1})
+          
+          var trace1 = {
             x: kmsurv_high.map((item) => item.t_i*12),
             y: kmsurv_high.map((item) => item.S_t),
             mode: 'lines',
             name: 'high',
             
             line: {shape: 'hv', color: 'red'},
-        };
-        
-        trace2 = {
+          };
+          
+          var trace2 = {
             x: kmsurv_low.map((item) => item.t_i*12),
             y: kmsurv_low.map((item) => item.S_t),
             mode: 'lines',
             name: 'low',
             
             line: {shape: 'hv', color: 'blue'},
-        };
-        
-        trace3 = {
+          };
+
+          var trace3 = {
             x: censor_low.map((item) => item.c_t*12),
             y: censor_low.map((item) => item.c_s),
             mode: 'markers',
             
             marker: { size: 6, color: 'blue', symbol : 142 },
             showlegend :false
-        }
-        
-        trace4 = {
+          }
+          var trace4 = {
             x: censor_high.map((item) => item.c_t*12),
             y: censor_high.map((item) => item.c_s),
             mode: 'markers',
             marker: { size: 6, color: 'red', symbol : 142 },
             showlegend :false
-        }
-          
+          }
 
+          var data = [trace1, trace2, trace3, trace4];
+
+          var layout = {
+              title : {
+                  text : title+ "<br>P-value = " + p_val,
+              },
+
+            yaxis:{
+                  autotick: false,
+                  ticks: 'outside',
+                  tick0: 0,
+                  dtick: 0.25,
+                  range : [0,1]
+              },
+            xaxis :{
+              title :'month'
+            },
+            legend: {
+              autosize : false,
+              font: {size: 12},
+              yref: 'paper',
+              title : p_val
+            }};
+            p_val_array.push({"title" : title, "data" : data, "layout" : layout, "p_val" :p_val})    
+        }
+
+      }
+      survivalDraw(p_val_array,plotName)
+    }
+
+
+    function survivalDraw( p_val_array,plotName) {
+
+      let boxIndex = 0
+      if(sur_sortOrder==0){ //default acs
+        p_val_array.sort(function (a, b) {
+          return parseFloat(a.p_val) - parseFloat(b.p_val)
+        })
+      } else { //desc
+        p_val_array.sort(function (a, b) {
+          return parseFloat(b.p_val) - parseFloat(a.p_val)
+        })
+      }
+      
+      for(var i =0;i<p_val_array.length;i++){
+        if ((boxIndex & 1) === 0) {
+
+          let newBox = $('<div class="survival_box"></div>');
+          newBox.attr('id', plotName+'_survival_box'+Math.floor(boxIndex / 2));
+          charDiv = $('<div class="survival-char-div"></div>');
+          charDiv.attr('id',plotName +'_survival-myDiv'+boxIndex);
+          newBox.append(charDiv);
+          $('#'+plotName).append(newBox);
+        } else {
+          let newBox = $('#'+plotName+'_survival_box' + Math.floor(boxIndex / 2))
+          charDiv = $('<div class="survival-char-div"></div>');
+          charDiv.attr('id', plotName +'_survival-myDiv'+boxIndex);
+          newBox.append(charDiv);
+        }
+        // console.log(allLayout.get(value))
+        Plotly.newPlot(plotName+"_survival-myDiv" +boxIndex, p_val_array[i].data, p_val_array[i].layout);
+        boxIndex++;
+      }
     }
 
     function isEmpty(val){
@@ -443,11 +598,11 @@
         }
       });
 
-      sur_genePatient = sur_geneAllData[0].trimEnd().split(",").slice(4);
+      sur_genePatient = sur_geneAllData[0].trimEnd().split(",").slice(4,209);
 
       for (let i = 1; i < sur_geneAllData.length; i++) {
         const row = sur_geneAllData[i].trimEnd().split(",")
-        sur_allGene.set(row[2], row.slice(4))
+        sur_allGene.set(row[2], row.slice(4,209))
       }
 
       hideSpinner('survivalContent')
@@ -477,5 +632,99 @@
         return value !== 'None' && value !== '' && self.indexOf(value) === sur_index;
       });
     }
+
+
+    function KM_Curve(data){
+
+      //Source http://stackoverflow.com/questions/11246758/how-to-get-unique-values-in-an-array
+      Array.prototype.contains = function(v) {
+          for(var i = 0; i < this.length; i++) {
+              if(this[i] === v) return true;
+          }
+          return false;
+      };
+      Array.prototype.unique = function() {
+          var arr = [];
+          for(var i = 0; i < this.length; i++) {
+              if(!arr.contains(this[i])) {
+                  arr.push(this[i]);
+              }
+          }
+          return arr;
+      }
+  
+      //get unique times of death.
+      var death_times = data.filter(d => d.death)
+          .map(d => d.time)
+          .sort()
+      var censored_times = data.filter(d => !d.death)
+          .map(d => parseFloat(d.time))
+          //censored_times = censored_times.map(v=>parseFloat(v))
+      
+      var censored_times_sorted = censored_times.sort(function(a, b)  {
+          return a - b;
+          });
+      
+      var km_table = death_times.map(t_i => {
+          var d_i = data.filter(d => d.time == t_i && d.death).length
+  
+          var Y_i = data.filter(d => d.time >= t_i).length
+  
+          var s_t = 1 - (d_i/Y_i);
+  
+          return {"t_i": t_i, "d_i": d_i, "Y_i": Y_i, "s_t": s_t}
+      })
+      
+      //console.log(km_table);
+      //console.log(km_table);
+      
+  
+      var censor_table = []
+      /*console.log("censored_time")
+      console.log(censored_times)
+      console.log("---------------")
+      console.log("censored_time_sorted")
+      console.log(censored_times_sorted)
+      console.log("--------------")
+      console.log("death_time")
+      console.log(death_times)
+      console.log("------------")
+      */
+      var j = 0
+      var prev_km = 1
+      var cur_km = 1
+      //showing censored point in the plot using previous S_t
+      for (let [i, row] of km_table.entries()) {
+          var t = row.t_i,
+              s_t = row.s_t,
+              last_S_t = i != 0 ? km_table[i-1].S_t : 1;
+          km_table[i].S_t = last_S_t * s_t;
+          if (i>0){
+              prev_km = km_table[i-1].S_t
+              cur_km = km_table[i].S_t
+          }
+          while(true){
+              if (censored_times_sorted[j]<=row.t_i){
+                  censor_table[j] = {"c_t" : censored_times_sorted[j], "c_s" : last_S_t}
+                  j ++;
+              }
+              else{
+                  break
+              }
+          }
+      }
+      //console.log(censor_table)
+      for(let i = j; i < censored_times_sorted.length; i++){
+          censor_table[i] = {"c_t" : censored_times_sorted[i], "c_s" : cur_km}
+      }
+      //console.log(censor_table)
+      //console.log(km_table)
+      //console.log(censor_table)
+      
+      //console.log(km_table, censor_table)
+      // console.table(km_table)
+      km_table[km_table.length] = {"t_i": max_date, "d_i": max_date, "Y_i": max_date, "S_t": cur_km}
+      return [km_table, censor_table];
+  }
 
 </script>

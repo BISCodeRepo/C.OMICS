@@ -408,7 +408,8 @@ body {
   margin-right: 20px;
   margin-bottom: 20px;
 }
-.comparisonPlot {
+
+.typeDivPlot {
   margin-left: 2%;
 }
 
@@ -420,26 +421,20 @@ body {
   width: 82%;
 }
 
-.survival_box1,
-.survival_box2,.survival_box {
+.survival_box {
   flex: 1;
   display: flex;
   /*justify-content: center;
   align-items: center;*/
 }
 
-.survival_flex-hori {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.survival_char-div {
+.survival-char-div {
   width: 48%;
-  height: 46vh;
+  height: 50vh;
   margin-right: 20px;
   margin-bottom: 20px;
 }
+
 .survival-number-input {
   width: 75px;
   height: 30px;
@@ -449,4 +444,8 @@ body {
   border: 1px solid rgb(233, 233, 233);
   border-radius: 6px;
   font-size: 15px;
+}
+
+#ImmuneHeatmapDiv .tab-content{
+  height:70%
 }

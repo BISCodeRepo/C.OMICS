@@ -320,7 +320,7 @@
       if (allGene.has(targetValue)) {
         targetArray.set(targetValue, allGene.get(targetValue))
         targetPatient.set(targetValue, genePatient);
-        $('.comparison-container1').append("<div id='ComparisonRNAPlot' class='comparisonPlot'><h3 class='custom-ttl3'>RNA</h3>");
+        $('.comparison-container1').append("<div id='ComparisonRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
         drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonRNAPlot')
         $('.comparison-container1').append("</div>");
       }
@@ -336,7 +336,7 @@
       }
 
       if(targetArray!=null && targetArray.size>0){
-        $('.comparison-container1').append("<div id='ComparisonProteinPlot' class='comparisonPlot'><h3 class='custom-ttl3'>Protein</h3>");
+        $('.comparison-container1').append("<div id='ComparisonProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
         drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonProteinPlot')
         $('.comparison-container1').append("</div>");
       }
@@ -352,7 +352,7 @@
       }
 
       if(targetArray!=null && targetArray.size>0){
-        $('.comparison-container1').append("<div id='ComparisonAcetylPlot' class='comparisonPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
+        $('.comparison-container1').append("<div id='ComparisonAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
         drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonAcetylPlot')
         $('.comparison-container1').append("</div>");
       }
@@ -368,7 +368,7 @@
       }
 
       if(targetArray!=null && targetArray.size>0){
-        $('.comparison-container1').append("<div id='ComparisonPhosphoPlot' class='comparisonPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
+        $('.comparison-container1').append("<div id='ComparisonPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
         drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonPhosphoPlot')
        $('.comparison-container1').append("</div>");
       }
@@ -472,7 +472,7 @@
     function comparisonDraw(res, allLayout, allPvalue,plotName) {
 
       let boxIndex = 0
-      
+      debugger
       var mapEntry = Array.from(allPvalue)
       if(sortOrder==0){ //default acs
         mapEntry.sort(function (a, b) {
