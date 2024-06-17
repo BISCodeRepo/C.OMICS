@@ -242,7 +242,7 @@
       if (sur_allGene.has(sur_selectval) && subPavlueList.filter((v, index, self) => {
         return v.split(',')[0] == 'RNA' && v.split(',')[1] == sur_selectval }).length > 0) {
         targetArray.set(sur_selectval, sur_allGene.get(sur_selectval));
-        $('.survival_container1').append("<div id='SurvivalRNAPlot' class='comparisonPlot'><h3 class='custom-ttl3'>RNA</h3>");
+        $('.survival_container1').append("<div id='SurvivalRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
         preDrawSurvivalPlot(targetArray,sur_genePatient,'SurvivalRNAPlot','RNA')
         $('.survival_container1').append("</div>");
       }

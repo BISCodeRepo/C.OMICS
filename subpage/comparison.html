@@ -282,11 +282,11 @@
         }
       });
 
-      genePatient = geneAllData[0].trimEnd().split(",").slice(4);
+      genePatient = geneAllData[0].trimEnd().split(",").slice(4,209);
 
       for (let i = 1; i < geneAllData.length; i++) {
         const row = geneAllData[i].trimEnd().split(",")
-        allGene.set(row[2], row.slice(4))
+        allGene.set(row[2], row.slice(4,209))
       }
 
       let groupOptions = []
@@ -315,14 +315,19 @@
 
       var targetArray = new Map();
       var targetPatient = new Map();
-
+      debugger
       //RNA
       if (allGene.has(targetValue)) {
-        targetArray.set(targetValue, allGene.get(targetValue))
-        targetPatient.set(targetValue, genePatient);
-        $('.comparison-container1').append("<div id='ComparisonRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
-        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonRNAPlot')
-        $('.comparison-container1').append("</div>");
+        var tmp = allGene.get(targetValue);
+        
+        if(!tmp.every((currentValue) => parseInt(currentValue) == 0)){ // quantified value is no 0
+          targetArray.set(targetValue, allGene.get(targetValue))
+          targetPatient.set(targetValue, genePatient);
+          $('.comparison-container1').append("<div id='ComparisonRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
+          drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonRNAPlot')
+          $('.comparison-container1').append("</div>");
+        }
+        
       }
 
       targetArray = new Map();
