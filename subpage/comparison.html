@@ -1,4 +1,4 @@
- <div id="comparisonContent">
+ <div id="comparisonContent" style="margin-top:-20px">
   <div class="layerPopup">
     <div class="spinner"></div>
   </div>
@@ -315,7 +315,7 @@
 
       var targetArray = new Map();
       var targetPatient = new Map();
-      debugger
+      //debugger
       //RNA
       if (allGene.has(targetValue)) {
         var tmp = allGene.get(targetValue);
@@ -477,7 +477,7 @@
     function comparisonDraw(res, allLayout, allPvalue,plotName) {
 
       let boxIndex = 0
-      debugger
+      //debugger
       var mapEntry = Array.from(allPvalue)
       if(sortOrder==0){ //default acs
         mapEntry.sort(function (a, b) {

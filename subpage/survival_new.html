@@ -1,4 +1,4 @@
-<div id="survivalContent">
+<div id="survivalContent" style="margin-top:-20px">
   <div class="layerPopup">
     <div class="spinner"></div>
   </div>
@@ -34,7 +34,7 @@
   <h4 class="component-ttl"></h4>
 
   <div id="survival_main_task_div" style="width: 95%; margin: auto;">
-    <div id="survival_geneName_list" style="width:17%;height:76vh;overflow: auto;float:left;margin-right:1%;">
+    <div id="survival_geneName_list" style="width:17%;height:76vh;float:left;margin-right:1%;overflow:auto">
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3 class="panel-title">Gene name</h3>
@@ -399,7 +399,9 @@
                   range : [0,1]
               },
             xaxis :{
-              title :'month'
+              title :'month',
+              dtick : 25,
+              range:[0,125]
             },
             legend: {
               autosize : false,

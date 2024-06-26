@@ -65,10 +65,11 @@ var toolbarMenu = {
       'Hierarchical Clustering',
       'KMeans Clustering',
       null,
-      'Marker Selection',
-      'Nearest Neighbors',
-      'Create Calculated Annotation',
-      null,
+      //'Marker Selection',
+      //'Nearest Neighbors',
+      //'Create Calculated Annotation',
+      //null,
+      //null,
       'Adjust',
       'Collapse',
       'Similarity Matrix',
@@ -80,9 +81,10 @@ var toolbarMenu = {
       null,
       'Sort/Group',
       'Filter',
-      null,
+      //null,
       //'API'
-      null],
+      //null
+      ],
     View: [
       'Zoom In', 'Zoom Out', null, 'Fit To Window', 'Fit Rows To Window', 'Fit Columns To Window', null, '100%', null,
       'Options'],
