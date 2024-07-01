@@ -262,26 +262,37 @@
  
  
     //Genes
-    var geneTmp = getConcatGeneList(nmfData);
- 
- 
-    $.each(geneTmp,function(n,value) {
-      geneList.push({id:value,title:value})
+    const dataToSend = { 'param':'param' };
+    $.ajax({
+      url: baseURL+'get_gene_name_list',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(dataToSend),
+      success: function (result) {
+        debugger
+        var geneTmp = result['geneName']
+
+        $.each(geneTmp,function(n,value) {
+          geneList.push({id:value,title:value})
+        });
+
+        selectizeElement = $('#nmfGenesOpt').selectize({
+          plugins: ["remove_button"],
+          maxItems: 10,
+          maxOptions: 100,
+          valueField: 'id',
+          labelField: 'title',
+          searchField: 'title',
+          sortField: 'title',
+          options: geneList,
+          create: false
+        });
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
     });
- 
- 
-    selectizeElement = $('#nmfGenesOpt').selectize({
-      plugins: ["remove_button"],
-      maxItems: 10,
-      maxOptions: 100,
-      valueField: 'id',
-      labelField: 'title',
-      searchField: 'title',
-      sortField: 'title',
-      options: geneList,
-      create: false
-    });
- 
  
     var tmpuniprotIdArray = $('#nmfGenesOpt').val().split(',');
     var subUniprotArray=[]
