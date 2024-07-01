@@ -24,7 +24,20 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                      r"/get_gene_heatmap_data": {"origins": "http://127.0.0.1:5500",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_protein_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_phospho_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_acetyl_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
                                      }
+                     
                      }) 
 """CORS(app, resources={r"/kruskal_wallis": {"origins": "http://166.104.110.31:7000",
                                           "methods": ["POST"],
@@ -34,11 +47,27 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/getGeneName": {"origins": "http://166.104.110.31:7000",
+                     r"/get_gene_name_list": {"origins": "http://166.104.110.31:7000",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
-                                     }
-                     r"/get_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                                     },
+                     r"/get_nmf_immune_heatmap_data": {"origins": "http://166.104.110.31:7000",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_gene_heatmap_data": {"origins": "http://166.104.110.31:7000",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_protein_heatmap_data": {"origins": "http://166.104.110.31:7000",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_phospho_heatmap_data": {"origins": "http://166.104.110.31:7000",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_acetyl_heatmap_data": {"origins": "http://166.104.110.31:7000",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      }
@@ -154,6 +183,65 @@ def get_nmf_immune_heatmap_data():
         return jsonify({"error": str(e)})
     
     
+@app.route('/get_protein_heatmap_data', methods=['POST'])
+def get_protein_heatmap_data():
+    try:
+        data = request.json
+        #print(data)
+        nmf_df = get_heatmap_data()
+        
+        protein_df = nmf_df[nmf_df['Type']=='PROTEIN'].copy()
+        print("PROTEIN Total : "+str(len(protein_df)))
+
+        protein_df['heatmap_gene_name'] =  protein_df.apply(lambda x:x['UniProt_Site'], axis=1)
+        print(len(protein_df))
+        
+        protein_sort = protein_df.sort_values(by=['UniProt_Site'],ascending=[True])
+        
+        return jsonify(protein_sort.to_json(orient='split'))
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+    
+@app.route('/get_phospho_heatmap_data', methods=['POST'])
+def get_phospho_heatmap_data():
+    try:
+        data = request.json
+        #print(data)
+        nmf_df = get_heatmap_data()
+        
+        phospho_df = nmf_df[nmf_df['Type']=='PHOSPHO'].copy()
+        print("PHOSPHO Total : "+str(len(phospho_df)))
+
+        phospho_df['heatmap_gene_name'] = phospho_df.apply(lambda x:x['UniProt_Site'], axis=1)
+        print(len(phospho_df))
+        
+        phospho_sort = phospho_df.sort_values(by=['UniProt_Site'],ascending=[True])
+        
+        return jsonify(phospho_sort.to_json(orient='split'))
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/get_acetyl_heatmap_data', methods=['POST'])
+def get_acetyl_heatmap_data():
+    try:
+        data = request.json
+        #print(data)
+        nmf_df = get_heatmap_data()
+        
+        acetyl_df = nmf_df[nmf_df['Type']=='ACETYL'].copy()
+        print("ACETYL Total : "+str(len(acetyl_df)))
+
+        acetyl_df['heatmap_gene_name'] = acetyl_df.apply(lambda x:x['UniProt_Site'], axis=1)
+        print(len(acetyl_df))
+        
+        acetyl_sort = acetyl_df.sort_values(by=['UniProt_Site'],ascending=[True])
+        
+        return jsonify(acetyl_sort.to_json(orient='split'))
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
     
 @app.route('/get_gene_heatmap_data', methods=['POST'])
 def get_gene_heatmap_data():
@@ -165,7 +253,12 @@ def get_gene_heatmap_data():
         rna_df = nmf_df[nmf_df['Type']=='RNA']
         print("RNA Total : "+str(len(rna_df)))
         
-        return jsonify({"subList":rna_df})
+        rna_df['heatmap_gene_name'] = rna_df.apply(lambda x:x['GeneName'], axis=1)
+        print(len(rna_df))
+        
+        rna_sort = rna_df.sort_values(by=['GeneName'],ascending=[True])
+        
+        return jsonify(rna_sort.to_json(orient='split'))
     except Exception as e:
         return jsonify({"error": str(e)})
 

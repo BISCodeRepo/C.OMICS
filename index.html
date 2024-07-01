@@ -289,30 +289,6 @@
           
        });
 
-      /*showSpinner('homeContent');
-
-       var percentage= 0;
-       $(".progress-bar-inner").width(percentage+"%");
-       $("#progressBarCount").text("0%");
-
-
-      var interval = setInterval(function(){
-         percentage+=10;
-         $(".progress-bar-inner").width(percentage+"%");
-         $("#progressBarCount").text(percentage+"%");
-
-         if(percentage>=110){
-           $(".progress-bar-inner").width(0+"%");
-           $("#progressBarCount").text(0+"%");
-           clearInterval(interval);
-           hideSpinner('homeContent');
-         }
-       },1500);
-
-       if(percentage>=110){
-        clearInterval(interval);
-       }*/
-
        $.ajax({
            type:"GET",   
            url: "../file/NMF_meta.csv",
@@ -323,27 +299,6 @@
              metaArray = data.split('\n');
            }
        });  
-
-
-      /* $.ajax({
-        type:"GET",   
-        url: "../file/tumer_nmf_all.csv",
-        data:[],  
-        dataType:"text",
-        cache:false,
-        success:function(data){  
-          allData = data.split('\n');
-          hideSpinner('nmfContent');
-          hideSpinner('ImmuneContent');
-          hideSpinner('comparisonContent');
-          hideSpinner('survivalContent');
-          hideSpinner('acetylsiteContent');
-          hideSpinner('phosphoContent');
-          hideSpinner('proteinConent');
-          hideSpinner('geneContent');
-        }
-      });*/
-      
    });
  
  </script>

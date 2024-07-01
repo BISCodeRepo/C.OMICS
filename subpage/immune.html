@@ -63,10 +63,7 @@ var subGenArray = []
 
     ImmunLayer();
 
-    showSpinner('ImmuneContent');
-
     $('#immnun-legend-after').addClass('active');
- 
  
     $('.ImmuneContainer').css({right:'0px'});
     $('.ImmuneContainer').css({width:'21rem'});
@@ -105,72 +102,30 @@ var subGenArray = []
 
         var ImmuneNmfData = allData;
         getInmmunNmfData(ImmuneNmfData,ImmuneData);
-        hideSpinner('ImmuneContent');
       }
     });
 
 
     $('#ImmuneSelectBtn').click(function(){
 
-      var subDataArray=[]
-      var subUniprotArray=[]
       var tmpuniprotIdArray = $('#ImmuneGenesOpt').val().split(',');
-      var subLinkArray = []
       //debugger
-      var subGenList = []
       if(tmpuniprotIdArray.length == 0 || tmpuniprotIdArray[0] == ''){
         tmpuniprotIdArray = ["CSNK2A1","KRAS","ERBB2","XPO1","TP53","EGFR"];
         var control = selectizeElement[0].selectize;
         control.setValue(["CSNK2A1","KRAS","ERBB2","XPO1","TP53","EGFR"]);
       } 
 
-      for(var i = 0; i<tmpuniprotIdArray.length;i++){
-          $.each(uniprotIdArray,function(n,v){
-            if(v.indexOf("_")>-1 && v.split("_")[0] == tmpuniprotIdArray[i]){
-              subGenList.push(n);
-              subUniprotArray.push(v);
-              $.each(linkArray,function(m,y){
-                if(v==y.split('=')[0]){
-                  subLinkArray.push(y.split('=')[1]);
-                  return;
-                }
-              })
-            } else if(v.indexOf("_")==-1 && v == tmpuniprotIdArray[i]){
-              subGenList.push(n);
-              subUniprotArray.push(v);
-              $.each(linkArray,function(m,y){
-                if(v==y.split('=')[0]){
-                  subLinkArray.push(y.split('=')[1]);
-                  return;
-                }
-              })
-            }
-          })
-      }
+      getImmuneSubHeatMap(tmpuniprotIdArray)
 
-      subGenArray = subUniprotArray
-
-      for(var i = 0; i<subGenList.length;i++){
-        var rowIdx = subGenList[i]
-        subDataArray.push(dataArray[rowIdx])
-      }
-
-      immunMorpheus = paintInmuneHeatMap(subUniprotArray,patientsArray,subDataArray,'ImmuneHeatmapDiv',ImmuneData,subLinkArray)
     });
-
 
     $('#ImmuneHeatmapDiv').mouseup(function(event){
       if(event.currentTarget.className == 'morpheus'){
         if ( immunMorpheus.selectedRowTrackName == 'Link' && ((event.button == 0) || (event.which == 1))) {
           var index = immunMorpheus.project.hoverRowIndex
-          var gene = subGenArray[index]
-          var link = ""
-          $.each(linkArray,function(m,y){
-            if(gene==y.split('=')[0]){
-              link = y.split('=')[1]
-              return;
-            }
-          });
+          var link = subGenArray[index]
+
           if(link!='X'){
             window.open('https://www.uniprot.org/uniprotkb/'+link+'/entry', '_blank');
           }
@@ -251,73 +206,78 @@ var subGenArray = []
   function getInmmunNmfData(ImmuneNmfData,ImmuneData){
 
     //debugger;
-    //Patients
-    patientsArray = getConcatSampleList(ImmuneNmfData);
-    
-    //GeneIDs
-    dataArray = getDataArray(ImmuneNmfData);
-    uniprotIdArray = getRowGeneList(ImmuneNmfData);
+    //Gene name list
+    $.ajax({
+      url: baseURL+'get_gene_name_list',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 'param':'param' }),
+      success: function (result) {
+        //debugger
+        var geneTmp = result['geneName']
 
-    //Genes
-    var geneTmp = getConcatGeneList(ImmuneNmfData);
+        $.each(geneTmp,function(n,value) {
+          geneList.push({id:value,title:value})
+        });
 
-    linkArray = getUniprotIDList(uniprotIdArray,ImmuneNmfData);
-
-    $.each(geneTmp,function(n,value) { 
-      geneList.push({id:value,title:value})
-    });
-
-    selectizeElement = $('#ImmuneGenesOpt').selectize({
-      plugins: ["remove_button"],
-      maxItems: 10,
-      maxOptions: 100,
-      valueField: 'id',
-      labelField: 'title',
-      searchField: 'title',
-      sortField: 'title',
-      options: geneList,
-      create: false
+        selectizeElement = $('#ImmuneGenesOpt').selectize({
+          plugins: ["remove_button"],
+          maxItems: 10,
+          maxOptions: 100,
+          valueField: 'id',
+          labelField: 'title',
+          searchField: 'title',
+          sortField: 'title',
+          options: geneList,
+          create: false
+        });
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
     });
 
     var tmpuniprotIdArray = $('#ImmuneGenesOpt').val().split(',');
-    var subUniprotArray=[]
 
-    var subGenList = []
-    var subLinkArray = []
-   
-    for(var i = 0; i<tmpuniprotIdArray.length;i++){
-      $.each(uniprotIdArray,function(n,v){
-        if(v.indexOf("_")>-1 && v.split("_")[0] == tmpuniprotIdArray[i]){
-          subGenList.push(n);
-          subUniprotArray.push(v);
-          $.each(linkArray,function(m,y){
-            if(v==y.split('=')[0]){
-              subLinkArray.push(y.split('=')[1]);
-              return;
-            }
-          })
-        } else if(v.indexOf("_")==-1 && v == tmpuniprotIdArray[i]){
-          subGenList.push(n);
-          subUniprotArray.push(v);
-          $.each(linkArray,function(m,y){
-            if(v==y.split('=')[0]){
-              subLinkArray.push(y.split('=')[1]);
-              return;
-            }
-          })
+    getImmuneSubHeatMap(tmpuniprotIdArray);
+  }
+
+
+  async function getImmuneSubHeatMap(tmpuniprotIdArray){
+
+    showSpinner('ImmuneContent');
+
+    $.ajax({
+      url: baseURL+'get_nmf_immune_heatmap_data',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 'geneNameList': tmpuniprotIdArray }),
+      success: function (result) {
+        //debugger
+        var resultMap = JSON.parse(result);
+        var patientsArray = getConcatSampleList(resultMap['columns']);
+
+        var subArray = []
+        var subUniprotArray = []
+        var subLinkArray = []
+        for(var i = 0;i<resultMap['data'].length;i++){
+          var tmp = resultMap['data'][i];
+          subArray.push(tmp.slice(4,tmp.length-1));
+          subUniprotArray.push(tmp.slice(tmp.length-1,tmp.length)[0]);
+          subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
         }
-      })
-    }
 
-    subGenArray = subUniprotArray
-
-    var subDataArray = []
-    for(var i = 0; i<subGenList.length;i++){
-      var rowIdx = subGenList[i]
-      subDataArray.push(dataArray[rowIdx])
-    }
-
-    immunMorpheus = paintInmuneHeatMap(subUniprotArray,patientsArray,subDataArray,'ImmuneHeatmapDiv',ImmuneData,subLinkArray)
+        subGenArray = subLinkArray
+        immunMorpheus = paintInmuneHeatMap(subUniprotArray,patientsArray,subArray,'ImmuneHeatmapDiv',ImmuneData,subLinkArray)
+        hideSpinner('ImmuneContent');
+        return immunMorpheus
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
+    });
   }
 
 
@@ -443,94 +403,13 @@ function paintInmuneHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,me
 
   
 /////////////////////// Sample(Patient)리스트 가져오기//////////////////////////////
-function getConcatSampleList(ImmuneNmfData){
+function getConcatSampleList(subColumns){
   
-  var patientsArray = []
-  //Patients
-  var nmfPat = ImmuneNmfData[0].substr(0,ImmuneNmfData[0].length-1);
-  patientsArray = patientsArray.concat(nmfPat.split(',').slice(4,nmfPat.split(',').length));
-
+  var patientsArray = subColumns.slice(4,subColumns.length-2);
   return patientsArray
 
 }
 
-
-function getConcatGeneList(ImmuneNmfData){
-
-  var geneList = []
-
-  //Genens
-  for(var i = 1; i<ImmuneNmfData.length-1;i++) {
-      var tmp = ImmuneNmfData[i]
-      geneList.push(tmp.split(',')[3].split("_")[0])
-  }
-
-  let patSet = new Set(geneList);
-  geneList = Array.from(patSet).sort();
-
-  return geneList
-
-}
-
-
-function getDataArray(ImmuneNmfData){
-
-  var dataList = []
-
-  for(var i = 1; i<ImmuneNmfData.length-1;i++) {
-      var tmp = ImmuneNmfData[i]
-      dataList.push(tmp.split(',').slice(4, tmp.split(',').length))
-  }
-
-  return dataList
-
-}
-
-
-function getGeneIDList(ImmuneNmfData){
-
-
-  var uniprotIdArray = []
-
-  for(var i = 1; i<ImmuneNmfData.length-1;i++) {
-      var tmp = ImmuneNmfData[i]
-      uniprotIdArray.push(tmp.split(',')[3])
-  }
-
-  return uniprotIdArray
-
-}
-
-
-function getRowGeneList(ImmuneNmfData){
-
-  var uniprotIdArray = []
-  for(var i = 1; i<ImmuneNmfData.length-1;i++) {
-      var tmp = ImmuneNmfData[i].split(",");
-      if(tmp[0] == 'RNA'){
-        uniprotIdArray.push(tmp[3] +"_g")
-      } else if(tmp[0] == 'PROTEIN'){
-        uniprotIdArray.push(tmp[3] +"_p ("+ tmp[1]+")")
-      } else {
-        uniprotIdArray.push(tmp[3])
-      }
-      
-  }
-  return uniprotIdArray
-
-}
-
-
-function getUniprotIDList(geneList,ImmuneNmfData){
-
-  var uniprotIdArray = []
-  for(var i= 0 ; i<geneList.length ; i++){
-    var tmp = ImmuneNmfData[i+1].split(',');
-    uniprotIdArray.push(geneList[i]+"="+tmp[1].split('_')[0])
-  }
-
-  return uniprotIdArray
-}
 
 //////////////// 색상 gradient ////////////////
 function getImmunColumnColorModel(metaList){

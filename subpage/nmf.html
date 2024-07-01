@@ -103,12 +103,8 @@
  
     $('#nmfSelectBtn').click(function(){
 
-      var subDataArray=[]
-      var subUniprotArray=[]
-      var subLinkArray = []
       var tmpuniprotIdArray = $('#nmfGenesOpt').val().split(',');
       //debugger
-      var subGenList = []
       if(tmpuniprotIdArray.length == 0 || tmpuniprotIdArray[0] == ''){
         tmpuniprotIdArray = ["CSNK2A1","KRAS","ERBB2","XPO1","TP53","EGFR"];
         var control = selectizeElement[0].selectize;
