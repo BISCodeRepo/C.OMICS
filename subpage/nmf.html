@@ -66,7 +66,12 @@
  
  
     showSpinner('nmfContent');
+
+    //legend
     NmfLayer();
+
+    var nmfData = allData;
+    getNmfData(nmfData);
  
     $('#nmfFloatContainerBtn').click(function(){
  
@@ -91,9 +96,6 @@
       $('#nmf-legend-after').removeClass('active');
     });
  
- 
-    var nmfData = allData;
-    getNmfData(nmfData);
  
     $('#nmf-legend-after').addClass('active');
  
@@ -261,13 +263,12 @@
     linkArray = getUniprotIDList(uniprotIdArray,nmfData);
  
  
-    //Genes
-    const dataToSend = { 'param':'param' };
+    //Gene name list
     $.ajax({
       url: baseURL+'get_gene_name_list',
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify(dataToSend),
+      data: JSON.stringify({ 'param':'param' }),
       success: function (result) {
         debugger
         var geneTmp = result['geneName']
@@ -293,8 +294,38 @@
         reject('error');
       }
     });
+
+    //default heat map
  
     var tmpuniprotIdArray = $('#nmfGenesOpt').val().split(',');
+
+
+    $.ajax({
+      url: baseURL+'get_heatmap_data',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 'geneNameList': tmpuniprotIdArray }),
+      success: function (result) {
+        debugger
+        var geneTmp = result['geneName']
+        
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
+    });
+
+
+
+
+
+
+
+
+
+
+
     var subUniprotArray=[]
  
  

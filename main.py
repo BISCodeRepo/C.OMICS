@@ -18,6 +18,10 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      }
+                     r"/get_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     }
                      }) 
 """CORS(app, resources={r"/kruskal_wallis": {"origins": "http://166.104.110.31:7000",
                                           "methods": ["POST"],
@@ -31,8 +35,39 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      }
+                     r"/get_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     }
                      })  """
-                     
+
+def get_prix_gene_name(geneNames):
+    tmp = geneNames
+    if '_' in tmp:
+        return tmp.split('_')[0]
+    else:
+        return tmp
+   
+    
+def get_heatmap_data():
+    
+    nmf_df = pd.read_csv('file/tumer_nmf_all.csv')
+    print(len(nmf_df))
+    #print(nmf_df.head())
+    nmf_df['search_gene_name'] = nmf_df.apply(lambda x:get_prix_gene_name(x['GeneName_Site']),axis=1)
+    
+    #protein_df = nmf_df[nmf_df['Type']=='PROTEIN']
+    #print("PROTEIN Total : "+str(len(protein_df)))
+    #rna_df = nmf_df[nmf_df['Type']=='RNA']
+    #print("RNA Total : "+str(len(rna_df)))
+    #acetyl_df = nmf_df[nmf_df['Type']=='ACETYL']
+    #print("ACETYL Total : "+str(len(acetyl_df)))
+    #phospho_df = nmf_df[nmf_df['Type']=='PHOSPHO']
+    #print("PHOSPHO Total : "+str(len(phospho_df)))
+    
+    return nmf_df
+
+                   
 @app.route('/kruskal_wallis', methods=['POST'])
 def kruskal_wallis():
     data = request.json
@@ -71,43 +106,6 @@ def rankSums():
         return jsonify({"error": "no data"})
 
 
-def read_file(path):
-    lines = []
-    r = open(path,'r')
-    try:
-        lines = r.readlines()
-    finally:
-        r.close()
-    return lines
-
-
-def get_prix_gene_name(geneNames):
-    tmp = geneNames
-    if '_' in tmp:
-        return tmp.split('_')[0]
-    else:
-        return tmp
-   
-    
-def get_heatmap_data():
-    
-    nmf_df = pd.read_csv('file/tumer_nmf_all.csv')
-    print(len(nmf_df))
-    #print(nmf_df.head())
-    nmf_df['search_gene_name'] = nmf_df.apply(lambda x:get_prix_gene_name(x['GeneName_Site']),axis=1)
-    
-    #protein_df = nmf_df[nmf_df['Type']=='PROTEIN']
-    #print("PROTEIN Total : "+str(len(protein_df)))
-    #rna_df = nmf_df[nmf_df['Type']=='RNA']
-    #print("RNA Total : "+str(len(rna_df)))
-    #acetyl_df = nmf_df[nmf_df['Type']=='ACETYL']
-    #print("ACETYL Total : "+str(len(acetyl_df)))
-    #phospho_df = nmf_df[nmf_df['Type']=='PHOSPHO']
-    #print("PHOSPHO Total : "+str(len(phospho_df)))
-    
-    return nmf_df
-
-
 @app.route('/get_gene_name_list', methods=['POST'])
 def get_gene_name_list():
     try:
@@ -121,10 +119,28 @@ def get_gene_name_list():
         return jsonify({'geneName':list(gene_name_vals)})
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+    
+@app.route('/get_heatmap_data', methods=['POST'])
+def get_heatmap_data():
+    try:
+        data = request.json
+        print(data)
+        nmf_df = get_heatmap_data()
+        
+        sub_nmf_df = nmf_df[nmf_df['search_gene_name']=='']
+        
+    
+        #print(nmf_df['search_gene_name'])
+        gene_name_vals = set(nmf_df['search_gene_name'].tolist())
+        print(len(list(gene_name_vals)))
+        return jsonify({'geneName':list(gene_name_vals)})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 if __name__ == '__main__':
     
-    get_heatmap_data()
+    #get_heatmap_data()
     
     app.run(debug=True,host="0.0.0.0",port=5000)
