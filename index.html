@@ -1,4 +1,4 @@
-<html lang="en" style="overflow:hidden;">
+<html lang="en">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,6 +31,8 @@
 
    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css" integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js" integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
    -->
@@ -109,12 +111,12 @@
              <div class="custom-header-inner">
                <ul class="custom-header-nav-grp" id="mymenu">
 
-                 <li class="custom-header-nav">
+                 <!--<li class="custom-header-nav">
                    <a href="#" class="link active">HOME</a>
-                 </li>
+                 </li>-->
     
                  <li class="custom-header-nav" name="NMF">
-                   <a href="#" class="link">NMF Cluster</a>
+                   <a href="#" class="link active">NMF Cluster</a>
                  </li>
     
                  <li class="custom-header-nav" name="IMMUNE">
@@ -160,10 +162,7 @@
      </div>
      <div id="homeContent">
        <div class="layerPopup">
-           <div class="progress-bar">
-             <span id="progressBarCount" style="position: absolute;margin-top: 3px;"></span>
-             <div class="progress-bar-inner"></div>
-           </div>
+        <div class="spinner"></div>
        </div>
        <div id="mainContent">
          <div id="NMFmainContent" ></div>
@@ -178,6 +177,20 @@
      </div>
   
  </div>
+ <!--<footer class="main-footer">
+  <table style="margin: auto; font-size: 13px;margin-top:20px">
+    <tbody>
+      <tr>
+        <td class="copy">Copyright © 2024 
+          <a href="http://bislab.hanyang.ac.kr/" class="under" target="_blank">Bioinformatics &amp; Intelligent Systems Lab</a>, 
+          <a href="http://www.hanyang.ac.kr/english/" class="under" target="_blank">Hanyang University</a>, 
+          Korea. All rights reserved.<br>
+          <a href="/inc/policy.jsp" class="under" target="_blank">Personal Information Policy</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+ </footer>-->
 </body>
 
 
@@ -196,110 +209,112 @@
 
    $(function() {
 
+      dropdownOpen();
 
-       function dropdownOpen() {     
-           $('.dropdown').mouseover(function () {
-               $(this).addClass('show');
-              
-               $(this).find(".dropdown-menu").addClass('show');
-           }).mouseout(function () {
-               $(this).find(".dropdown-menu").removeClass('show');
-               $(this).removeClass('show');
-           });
-       }
-       dropdownOpen();
-
-
-       $("#mymenu li").click(function(){
+      $.ajax({
+        type:"GET",   
+        url: "../file/NMF_meta.csv",
+        data:[],  
+        dataType:"text",
+        cache:false,
+        success:function(data){  
+          metaArray = data.split('\n');
+          $('#NMFmainContent').load('/subpage/nmf.html')
+        }
+      }); 
 
 
-         $('#mymenu li a').removeClass('active');
-         $($(this).children()[0]).addClass('active');
-          
-           if($(this).attr('name') != undefined){
-               $('#NMFmainContent').hide();
-               $('#IMMUNEmainContent').hide();
-               $('#PROTEINmainContent').hide();
-               $('#PHOSPHOmainContent').hide();
-               $('#ACETYLmainContent').hide();
-               $('#GENEmainContent').hide();
-               $('#COMPARISONmainContent').hide();
-               $('#SURVIVALmainContent').hide();
+      $("#mymenu li").click(function(){
+
+        $('#mymenu li a').removeClass('active');
+        $($(this).children()[0]).addClass('active');
+        
+          if($(this).attr('name') != undefined){
+
+              $('#NMFmainContent').hide();
+              $('#IMMUNEmainContent').hide();
+              $('#PROTEINmainContent').hide();
+              $('#PHOSPHOmainContent').hide();
+              $('#ACETYLmainContent').hide();
+              $('#GENEmainContent').hide();
+              $('#COMPARISONmainContent').hide();
+              $('#SURVIVALmainContent').hide();
 
 
-               switch($(this).attr('name')){
-                   case 'NMF':
-                       $('#NMFmainContent').show();
-                       if(nmfPage){
-                           nmfPage = false;
-                           $('#NMFmainContent').load('/subpage/nmf.html')
-                       } 
-                   break;
-                   case 'IMMUNE':
-                       $('#IMMUNEmainContent').show();
-                       if(immunPage){
-                           immunPage = false
-                           $('#IMMUNEmainContent').load('/subpage/immune.html')
-                       }
-                   break;
-                   case 'PROTEIN':
-                       $('#PROTEINmainContent').show();
-                       if(proteinPage){
-                           proteinPage = false
-                           $('#PROTEINmainContent').load('/subpage/quantitation_protein.html')
-                       }
-                   break;
-                   case 'PHOSPHO':
-                       $('#PHOSPHOmainContent').show();
-                       if(phosphoPage){
-                           phosphoPage = false
-                           $('#PHOSPHOmainContent').load('/subpage/quantitation_phosphosite.html')
-                       }
-                   break;
-                   case 'ACETYL':
-                       $('#ACETYLmainContent').show();
-                       if(acetylPage){
-                           acetylPage = false
-                           $('#ACETYLmainContent').load('/subpage/quantitation_acetylsite.html')
-                       }
-                   break;
-                   case 'RNA':
-                       $('#GENEmainContent').show();
-                       if(genePage){
-                           genePage = false
-                           $('#GENEmainContent').load('/subpage/quantitation_gene.html')
-                       }
-                   break;
-                   case 'COMPARISON':
-                       $('#COMPARISONmainContent').show();
-                       if(comparisonPage){
-                           comparisonPage = false
-                           $('#COMPARISONmainContent').load('/subpage/comparison.html')
-                       }
-                   break;
-                   case 'SURVIVAL':
-                       $('#SURVIVALmainContent').show();
-                       if(survivalPage){
-                           survivalPage = false
-                           $('#SURVIVALmainContent').load('/subpage/survival_new.html')
-                       }
-                   break;
-               }  
-           }
-          
-       });
+              switch($(this).attr('name')){
+                  case 'NMF':
+                      $('#NMFmainContent').show();
+                      if(nmfPage){
+                          nmfPage = false;
+                          $('#NMFmainContent').load('/subpage/nmf.html')
+                      } 
+                  break;
+                  case 'IMMUNE':
+                      $('#IMMUNEmainContent').show();
+                      if(immunPage){
+                          immunPage = false
+                          $('#IMMUNEmainContent').load('/subpage/immune.html')
+                      }
+                  break;
+                  case 'PROTEIN':
+                      $('#PROTEINmainContent').show();
+                      if(proteinPage){
+                          proteinPage = false
+                          $('#PROTEINmainContent').load('/subpage/quantitation_protein.html')
+                      }
+                  break;
+                  case 'PHOSPHO':
+                      $('#PHOSPHOmainContent').show();
+                      if(phosphoPage){
+                          phosphoPage = false
+                          $('#PHOSPHOmainContent').load('/subpage/quantitation_phosphosite.html')
+                      }
+                  break;
+                  case 'ACETYL':
+                      $('#ACETYLmainContent').show();
+                      if(acetylPage){
+                          acetylPage = false
+                          $('#ACETYLmainContent').load('/subpage/quantitation_acetylsite.html')
+                      }
+                  break;
+                  case 'RNA':
+                      $('#GENEmainContent').show();
+                      if(genePage){
+                          genePage = false
+                          $('#GENEmainContent').load('/subpage/quantitation_gene.html')
+                      }
+                  break;
+                  case 'COMPARISON':
+                      $('#COMPARISONmainContent').show();
+                      if(comparisonPage){
+                          comparisonPage = false
+                          $('#COMPARISONmainContent').load('/subpage/comparison.html')
+                      }
+                  break;
+                  case 'SURVIVAL':
+                      $('#SURVIVALmainContent').show();
+                      if(survivalPage){
+                          survivalPage = false
+                          $('#SURVIVALmainContent').load('/subpage/survival_new.html')
+                      }
+                  break;
+              }  
+          }
+        
+      });
 
-       $.ajax({
-           type:"GET",   
-           url: "../file/NMF_meta.csv",
-           data:[],  
-           dataType:"text",
-           cache:false,
-           success:function(data){  
-             metaArray = data.split('\n');
-           }
-       });  
    });
+
+   function dropdownOpen() {     
+    $('.dropdown').mouseover(function () {
+        $(this).addClass('show');
+       
+        $(this).find(".dropdown-menu").addClass('show');
+    }).mouseout(function () {
+        $(this).find(".dropdown-menu").removeClass('show');
+        $(this).removeClass('show');
+    });
+}
  
  </script>
 </html>

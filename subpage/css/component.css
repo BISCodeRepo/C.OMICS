@@ -445,3 +445,11 @@ body {
   border-radius: 6px;
   font-size: 15px;
 }
+
+.main-footer {
+  height:80px;
+  background:#e4e6e9;
+  position: relative;
+  width: 100%;
+  bottom:0;
+}

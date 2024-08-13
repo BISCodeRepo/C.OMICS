@@ -71,7 +71,7 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      }
-                     })  """
+                     }) """
 
 def get_prix_gene_name(geneNames):
     tmp = geneNames
@@ -87,15 +87,6 @@ def get_heatmap_data():
     print(len(nmf_df))
     #print(nmf_df.head())
     nmf_df['search_gene_name'] = nmf_df.apply(lambda x:get_prix_gene_name(x['GeneName_Site']),axis=1)
-    
-    #protein_df = nmf_df[nmf_df['Type']=='PROTEIN']
-    #print("PROTEIN Total : "+str(len(protein_df)))
-    #rna_df = nmf_df[nmf_df['Type']=='RNA']
-    #print("RNA Total : "+str(len(rna_df)))
-    #acetyl_df = nmf_df[nmf_df['Type']=='ACETYL']
-    #print("ACETYL Total : "+str(len(acetyl_df)))
-    #phospho_df = nmf_df[nmf_df['Type']=='PHOSPHO']
-    #print("PHOSPHO Total : "+str(len(phospho_df)))
     
     return nmf_df
 

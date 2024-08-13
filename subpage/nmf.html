@@ -7,7 +7,7 @@
     <div class="white-bd-box search-01-box">
       <h3 class="custom-ttl">Genes of intereset (max. 10)</h3>
       <div style="width:100%">
-        <div class="" style="width: 91%;max-height: 150px;">
+        <div style="width: 91%;max-height: 150px;">
           <input type="text" id="nmfGenesOpt" data-width="95%" name="nmfGenesSelect" value="CSNK2A1,KRAS,ERBB2,XPO1,TP53,EGFR"/>
         </div>
         <div class="box-btn-wrap" style="width:10%;float:right;margin-top:-42px;">
@@ -19,7 +19,7 @@
  
   <h4 class="component-ttl"></h4>
  
-  <div id="nmfHeatmapDiv" style="width:90%;margin:auto;background-color: white;overflow: auto;"> </div>
+  <div id="nmfHeatmapDiv" style="width:90%;margin:auto;background-color: white;"> </div>
  
   <div class="nmfContainer">
     <div class="legend-box-area">
@@ -117,7 +117,7 @@
  
  
     $('#nmfHeatmapDiv').mouseup(function(event){
-      debugger;
+      //debugger;
       if(event.currentTarget.className == 'morpheus'){
         if (nmfMorpheus.selectedRowTrackName == 'Link' && ((event.button == 0) || (event.which == 1))) {
           var index = nmfMorpheus.project.hoverRowIndex

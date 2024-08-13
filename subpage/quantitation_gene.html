@@ -73,96 +73,78 @@
     async function getGeneSubHeatMap(){
 
       showSpinner('geneContent');
-  
+      
       $.ajax({
-        url: baseURL+'get_gene_heatmap_data',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 'param': 'param' }),
-        success: function (result) {
-          //debugger
-          var resultMap = JSON.parse(result);
-          var patientsArray = getConcatSampleList(resultMap['columns']);
-  
-          var subArray = []
+        type:"GET",   
+        url: "../file/Quantitation_genes.csv",
+        data:[],  
+        dataType:"text",
+        cache:false,
+        success:function(data){  
+          //debugger;
+          geneArray = data.split('\n');
+          var patientsIndexArray = getGeneConcatSampleList(geneArray[0].trimEnd().split(","));
+          var patientsArray = []
           var subUniprotArray = []
-          var subLinkArray = []
-          for(var i = 0;i<resultMap['data'].length;i++){
-            var tmp = resultMap['data'][i];
-            subArray.push(tmp.slice(4,tmp.length-1));
-            subUniprotArray.push(tmp.slice(tmp.length-1,tmp.length)[0]);
-            subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
+          var subArray = []
+          for(var i =1; i<geneArray.length;i++){
+            var tmp = geneArray[i].trimEnd().split(',');
+            subUniprotArray.push(tmp[0]);
+            var tmpGeneArray=[]
+            $.each(patientsIndexArray,function(j,v){
+              tmpGeneArray.push(tmp[v.split('_')[1]]);
+              if(i == 1){
+                patientsArray.push(v.split('_')[0]);
+              }
+            });
+
+            subArray.push(tmpGeneArray)
           }
-  
-          protein_link = subLinkArray
-          genesiteMorpheus = paintGeneHeatMap(subUniprotArray,patientsArray,subArray,'geneheatmapDiv',metaArray,subLinkArray)
+
+          genesiteMorpheus = paintGeneHeatMap(subUniprotArray,patientsArray,subArray,'geneheatmapDiv',metaArray)
           hideSpinner('geneContent');
           return genesiteMorpheus
-        },
-        error: function (error) {
-          console.error('error:', error);
-          reject('error');
         }
-      });
+    }); 
+      
     }
 
-    function paintGeneHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray,linkArray){
-
-      var patientTmp = []
-      var subPatient = []
+    function paintGeneHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray){
     
       var nmfMetaObj = {
         "vectors" :[]
       }
-    
+  
       //debugger;
-    
-      for(var i=0; i<metaArray.length; i++){
-        var tmp = metaArray[i].substr(0,metaArray[i].length-1);
-        var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
-        
-        for(var j=0; j<patientsArray.length;j++){
-          var paiTmp = patientsArray[j].substr(0,patientsArray[j].length-1)+'T';
-          if(tmpArray.indexOf(paiTmp)>-1){
-            patientTmp.push(tmpArray.indexOf(paiTmp));
-            subPatient.push(patientsArray[j])
-          }
-        }
-      }
-    
-      var finalDataArray = [];
-      for(var i = 0; i<dataArray.length;i++){
-        var tmp = dataArray[i];
-        var fArray = []
-        for(var j=0;j<patientTmp.length;j++){
-          fArray.push(tmp[patientTmp[j]])
-        }
-        finalDataArray.push(fArray)
-      }
-    
-    
+
       var metaList = []
+      metaList.push({
+        'name':'Sample ID',
+        'array':patientsArray
+      });
+
       if(metaArray !=null && metaArray.length > 0){
-          for(var i=0; i<metaArray.length; i++){
-              var tmp = metaArray[i].substr(0,metaArray[i].length-1);
-              var colValue = tmp.split(',')[0];
-              var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
-              var putArray =[];
-              for(var j=0;j<patientTmp.length;j++){
-                putArray.push(tmpArray[patientTmp[j]]);
-              }
-              if(colValue=='Sample ID'){
-                metaList.push({
-                  'name':colValue,
-                  'array':subPatient
-                })
-              } else{
-                metaList.push({
-                  'name':colValue,
-                  'array':putArray
-                })
-              }
+        var subPatArray = metaArray[0].trimEnd().split(',');
+        var subPatIndexArray = []
+        for(var i=0;i<subPatArray.length;i++){
+          $.each(patientsArray,function(j,v){
+            if(subPatArray[i]==v){
+              subPatIndexArray.push(i)
             }
+          });
+        }
+
+        for(var i=1; i<metaArray.length; i++){
+          var tmp = metaArray[i].trimEnd().split(',');
+          var putArray = []
+          $.each(subPatIndexArray,function(j,v){
+           putArray.push(tmp[v])
+          });
+          metaList.push({
+            'name':tmp[0],
+            'array':putArray
+          })
+        }
       }
       
       nmfMetaObj['vectors'] = metaList
@@ -171,17 +153,14 @@
     
       var json = {
         "rows": uniprotIdArray.length,
-        "columns": subPatient.length,
-        "seriesArrays": [finalDataArray],
+        "columns": patientsArray.length,
+        "seriesArrays": [dataArray],
         "seriesDataTypes": ["Float32"],
         "seriesNames": ["RNA"],
         "rowMetadataModel": {
           "vectors": [{
             "name": "RNA",
             "array": uniprotIdArray
-          },{
-            "name": "Link",
-            "array": linkArray
           }]
         },
         "columnMetadataModel": nmfMetaObj
@@ -221,9 +200,15 @@
     }
 
     /////////////////////// Sample(Patient)리스트 가져오기//////////////////////////////
-  function getConcatSampleList(subColumns){
-    var patientsArray = subColumns.slice(4,subColumns.length-2);
-    return patientsArray
+  function getGeneConcatSampleList(subColumns){
+    var patientsArray = subColumns.slice(1,subColumns.length);
+    var subpatients = []
+    for(var i = 0;i<patientsArray.length;i++){
+      if (patientsArray[i].split('-')[2]=='T'){
+        subpatients.push(patientsArray[i]+"_"+(i+1))
+      }
+    }
+    return subpatients
 
   }
 
