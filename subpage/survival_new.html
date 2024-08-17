@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="survival_container1"> </div>
+    <div id="survival_container1"> </div>
   </div>
   
 
@@ -55,20 +55,13 @@
     var allPvalueList = [];
     var overallList = [];
     var sur_allPatient = new Map();
-    var sur_proteinPatient = []
-    var sur_genePatient = []
-    var sur_acetlysitePatient = []
-    var sur_phosphositePatient = []
-    var sur_allProtein = new Map();
-    var sur_allGene = new Map();
-    var sur_allAcetlysite = new Map();
-    var sur_allPhosphosite = new Map();
     var sur_patientInfo = [];
     var sur_targetOptions = []
     var sur_sortOrder = 0
     var subPavlueList = [];
     var sur_selectval='';
     var min_date = 0;
+    var SurvivalAllData = null;
     //var max_date = d3.max(data, (d)=>d.time)
     var max_date = 11;
 
@@ -95,7 +88,6 @@
             cache:false,
             success:function(data){  
                 allPvalueList = data.split('\n');
-                hideSpinner('survivalContent');
             }
         }); 
 
@@ -117,7 +109,10 @@
             } else{
                 sur_sortOrder = 0
             }
-            genenNameClick('sort');
+
+            $('#survival_container1').empty();
+            GetSurvivalDatafitPlot(SurvivalAllData,sur_selectval)
+            //genenNameClick('sort');
         });
 
         $('#survival_geneName_list').css('display','none');
@@ -202,7 +197,7 @@
     function drawGeneTable(subPavlueList){
 
         $('#geneNameListUl').empty();
-        $('.survival_container1').empty();
+        $('#survival_container1').empty();
         
         var liSet = new Set()
         for (var i = 0; i < subPavlueList.length; i++) {
@@ -231,66 +226,103 @@
     //click gene name list
     function genenNameClick(e){
 
-      $('.survival_container1').empty();
+      $('#survival_container1').empty();
       var targetArray = new Map();
 
       if(e !='sort'){
         sur_selectval = $(e).attr('name');
       }
-      
-        //RNA
-      if (sur_allGene.has(sur_selectval) && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'RNA' && v.split(',')[1] == sur_selectval }).length > 0) {
-        targetArray.set(sur_selectval, sur_allGene.get(sur_selectval));
-        $('.survival_container1').append("<div id='SurvivalRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
-        preDrawSurvivalPlot(targetArray,sur_genePatient,'SurvivalRNAPlot','RNA')
-        $('.survival_container1').append("</div>");
+
+      $.ajax({
+        url: baseURL+'get_comparison_and_survival_data',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 'geneName': sur_selectval}),
+        success: function (result) {
+
+          var resultMap = JSON.parse(result);
+          SurvivalAllData = resultMap
+          GetSurvivalDatafitPlot(resultMap,sur_selectval)
+
+        },
+        error: function (error) {
+          console.error('error:', error);
+          reject('error');
+        }
+      });
+
+    }
+
+    function GetSurvivalDatafitPlot(resultMap,sur_selectval){
+
+      //debugger
+
+      if(resultMap['data']==null || resultMap['data'].length ==0){
+        return
       }
 
-      targetArray = new Map();
+      var targetGeneArray = new Map();
+      var targetGenePatient = [];
 
-      //PROTEIN
-      for(const [key, value] of sur_allProtein){
-        if (key.split("_")[0] !== sur_selectval) continue;
-        targetArray.set(key, value)
+      var targetProteinArray = new Map();
+      var targetProteinPatient = [];
+
+      var targetPhosphoArray = new Map();
+      var targetPhosphoPatient = [];
+
+      var targetAcetylArray = new Map();
+      var targetAcetylPatient = [];
+
+      for(var i = 0;i<resultMap['data'].length;i++){
+        var tmp = resultMap['data'][i];
+        switch(tmp[0]){
+          case 'RNA':
+            targetGeneArray.set(tmp[3], tmp.slice(4,209));
+            targetGenePatient = resultMap['columns'].slice(4,209);
+          break;
+          case 'PROTEIN':
+            targetProteinArray.set(tmp[3]+'_'+tmp[1], tmp.slice(4,tmp.length-1));
+            targetProteinPatient = resultMap['columns'].slice(4,tmp.length-1);
+          break;
+          case 'PHOSPHO':
+            targetPhosphoArray.set(tmp[3], tmp.slice(4,tmp.length-1));
+            targetPhosphoPatient = resultMap['columns'].slice(4,tmp.length-1);
+          break;
+          case 'ACETYLE':
+            targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length-1));
+            targetAcetylPatient = resultMap['columns'].slice(4,tmp.length-1);
+          break;
+        }
       }
 
-      if(targetArray!=null && targetArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'PROTEIN' && targetArray.has(v.split(',')[1])}).length > 0){
-        $('.survival_container1').append("<div id='SurvivalProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
-        preDrawSurvivalPlot(targetArray,sur_proteinPatient,'SurvivalProteinPlot','PROTEIN')
-        $('.survival_container1').append("</div>");
+      if(targetGeneArray!=null && targetGeneArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'RNA' && v.split(',')[1] == sur_selectval }).length > 0){
+        $('#survival_container1').append("<div id='SurvivalRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
+        preDrawSurvivalPlot(targetGeneArray,targetGenePatient,'SurvivalRNAPlot','RNA')
+        $('#survival_container1').append("<hr></div>");
+      }
+    
+      if(targetProteinArray!=null && targetProteinArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'PROTEIN' && targetProteinArray.has(v.split(',')[1])}).length > 0){
+        $('#survival_container1').append("<div id='SurvivalProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
+        preDrawSurvivalPlot(targetProteinArray,targetProteinPatient,'SurvivalProteinPlot','PROTEIN')
+        $('#survival_container1').append("<hr></div>");
       }
 
-      targetArray = new Map();
-
-      //Acetyl
-      for (const [key, value] of sur_allAcetlysite) {
-        if (key.split("_")[0] !== sur_selectval) continue;
-        targetArray.set(key, value)
+      if(targetAcetylArray!=null && targetAcetylArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'ACETYL'&& targetAcetylArray.has(v.split(',')[1])}).length > 0){
+        $('#survival_container1').append("<div id='SurvivalAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
+        preDrawSurvivalPlot(targetAcetylArray,targetAcetylPatient,'SurvivalAcetylPlot','ACETYL')
+        $('#survival_container1').append("<hr></div>");
       }
 
-      if(targetArray!=null && targetArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'ACETYL'&& targetArray.has(v.split(',')[1])}).length > 0){
-        $('.survival_container1').append("<div id='SurvivalAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
-        preDrawSurvivalPlot(targetArray,sur_acetlysitePatient,'SurvivalAcetylPlot','ACETYL')
-        $('.survival_container1').append("</div>");
-      }
-      
-      targetArray = new Map();
-
-      //Phospho
-      for (const [key, value] of sur_allPhosphosite) {
-        if (key.split("_")[0] !== sur_selectval) continue;
-        targetArray.set(key, value)
+      if(targetPhosphoArray!=null && targetPhosphoArray.size>0 && subPavlueList.filter((v, index, self) => {
+        return v.split(',')[0] == 'PHOSPHO'&& targetPhosphoArray.has(v.split(',')[1])}).length > 0){
+        $('#survival_container1').append("<div id='SurvivalPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
+        preDrawSurvivalPlot(targetPhosphoArray,targetPhosphoPatient,'SurvivalPhosphoPlot','PHOSPHO')
+        $('#survival_container1').append("<hr></div>");
       }
 
-      if(targetArray!=null && targetArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'PHOSPHO'&& targetArray.has(v.split(',')[1])}).length > 0){
-        $('.survival_container1').append("<div id='SurvivalPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
-        preDrawSurvivalPlot(targetArray,sur_phosphositePatient,'SurvivalPhosphoPlot','PHOSPHO')
-        $('.survival_container1').append("</div>");
-      }
     }
 
 
@@ -385,10 +417,11 @@
           }
 
           var data = [trace1, trace2, trace3, trace4];
+          p_val1 = formatSurvivalNumbers(p_val)
 
           var layout = {
               title : {
-                  text : title+ "<br>P-value = " + p_val,
+                  text : title+ "<br>P-value = " + p_val1,
               },
 
             yaxis:{
@@ -461,25 +494,37 @@
 
     function getSurvivalData() {
 
-      var surAllData = allData
+      $.ajax({
+        url: baseURL+'get_gene_name_list',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 'param':'param' }),
+        success: function (result) {
+          //debugger
+          var geneTmp = result['geneName']
+  
+          $.each(geneTmp,function(n,value) {
+            geneList.push({id:value,title:value})
+          });
+  
+          var $select = $('#survival_select-tools').selectize({
+            plugins: ["remove_button"],
+            maxItems: 1,
+            maxOptions: 100,
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            sortField: 'title',
+            options: geneList,
+            create: false,
+          });
 
-      showSpinner('survivalContent');
-
-      var geneTmp = getSurvivalGeneList(surAllData);
- 
-      $.each(geneTmp,function(n,value) {
-        sur_targetOptions.push({id:value,title:value})
-      });
-
-      var $select = $('#survival_select-tools').selectize({
-        plugins: ["remove_button"],
-        maxItems: 1,
-        maxOptions: 100,
-        valueField: 'id',
-        labelField: 'title',
-        searchField: 'title',
-        options: sur_targetOptions,
-        create: false,
+          hideSpinner('survivalContent');
+        },
+        error: function (error) {
+          console.error('error:', error);
+          reject('error');
+        }
       });
   
       var $select3 = $('#survival_type-tools').selectize({
@@ -495,6 +540,7 @@
       });
 
       const patientData = metaArray;
+
       const rowHeader = [];
       patientData.map((row) => {
         const rowData = row.split(",");
@@ -503,11 +549,11 @@
       });
 
       //get sur_patientInfo
-      for (let i = 1; i < patientData[0].split(",").length; i++) {
+      for (let i = 1; i < patientData[0].trimEnd().split(",").length; i++) {
         sur_patientInfo.push(new PatientMetaData());
       }
       for (let i = 0; i < rowHeader.length; i++) {
-        let row = patientData[i].split(",").slice(1)
+        let row = patientData[i].trimEnd().split(",").slice(1)
         for (let j = 0; j < row.length; j++) {
           sur_patientInfo[j][rowHeader[i]] = row[j];
         }
@@ -517,98 +563,20 @@
       });
       //console.log(sur_allPatient)
 
-      //separate data by type(protein,rna,acetyl,phospho)
+    }
 
-      //protein
-      var sur_proteinAllData = []
-      
-      $.each(surAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          sur_proteinAllData.push(v)
-        }
-        
-        if(tmp[0] == 'PROTEIN'){
-          sur_proteinAllData.push(v)
-        }
-      });
-
-      sur_proteinPatient = sur_proteinAllData[0].trimEnd().split(",").slice(4);
-
-      for (let i = 1; i < sur_proteinAllData.length; i++) {
-        const row = sur_proteinAllData[i].trimEnd().split(",")
-        sur_allProtein.set(row[2]+'_'+row[1], row.slice(4))
-        //sur_allProtein.set(row[1], row.slice(4))
+    function formatSurvivalNumbers(num) {
+ 
+ 
+      // Check if the number is very close to 0 (but not 0)
+      if (Math.abs(num) > 0 && Math.abs(num) < 1e-6) {
+        // Use scientific notation
+        return num.toExponential(6);
+      } else {
+        // Otherwise, round to 5 decimal places
+        return Number(num).toFixed(6);
       }
-
-      //acetyl
-      var sur_acetylAllData = []
-      
-      $.each(surAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          sur_acetylAllData.push(v)
-        }
-        
-        if(tmp[0] == 'ACETYL'){
-          sur_acetylAllData.push(v)
-        }
-      });
-
-      sur_acetlysitePatient = sur_acetylAllData[0].trimEnd().split(",").slice(4);
-
-      for (let i = 1; i < sur_acetylAllData.length; i++) {
-        const row = sur_acetylAllData[i].trimEnd().split(",")
-        sur_allAcetlysite.set(row[1], row.slice(4))
-        sur_allAcetlysite.set(row[3], row.slice(4))
-      }
-
-      //phospho
-      var sur_phosphoAllData = []
-      
-      $.each(surAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          sur_phosphoAllData.push(v)
-        }
-        
-        if(tmp[0] == 'PHOSPHO'){
-          sur_phosphoAllData.push(v)
-        }
-      });
-
-      sur_phosphositePatient = sur_phosphoAllData[0].trimEnd().split(",").slice(4);
-
-      for (let i = 1; i < sur_phosphoAllData.length; i++) {
-        const row = sur_phosphoAllData[i].trimEnd().split(",")
-        sur_allPhosphosite.set(row[1], row.slice(4))
-        sur_allPhosphosite.set(row[3], row.slice(4))
-      }
-
-      //rna
-
-      var sur_geneAllData = []
-      
-      $.each(surAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          sur_geneAllData.push(v)
-        }
-        
-        if(tmp[0] == 'RNA'){
-          sur_geneAllData.push(v)
-        }
-      });
-
-      sur_genePatient = sur_geneAllData[0].trimEnd().split(",").slice(4,209);
-
-      for (let i = 1; i < sur_geneAllData.length; i++) {
-        const row = sur_geneAllData[i].trimEnd().split(",")
-        sur_allGene.set(row[2], row.slice(4,209))
-      }
-
-      hideSpinner('survivalContent')
-
+ 
     }
 
     function getSurvivalGeneList(nmfData){

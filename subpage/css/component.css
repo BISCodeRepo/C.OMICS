@@ -413,7 +413,7 @@ body {
   margin-left: 2%;
 }
 
-.survival_container1 {
+#survival_container1 {
   display: flex;
   flex-direction: column;
   height: 76vh;
@@ -452,4 +452,11 @@ body {
   position: relative;
   width: 100%;
   bottom:0;
+}
+
+hr {
+  margin: auto; /* 선의 상하 여백 */
+  border: none;
+  border-top: 2px solid #070707; /* 선의 스타일 */
+  width: 96%;
 }

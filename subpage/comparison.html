@@ -26,7 +26,7 @@
       </div>
     </div>
   </div>
-  <div class="comparison-container1"></div>
+  <div id="comparison-container1"></div>
  
  </div>
  
@@ -48,20 +48,13 @@
 
     var allUniqueValue = new Map();
     var allPatient = new Map();
-    var proteinPatient = []
-    var genePatient = []
-    var acetlysitePatient = []
-    var phosphositePatient = []
-    var allProtein = new Map();
-    var allGene = new Map();
-    var allAcetlysite = new Map();
-    var allPhosphosite = new Map();
     var patientInfo = [];
-    var targetOptions = [];
     var index = 1
     var sortKey = 0
     var sortOrder = 0
     var groupValue = "";
+    var uniqueValue = null;
+    var ComparisonAllData = null;
 
     $(function(){
 
@@ -75,7 +68,9 @@
         } else{
           sortOrder = 0
         }
-        comparsionClickEvent();
+        $('#comparison-container1').empty();
+        GetDatafitPlot(ComparisonAllData,uniqueValue)
+        //comparsionClickEvent();
       });
 
 
@@ -104,76 +99,51 @@
         return;
       }
 
-      let uniqueValue = allUniqueValue.get(groupValue);
+      uniqueValue = allUniqueValue.get(groupValue);
       uniqueValue = uniqueValue.sort();
 
       drawComparisonPlot(targetValue,uniqueValue);
 
     }
  
-    /*var $select2 = $('#comparison-select-tools2').selectize({
-      plugins: ["remove_button"],
-      maxItems: 1,
-      maxOptions: 2,
-      valueField: 'id',
-      labelField: 'title',
-      searchField: 'title',
-      options: [],
-      create: false
-    });
- 
- 
-    var sortOptions = []
-    var selectizeControl2 = $select2[0].selectize;
-    sortOptions.push({ id: 1, title: 'P-Value' })
-    sortOptions.push({ id: 2, title: 'Gene Name' })
-    selectizeControl2.addOption(sortOptions);
-    selectizeControl2.on('change', function (value) {
-      if (value[0] === '1') {
-        sortKey = 1
-        comparisonDraw(res, allLayout, allPvalue)
-      } else if (value[0] === '2') {
-        sortKey = 2
-        comparisonDraw(res, allLayout, allPvalue)
-      }
-    });*/
- 
     function getComparisonData() {
-
-      var comAllData = allData;
 
       showSpinner('comparisonContent');
 
       const patientData = metaArray;
       const rowHeader = [];
 
-      var geneTmp = getComparsionGeneList(comAllData);
- 
-      $.each(geneTmp,function(n,value) {
-        targetOptions.push({id:value,title:value})
-      });
+      $.ajax({
+        url: baseURL+'get_gene_name_list',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 'param':'param' }),
+        success: function (result) {
+          //debugger
+          var geneTmp = result['geneName']
+  
+          $.each(geneTmp,function(n,value) {
+            geneList.push({id:value,title:value})
+          });
+  
+          var $select = $('#comparison-select-tools').selectize({
+            plugins: ["remove_button"],
+            maxItems: 1,
+            maxOptions: 100,
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            sortField: 'title',
+            options: geneList,
+            create: false,
+          });
 
-      var $select = $('#comparison-select-tools').selectize({
-        plugins: ["remove_button"],
-        maxItems: 1,
-        maxOptions: 100,
-        valueField: 'id',
-        labelField: 'title',
-        searchField: 'title',
-        options: targetOptions,
-        create: false,
-      });
-   
-   
-      var $select1 = $('#comparison-select-tools1').selectize({
-        plugins: ["remove_button"],
-        maxItems: 1,
-        maxOptions: 100,
-        valueField: 'id',
-        labelField: 'title',
-        searchField: 'title',
-        options: [],
-        create: false
+          hideSpinner('comparisonContent');
+        },
+        error: function (error) {
+          console.error('error:', error);
+          reject('error');
+        }
       });
 
       patientData.map((row) => {
@@ -186,108 +156,6 @@
       allUniqueValue.delete('Sample ID');
       allUniqueValue.delete('Subtype Membership');
       allUniqueValue.delete('Age');
-      //get patientInfo
-      for (let i = 1; i < patientData[0].split(",").length; i++) {
-        patientInfo.push(new PatientMetaData());
-      }
-      for (let i = 0; i < rowHeader.length; i++) {
-        let row = patientData[i].split(",").slice(1)
-        for (let j = 0; j < row.length; j++) {
-          patientInfo[j][rowHeader[i]] = row[j];
-        }
-      }
-      patientInfo.forEach((value) => {
-        allPatient.set(value['Sample ID'], value)
-      });
-
-      //separate data by type(protein,rna,acetyl,phospho)
-
-      //protein
-      var proteinAllData = []
-      
-      $.each(comAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          proteinAllData.push(v)
-        }
-        
-        if(tmp[0] == 'PROTEIN'){
-          proteinAllData.push(v)
-        }
-      });
-
-      proteinPatient = proteinAllData[0].trimEnd().split(",").slice(4);
-
-      for (let i = 1; i < proteinAllData.length; i++) {
-        const row = proteinAllData[i].trimEnd().split(",")
-        //allProtein.set(row[1], row.slice(4))
-        //genename_protein
-        allProtein.set(row[2]+'_'+row[1], row.slice(4))
-      }
-
-      //acetyl
-      var acetylAllData = []
-      
-      $.each(comAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          acetylAllData.push(v)
-        }
-        
-        if(tmp[0] == 'ACETYL'){
-          acetylAllData.push(v)
-        }
-      });
-
-      acetlysitePatient = acetylAllData[0].trimEnd().split(",").slice(4);
-
-      for (let i = 1; i < acetylAllData.length; i++) {
-        const row = acetylAllData[i].trimEnd().split(",")
-        allAcetlysite.set(row[1], row.slice(4))
-        allAcetlysite.set(row[3], row.slice(4))
-      }
-      //phospho
-      var phosphoAllData = []
-      
-      $.each(comAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          phosphoAllData.push(v)
-        }
-        
-        if(tmp[0] == 'PHOSPHO'){
-          phosphoAllData.push(v)
-        }
-      });
-
-      phosphositePatient = phosphoAllData[0].trimEnd().split(",").slice(4);
-
-      for (let i = 1; i < phosphoAllData.length; i++) {
-        const row = phosphoAllData[i].trimEnd().split(",")
-        allPhosphosite.set(row[1], row.slice(4))
-        allPhosphosite.set(row[3], row.slice(4))
-      }
-
-      //rna
-      var geneAllData = []
-      
-      $.each(comAllData,function(n,v){
-        var tmp = v.split(",");
-        if(n==0){
-          geneAllData.push(v)
-        }
-        
-        if(tmp[0] == 'RNA'){
-          geneAllData.push(v)
-        }
-      });
-
-      genePatient = geneAllData[0].trimEnd().split(",").slice(4,209);
-
-      for (let i = 1; i < geneAllData.length; i++) {
-        const row = geneAllData[i].trimEnd().split(",")
-        allGene.set(row[2], row.slice(4,209))
-      }
 
       let groupOptions = []
       index = 1
@@ -296,10 +164,32 @@
         index++;
       }
 
-      var selectizeControl1 = $select1[0].selectize;
-      selectizeControl1.addOption(groupOptions);
+      var $select1 = $('#comparison-select-tools1').selectize({
+        plugins: ["remove_button"],
+        maxItems: 1,
+        maxOptions: 100,
+        valueField: 'id',
+        labelField: 'title',
+        searchField: 'title',
+        options: groupOptions,
+        create: false
+      });
 
-      hideSpinner('comparisonContent');
+      //get patientInfo
+      //debugger;
+      for (let i = 1; i < patientData[0].trimEnd().split(",").length; i++) {
+        patientInfo.push(new PatientMetaData());
+      }
+      for (let i = 0; i < rowHeader.length; i++) {
+        let row = patientData[i].trimEnd().split(",").slice(1)
+        for (let j = 0; j < row.length; j++) {
+          patientInfo[j][rowHeader[i]] = row[j];
+        }
+      }
+      patientInfo.forEach((value) => {
+        allPatient.set(value['Sample ID'], value)
+      });
+
     }
  
  
@@ -311,73 +201,96 @@
 
     function drawComparisonPlot(targetValue,uniqueValue){
 
-      $('.comparison-container1').empty();
+      $('#comparison-container1').empty();
 
       var targetArray = new Map();
       var targetPatient = new Map();
-      //debugger
-      //RNA
-      if (allGene.has(targetValue)) {
-        var tmp = allGene.get(targetValue);
-        
-        if(!tmp.every((currentValue) => parseInt(currentValue) == 0)){ // quantified value is no 0
-          targetArray.set(targetValue, allGene.get(targetValue))
-          targetPatient.set(targetValue, genePatient);
-          $('.comparison-container1').append("<div id='ComparisonRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
-          drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonRNAPlot')
-          $('.comparison-container1').append("</div>");
+
+      $.ajax({
+        url: baseURL+'get_comparison_and_survival_data',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 'geneName': targetValue,'metaName': uniqueValue}),
+        success: function (result) {
+
+          var resultMap = JSON.parse(result);
+          ComparisonAllData = resultMap
+          GetComparisonDatafitPlot(resultMap,uniqueValue)
+
+        },
+        error: function (error) {
+          console.error('error:', error);
+          reject('error');
         }
-        
+      });
+    }
+
+    function GetComparisonDatafitPlot(resultMap,uniqueValue){
+
+      var subArray = [];
+      //debugger
+
+      if(resultMap['data']==null || resultMap['data'].length ==0){
+        return
       }
 
-      targetArray = new Map();
-      targetPatient = new Map();
+      var targetGeneArray = new Map();
+      var targetGenePatient = new Map();
 
-      //PROTEIN
-      for(const [key, value] of allProtein){
-        if (key.split("_")[0] !== targetValue) continue;
-        targetArray.set(key, value)
-        targetPatient.set(key, proteinPatient)
+      var targetProteinArray = new Map();
+      var targetProteinPatient = new Map();
+
+      var targetPhosphoArray = new Map();
+      var targetPhosphoPatient = new Map();
+
+      var targetAcetylArray = new Map();
+      var targetAcetylPatient = new Map();
+
+      for(var i = 0;i<resultMap['data'].length;i++){
+        var tmp = resultMap['data'][i];
+        switch(tmp[0]){
+          case 'RNA':
+            targetGeneArray.set(tmp[3], tmp.slice(4,209));
+            targetGenePatient.set(tmp[3], resultMap['columns'].slice(4,209));
+          break;
+          case 'PROTEIN':
+            targetProteinArray.set(tmp[3]+'_'+tmp[1], tmp.slice(4,tmp.length-1));
+            targetProteinPatient.set(tmp[3]+'_'+tmp[1], resultMap['columns'].slice(4,tmp.length-1));
+          break;
+          case 'PHOSPHO':
+            targetPhosphoArray.set(tmp[3], tmp.slice(4,tmp.length-1));
+            targetPhosphoPatient.set(tmp[3], resultMap['columns'].slice(4,tmp.length-1));
+          break;
+          case 'ACETYLE':
+            targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length-1));
+            targetAcetylPatient.set(tmp[3], resultMap['columns'].slice(4,tmp.length-1));
+          break;
+        }
       }
 
-      if(targetArray!=null && targetArray.size>0){
-        $('.comparison-container1').append("<div id='ComparisonProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
-        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonProteinPlot')
-        $('.comparison-container1').append("</div>");
+      if(targetGeneArray!=null && targetGeneArray.size>0){
+        $('#comparison-container1').append("<div id='ComparisonRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
+          drawComparisonBoxPlot(targetGeneArray,targetGenePatient,uniqueValue,'ComparisonRNAPlot')
+          $('#comparison-container1').append("<hr></div>");
+      }
+    
+      if(targetProteinArray!=null && targetProteinArray.size>0){
+        $('#comparison-container1').append("<div id='ComparisonProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
+        drawComparisonBoxPlot(targetProteinArray,targetProteinPatient,uniqueValue,'ComparisonProteinPlot')
+        $('#comparison-container1').append("<hr></div>");
       }
 
-      targetArray = new Map();
-      targetPatient = new Map();
-
-      //Acetyl
-      for (const [key, value] of allAcetlysite) {
-        if (key.split("_")[0] !== targetValue) continue;
-        targetArray.set(key, value)
-        targetPatient.set(key, acetlysitePatient)
+      if(targetAcetylArray!=null && targetAcetylArray.size>0){
+        $('#comparison-container1').append("<div id='ComparisonAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
+        drawComparisonBoxPlot(targetAcetylArray,targetAcetylPatient,uniqueValue,'ComparisonAcetylPlot')
+        $('#comparison-container1').append("<hr></div>");
       }
 
-      if(targetArray!=null && targetArray.size>0){
-        $('.comparison-container1').append("<div id='ComparisonAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
-        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonAcetylPlot')
-        $('.comparison-container1').append("</div>");
+      if(targetPhosphoArray!=null && targetPhosphoArray.size>0){
+        $('#comparison-container1').append("<div id='ComparisonPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
+        drawComparisonBoxPlot(targetPhosphoArray,targetPhosphoPatient,uniqueValue,'ComparisonPhosphoPlot')
+       $('#comparison-container1').append("<hr></div>");
       }
-      
-      targetArray = new Map();
-      targetPatient = new Map();
-
-      //Phospho
-      for (const [key, value] of allPhosphosite) {
-        if (key.split("_")[0] !== targetValue) continue;
-        targetArray.set(key, value)
-        targetPatient.set(key, phosphositePatient)
-      }
-
-      if(targetArray!=null && targetArray.size>0){
-        $('.comparison-container1').append("<div id='ComparisonPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
-        drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,'ComparisonPhosphoPlot')
-       $('.comparison-container1').append("</div>");
-      }
-
     }
 
     function drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,plotName){
@@ -434,7 +347,7 @@
           pValue = result
           allPvalue.set(value, pValue)
 
-          pValue = formatNumbers(pValue)
+          pValue = formatComparisonNumbers(pValue)
           //pText = "P-value = " + pValue 
  
           var layout = {
@@ -586,16 +499,16 @@
       return pValue;
     }
 
-    function formatNumbers(num) {
+    function formatComparisonNumbers(num) {
  
  
       // Check if the number is very close to 0 (but not 0)
-      if (Math.abs(num) > 0 && Math.abs(num) < 1e-5) {
+      if (Math.abs(num) > 0 && Math.abs(num) < 1e-6) {
         // Use scientific notation
-        return num.toExponential(5);
+        return num.toExponential(6);
       } else {
         // Otherwise, round to 5 decimal places
-        return Number(num.toFixed(5));
+        return Number(num).toFixed(6);
       }
  
     }
@@ -604,8 +517,7 @@
     function getComparsionGeneList(nmfData){
  
       var geneList = []
-     
-     
+
       //Genens
       for(var i = 1; i<nmfData.length-1;i++) {
           var tmp = nmfData[i]

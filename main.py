@@ -36,8 +36,11 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                      r"/get_acetyl_heatmap_data": {"origins": "http://127.0.0.1:5500",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_comparison_and_survival_data": {"origins": "http://127.0.0.1:5500",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
                                      }
-                     
                      }) 
 """CORS(app, resources={r"/kruskal_wallis": {"origins": "http://166.104.110.31:7000",
                                           "methods": ["POST"],
@@ -70,6 +73,10 @@ CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
                      r"/get_acetyl_heatmap_data": {"origins": "http://166.104.110.31:7000",
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
+                                     },
+                     r"/get_comparison_and_survival_data": {"origins": "http://166.104.110.31:7000",
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
                                      }
                      }) """
 
@@ -84,7 +91,7 @@ def get_prix_gene_name(geneNames):
 def get_heatmap_data():
     
     nmf_df = pd.read_csv('file/tumer_nmf_all.csv')
-    print(len(nmf_df))
+    #print(len(nmf_df))
     #print(nmf_df.head())
     nmf_df['search_gene_name'] = nmf_df.apply(lambda x:get_prix_gene_name(x['GeneName_Site']),axis=1)
     
@@ -250,6 +257,26 @@ def get_gene_heatmap_data():
         rna_sort = rna_df.sort_values(by=['GeneName'],ascending=[True])
         
         return jsonify(rna_sort.to_json(orient='split'))
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+
+@app.route('/get_comparison_and_survival_data', methods=['POST'])
+def get_comparison_and_survival_data():
+    try:
+        data = request.json
+        print(data)
+        
+        geneName = data['geneName']
+        #print(geneName)
+        
+        nmf_df = get_heatmap_data()
+        
+        sub_comparison_data = nmf_df[nmf_df['search_gene_name']==geneName]
+        print(len(sub_comparison_data))
+        
+        return jsonify(sub_comparison_data.to_json(orient='split'))
+    
     except Exception as e:
         return jsonify({"error": str(e)})
 
