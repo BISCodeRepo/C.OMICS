@@ -3,7 +3,7 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>PDIAMOND</title>
+   <title>C.OMICS</title>
 
 
    <!-- Latest compiled and minified CSS -->
@@ -111,12 +111,12 @@
              <div class="custom-header-inner">
                <ul class="custom-header-nav-grp" id="mymenu">
 
-                 <!--<li class="custom-header-nav">
-                   <a href="#" class="link active">HOME</a>
-                 </li>-->
+                 <li class="custom-header-nav" name="HOME">
+                   <a href="index.html" class="link active">HOME</a>
+                 </li>
     
                  <li class="custom-header-nav" name="NMF">
-                   <a href="#" class="link active">NMF Cluster</a>
+                   <a href="#" class="link">NMF Cluster</a>
                  </li>
     
                  <li class="custom-header-nav" name="IMMUNE">
@@ -145,11 +145,11 @@
                  </li>
     
                  <li class="custom-header-nav" name="COMPARISON">
-                   <a href="#" class="link">Group comparison</a>
+                   <a href="#" class="link">Group Comparison</a>
                  </li>
     
                  <li class="custom-header-nav" name="SURVIVAL">
-                   <a href="#" class="link">Survival analysis</a>
+                   <a href="#" class="link">Survival Analysis</a>
                  </li>
 
                  <li class="custom-header-nav" name="HELP">
@@ -219,7 +219,7 @@
         cache:false,
         success:function(data){  
           metaArray = data.split('\n');
-          $('#NMFmainContent').load('/subpage/nmf.html')
+          //$('#NMFmainContent').load('/subpage/nmf.html')
         }
       }); 
 

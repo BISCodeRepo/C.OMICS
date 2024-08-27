@@ -36,6 +36,7 @@
   <script type="text/javascript">
 
     var genesiteMorpheus=null;
+    var geneArray = [];
 
     $(function() {
 
@@ -70,11 +71,72 @@
       getGeneSubHeatMap();
     });
 
+    function getGeneRealHeatMap(){
+
+      var patientsIndexArray = getGeneConcatSampleList(geneArray[0].trimEnd().split(","));
+      var patientsArray = []
+      var subUniprotArray = []
+      var subArray = []
+      for(var i =1; i<geneArray.length;i++){
+        var tmp = geneArray[i].trimEnd().split(',');
+        subUniprotArray.push(tmp[0]);
+        var tmpGeneArray=[]
+        $.each(patientsIndexArray,function(j,v){
+          tmpGeneArray.push(tmp[v.split('_')[1]]);
+          if(i == 1){
+            patientsArray.push(v.split('_')[0]);
+          }
+        });
+
+        subArray.push(tmpGeneArray)
+      }
+
+      genesiteMorpheus = paintGeneHeatMap(subUniprotArray,patientsArray,subArray,'geneheatmapDiv',metaArray)
+      hideSpinner('geneContent');
+      return genesiteMorpheus
+    }
+
     async function getGeneSubHeatMap(){
 
       showSpinner('geneContent');
-      
-      $.ajax({
+
+      const csvUrls = [
+            '../file/gene_sub/sub1.csv',
+            '../file/gene_sub/sub2.csv',
+            '../file/gene_sub/sub3.csv',
+            '../file/gene_sub/sub4.csv',
+            '../file/gene_sub/sub5.csv',
+            '../file/gene_sub/sub6.csv',
+            '../file/gene_sub/sub7.csv'
+        ];
+
+      Promise.all(csvUrls.map(url => fetch(url)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+          }
+          return response.text();
+      })
+      .then(text => {
+          //debugger
+          if(geneArray == null || geneArray.length == 0){
+            geneArray = allData.concat(text.split('\n'))
+          } else{
+            var tmp = text.split('\n')
+            geneArray = geneArray.concat(tmp.slice(1,tmp.length))
+          }
+      })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        })
+      )).then(responses => {
+          getGeneRealHeatMap();
+          console.log('All CSVs fetched successfully');
+      }).catch(error => {
+          console.error('There was a problem fetching at least one CSV:', error);
+      });
+
+      /*$.ajax({
         type:"GET",   
         url: "../file/Quantitation_genes.csv",
         data:[],  
@@ -105,7 +167,7 @@
           hideSpinner('geneContent');
           return genesiteMorpheus
         }
-    }); 
+    }); */
       
     }
 

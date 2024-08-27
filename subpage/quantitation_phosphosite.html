@@ -38,6 +38,7 @@
 
     var phosphoMorpheus=null;
     var phospho_link = [];
+    var phosphoArray = [];
 
     $(function() {
 
@@ -85,11 +86,78 @@
       getPhosphoSubheatMap();
     });
 
+    function phosphoRealHeatMap(){
+
+      var patientsIndexArray = getPhosphoConcatSampleList(phosphoArray[0].trimEnd().split(","));
+      var patientsArray = []
+      var subUniprotArray = []
+      var subArray = []
+      var subLinkArray = []
+
+      for(var i =1; i<phosphoArray.length;i++){
+        var tmp = phosphoArray[i].trimEnd().split(',');
+        subUniprotArray.push(tmp[0]);
+        subLinkArray.push(tmp[0].split('_')[0])
+        var tmpPhosphoArray=[]
+        $.each(patientsIndexArray,function(j,v){
+          tmpPhosphoArray.push(tmp[v.split('_')[1]]);
+          if(i == 1){
+            patientsArray.push(v.split('_')[0]);
+          }
+        });
+
+        subArray.push(tmpPhosphoArray)
+      }
+
+      phospho_link = subLinkArray
+
+      phosphoMorpheus = paintPhosphoHeatMap(subUniprotArray,patientsArray,subArray,'phosphoheatmapDiv',metaArray,subLinkArray)
+      hideSpinner('phosphoContent');
+      return phosphoMorpheus
+
+    }
+
     async function getPhosphoSubheatMap(){
 
       showSpinner('phosphoContent');
 
-      $.ajax({
+      const csvUrls = [
+            '../file/phospho_sub/sub1.csv',
+            '../file/phospho_sub/sub2.csv',
+            '../file/phospho_sub/sub3.csv',
+            '../file/phospho_sub/sub4.csv',
+            '../file/phospho_sub/sub5.csv',
+            '../file/phospho_sub/sub6.csv'
+        ];
+
+      Promise.all(csvUrls.map(url => fetch(url)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+          }
+          return response.text();
+      })
+      .then(text => {
+          //debugger
+          if(phosphoArray == null || phosphoArray.length == 0){
+            phosphoArray = phosphoArray.concat(text.split('\n'))
+          } else{
+            var tmp = text.split('\n')
+            phosphoArray = phosphoArray.concat(tmp.slice(1,tmp.length))
+          }
+      })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        })
+      )).then(responses => {
+          phosphoRealHeatMap();
+          console.log('All CSVs fetched successfully');
+      }).catch(error => {
+          console.error('There was a problem fetching at least one CSV:', error);
+      });
+
+
+      /*$.ajax({
         type:"GET",   
         url: "../file/Quantitation_phospho.csv",
         data:[],  
@@ -125,7 +193,7 @@
           hideSpinner('phosphoContent');
           return phosphoMorpheus
         }
-      });
+      });*/
     }
 
     function paintPhosphoHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray,linkArray){

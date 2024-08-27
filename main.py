@@ -5,80 +5,45 @@ import numpy as np
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app, resources={r"/kruskal_wallis": {"origins": "http://127.0.0.1:5500",
+#origins = ["https://comics.hanyang.ac.kr","http://comics.hanyang.ac.kr","http://166.104.110.31:7000"]
+origins = ["http://127.0.0.1:5500"]
+CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                                           "methods": ["POST"],
                                           "allow_headers": ["Content-Type"]
                                           },
-                     r"/rank_sums": {"origins": "http://127.0.0.1:5500",
+                     r"/api/rank_sums": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_gene_name_list": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_gene_name_list": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_nmf_immune_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_nmf_immune_heatmap_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_gene_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_gene_heatmap_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_protein_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_protein_heatmap_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_phospho_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_phospho_heatmap_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_acetyl_heatmap_data": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_acetyl_heatmap_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/get_comparison_and_survival_data": {"origins": "http://127.0.0.1:5500",
+                     r"/api/get_comparison_and_survival_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      }
-                     }) 
-"""CORS(app, resources={r"/kruskal_wallis": {"origins": "http://166.104.110.31:7000",
-                                          "methods": ["POST"],
-                                          "allow_headers": ["Content-Type"]
-                                          },
-                     r"/rank_sums": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_gene_name_list": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_nmf_immune_heatmap_data": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_gene_heatmap_data": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_protein_heatmap_data": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_phospho_heatmap_data": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_acetyl_heatmap_data": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     },
-                     r"/get_comparison_and_survival_data": {"origins": "http://166.104.110.31:7000",
-                                     "methods": ["POST"],
-                                     "allow_headers": ["Content-Type"]
-                                     }
-                     }) """
+                     })
 
 def get_prix_gene_name(geneNames):
     tmp = geneNames
@@ -108,7 +73,7 @@ def get_heatmap_gene_name_list(gene_type,gene_site,uniprot_site):
         return tmp
 
                    
-@app.route('/kruskal_wallis', methods=['POST'])
+@app.route('/api/kruskal_wallis', methods=['POST'])
 def kruskal_wallis():
     data = request.json
     if 'allData' in data:
@@ -129,7 +94,7 @@ def kruskal_wallis():
         return jsonify({"error": "no data"})
 
 
-@app.route('/rank_sums', methods=['POST'])
+@app.route('/api/rank_sums', methods=['POST'])
 def rankSums():
     data = request.json
     if 'allData' in data:
@@ -146,7 +111,7 @@ def rankSums():
         return jsonify({"error": "no data"})
 
 
-@app.route('/get_gene_name_list', methods=['POST'])
+@app.route('/api/get_gene_name_list', methods=['POST'])
 def get_gene_name_list():
     try:
         data = request.json
@@ -161,7 +126,7 @@ def get_gene_name_list():
         return jsonify({"error": str(e)})
     
     
-@app.route('/get_nmf_immune_heatmap_data', methods=['POST'])
+@app.route('/api/get_nmf_immune_heatmap_data', methods=['POST'])
 def get_nmf_immune_heatmap_data():
     try:
         data = request.json
@@ -181,7 +146,7 @@ def get_nmf_immune_heatmap_data():
         return jsonify({"error": str(e)})
     
     
-@app.route('/get_protein_heatmap_data', methods=['POST'])
+@app.route('/api/get_protein_heatmap_data', methods=['POST'])
 def get_protein_heatmap_data():
     try:
         data = request.json
@@ -201,7 +166,7 @@ def get_protein_heatmap_data():
         return jsonify({"error": str(e)})
     
     
-@app.route('/get_phospho_heatmap_data', methods=['POST'])
+@app.route('/api/get_phospho_heatmap_data', methods=['POST'])
 def get_phospho_heatmap_data():
     try:
         data = request.json
@@ -221,7 +186,7 @@ def get_phospho_heatmap_data():
         return jsonify({"error": str(e)})
 
 
-@app.route('/get_acetyl_heatmap_data', methods=['POST'])
+@app.route('/api/get_acetyl_heatmap_data', methods=['POST'])
 def get_acetyl_heatmap_data():
     try:
         data = request.json
@@ -241,7 +206,7 @@ def get_acetyl_heatmap_data():
         return jsonify({"error": str(e)})
     
     
-@app.route('/get_gene_heatmap_data', methods=['POST'])
+@app.route('/api/get_gene_heatmap_data', methods=['POST'])
 def get_gene_heatmap_data():
     try:
         data = request.json
@@ -261,7 +226,7 @@ def get_gene_heatmap_data():
         return jsonify({"error": str(e)})
     
 
-@app.route('/get_comparison_and_survival_data', methods=['POST'])
+@app.route('/api/get_comparison_and_survival_data', methods=['POST'])
 def get_comparison_and_survival_data():
     try:
         data = request.json
@@ -284,3 +249,4 @@ def get_comparison_and_survival_data():
 if __name__ == '__main__':
       
     app.run(debug=True,host="0.0.0.0",port=5000)
+    #app.run(debug=True, host="0.0.0.0", port=5000, ssl_keyfile='/home/bis/PDIAMOND/key.pem', ssl_certfile='/home/bis/PDIAMOND/cert.pem', reload=True)
