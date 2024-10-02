@@ -106,13 +106,13 @@
    <div class="components-page">
      <div class="component-item">
          <header class="custom-header">
-           <img src="/subpage/images/logo.png" class="header-logo">
+           <img src="/subpage/images/1-Photoroom.png" class="header-logo" id="logoImg">
 
              <div class="custom-header-inner">
                <ul class="custom-header-nav-grp" id="mymenu">
 
                  <li class="custom-header-nav" name="HOME">
-                   <a href="index.html" class="link active">HOME</a>
+                   <a href="#" class="link active">HOME</a>
                  </li>
     
                  <li class="custom-header-nav" name="NMF">
@@ -165,6 +165,12 @@
         <div class="spinner"></div>
        </div>
        <div id="mainContent">
+        <div id="homeMainContent" style="margin-left:30%">
+          <div style="width:50%">
+            <h3 style="margin-left: 2%;">No.1 logo</h3>
+            <img src="/subpage/images/1-Photoroom.png" style="width: 100%;">
+          </div>
+        </div>
          <div id="NMFmainContent" ></div>
          <div id="IMMUNEmainContent" ></div>
          <div id="PROTEINmainContent" ></div>
@@ -197,6 +203,7 @@
 <script type="text/javascript">
 
 
+   var homePage = false;
    var nmfPage = true;
    var immunPage = true;
    var proteinPage = true;
@@ -231,6 +238,7 @@
         
           if($(this).attr('name') != undefined){
 
+              $('#homeMainContent').hide();
               $('#NMFmainContent').hide();
               $('#IMMUNEmainContent').hide();
               $('#PROTEINmainContent').hide();
@@ -240,8 +248,13 @@
               $('#COMPARISONmainContent').hide();
               $('#SURVIVALmainContent').hide();
 
-
               switch($(this).attr('name')){
+                  case 'HOME':
+                      $('#homeMainContent').show();
+                      if(homePage){
+                         homePage = false;
+                      } 
+                  break;
                   case 'NMF':
                       $('#NMFmainContent').show();
                       if(nmfPage){

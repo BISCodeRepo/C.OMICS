@@ -4,9 +4,10 @@ body {
 }
 
 .header-logo {
-  width: 190px; 
-  margin: 10px; 
-  position: fixed;
+  width: 150px;
+  margin-top: 10px;
+  margin-left: 13px;
+  position: absolute;
 }
 
 .component-ttl {

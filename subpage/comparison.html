@@ -33,19 +33,6 @@
  
   <script type="text/javascript">
 
-    //box color
-    var boxPlotColor =[
-      'rgba(93, 164, 214, 0.5)', 
-      'rgba(255, 144, 14, 0.5)', 
-      'rgba(44, 160, 101, 0.5)', 
-      'rgba(255, 65, 54, 0.5)', 
-      'rgba(207, 114, 255, 0.5)', 
-      'rgba(127, 96, 0, 0.5)', 
-      'rgba(255, 140, 184, 0.5)', 
-      'rgba(79, 90, 117, 0.5)', 
-      'rgba(222, 223, 0, 0.5)'
-    ]
-
     var allUniqueValue = new Map();
     var allPatient = new Map();
     var patientInfo = [];
@@ -121,6 +108,7 @@
         success: function (result) {
           //debugger
           var geneTmp = result['geneName']
+          var geneList = []
   
           $.each(geneTmp,function(n,value) {
             geneList.push({id:value,title:value})
@@ -297,6 +285,8 @@
 
       var res = new Map()
 
+      var boxPlotColor = nmfMetaColorNameMap[$('#comparison-select-tools1').text()]
+
       for (const [key, value] of targetArray) {
         let curArray = value;
         let curTarget = key;
@@ -308,7 +298,7 @@
             type: "box",
             name: uniqueValue[i],
             marker: {
-              color: boxPlotColor[i],
+              color: boxPlotColor[uniqueValue[i]],
             },
           })
         }
