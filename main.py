@@ -55,12 +55,22 @@ def get_prix_gene_name(geneNames):
     
 def get_heatmap_data():
     
-    nmf_df = pd.read_csv('file/tumer_nmf_all.csv')
+    nmf_df = pd.read_pickle('file/tumer_nmf_all.pkl')
     #print(len(nmf_df))
     #print(nmf_df.head())
-    nmf_df['search_gene_name'] = nmf_df.apply(lambda x:get_prix_gene_name(x['GeneName_Site']),axis=1)
+    #nmf_df['search_gene_name'] = nmf_df.apply(lambda x:get_prix_gene_name(x['GeneName_Site']),axis=1)
     
     return nmf_df
+
+
+def get_only_rna_data():
+    rna_df = pd.read_pickle()
+    return rna_df
+
+
+def get_other_data():
+    other_df = pd.read_pickle()
+    return other_df
 
 
 def get_heatmap_gene_name_list(gene_type,gene_site,uniprot_site):
@@ -120,6 +130,21 @@ def get_gene_name_list():
     
         #print(nmf_df['search_gene_name'])
         gene_name_vals = set(nmf_df['search_gene_name'].tolist())
+        #print(len(list(gene_name_vals)))
+        return jsonify({'geneName':list(gene_name_vals)})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+
+@app.route('/api/get_only_rna', methods=['POST'])
+def get_only_rna():
+    try:
+        data = request.json
+        #print(data)
+        rna = get_only_rna_data()
+    
+        #print(nmf_df['search_gene_name'])
+        gene_name_vals = set(rna['search_gene_name'].tolist())
         #print(len(list(gene_name_vals)))
         return jsonify({'geneName':list(gene_name_vals)})
     except Exception as e:

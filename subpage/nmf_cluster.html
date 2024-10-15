@@ -1,0 +1,570 @@
+<div id="nmfContent">
+  <div class="layerPopup">
+    <div class="spinner"></div>
+  </div>
+  <div class="component-item">
+    <!--<h3 class="component-ttl"></h3>-->
+    <div class="white-bd-box search-01-box">
+      <h3 class="custom-ttl">Genes of intereset (max. 10)</h3>
+      <div style="width:100%">
+        <div style="width: 91%;max-height: 150px;">
+          <input type="text" id="nmfGenesOpt" data-width="95%" name="nmfGenesSelect" value="CSNK2A1,KRAS,ERBB2,XPO1,TP53,EGFR"/>
+        </div>
+        <div class="box-btn-wrap" style="width:10%;float:right;margin-top:-42px;">
+          <button type="button" class="green-btn" id="nmfSelectBtn">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <h4 class="component-ttl"></h4>
+ 
+  <div id="nmfHeatmapRNADiv" style="width:90%;margin:auto;background-color: white;"> </div>
+  <div id="nmfHeatmapOtherDiv" style="width:90%;margin:auto;background-color: white;"> </div>
+ 
+  <div class="nmfContainer">
+    <div class="legend-box-area">
+      <div id="nmfFloatContainerBtn" class="legend-box-before">
+        <h6 class="custom-ttp">Legend</h6>
+      </div>
+ 
+ 
+      <div id="nmf-legend-after" class="legend-box-after">
+        <div class="box-top">
+          <h3 class="custom-ttp">Legend</h3>
+ 
+ 
+          <button id="nmfFloatContainerRemoveBtn" type="button" class="ico-btn">
+            <span class="txt-hidden">닫기</span>
+            <img src="subpage/images/ico-x.svg" alt="닫기 아이콘" class="ico">
+          </button>
+        </div>
+        <div id="nmfFloatContainer" style="font-size: 10px;background: #fbfffe; overflow: auto;height:22rem;"></div>
+    </div>
+  </div>
+ </div>
+</div>
+ <style type="text/css">
+  .nmfContainer{
+    width:0px;border-radius: 0 15px 15px 0;height: 27rem;
+    background: #f2f5fb;position: absolute; top: 24rem;right: 5rem;z-index: 999;
+  }
+ </style>
+ <script type="text/javascript">
+ 
+ 
+ var patientsArray = []
+ var uniprotIdArray = []
+ var dataArray = []
+ var geneList = []
+ var selectizeElement = null;
+ var linkArray =[]
+ var subGenArray = []
+
+ var nmfRNAMorpheus = null;
+ var nmfOtherMorpheus = null;
+ 
+ 
+  $(function() {
+
+    //legend
+    NmfLayer();
+
+    //select box & heatmap
+    getNmfData();
+ 
+    $('#nmfFloatContainerBtn').click(function(){
+ 
+ 
+      $(this).removeClass('active');
+      $('#nmf-legend-after').addClass('active');
+ 
+ 
+      $('.nmfContainer').css({right:'0px'});
+      $('.nmfContainer').css({width:'22rem'});
+      $(".nmfContainer").css("z-index","auto");
+      NmfLayer();
+    });
+ 
+ 
+    $('#nmfFloatContainerRemoveBtn').click(function(){
+      $('#nmfFloatContainer').empty();
+      $('.nmfContainer').css({width:'0px'});
+      $('.nmfContainer').css({right:'5rem'});
+      $(".nmfContainer").css("z-index","999");
+      $('#nmfFloatContainerBtn').addClass('active');
+      $('#nmf-legend-after').removeClass('active');
+    });
+ 
+ 
+    $('#nmf-legend-after').addClass('active');
+ 
+ 
+    $('.nmfContainer').css({right:'0px'});
+    $('.nmfContainer').css({width:'22rem'});
+    $(".nmfContainer").css("z-index","auto");
+ 
+    $('#nmfSelectBtn').click(function(){
+
+      var tmpuniprotIdArray = $('#nmfGenesOpt').val().split(',');
+      //debugger
+      if(tmpuniprotIdArray.length == 0 || tmpuniprotIdArray[0] == ''){
+        tmpuniprotIdArray = ["CSNK2A1","KRAS","ERBB2","XPO1","TP53","EGFR"];
+        var control = selectizeElement[0].selectize;
+        control.setValue(["CSNK2A1","KRAS","ERBB2","XPO1","TP53","EGFR"]);
+      }
+
+      getNMFRNAHeatMap(tmpuniprotIdArray);
+      getNMFOtherHeatMap(tmpuniprotIdArray);
+
+    });
+ 
+ 
+    $('#nmfHeatmapOtherDiv').mouseup(function(event){
+      //debugger;
+      if(event.currentTarget.className == 'morpheus'){
+        if (nmfOtherMorpheus.selectedRowTrackName == 'Link' && ((event.button == 0) || (event.which == 1))) {
+          var index = nmfOtherMorpheus.project.hoverRowIndex
+          var link = subGenArray[index]
+          if(link!='X'){
+            window.open('https://www.uniprot.org/uniprotkb/'+link+'/entry', '_blank');
+          }
+        }
+   
+        nmfOtherMorpheus.selectedRowTrackName = ''
+      }
+     
+    });
+ 
+ 
+  });
+
+
+   function NmfLayer(){
+    //debugger;
+    var colorMap = nmfMetaColorNameMap
+    var htmlStr="<table style='font-size: 11px;border-style: solid;border-width:1px;border-color: #e5efe9;'><tr>";
+      var substr="";
+      var i = 1;
+      //debugger;
+      $.map(colorMap, function(k, v){
+
+        if(v=='Subtype Membership'){
+          htmlStr += "<td style='text-align: center;'>Subtype Membership</td>";
+          htmlStr += "<td style='height: fit-content;'>" +
+          "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>"+
+            "<tr><td>"+
+              "<div style='height:20px;width:98px;margin:auto; background : linear-gradient(to right,#FFFFFF,#FF6600);'></div>"+
+            "</td></tr>"+
+            "<tr><td>"+
+              "<div style='float: left;margin-left:2px'>0.3</div><div style='float:right;margin-right:2px'>1</div>"+
+            "</td></tr></table>"+
+          "<div style='height: 5px;'></div></td>" ;
+        } else if(v=='Age'){
+          htmlStr += "<td style='text-align: center;'>Age</td>";
+          htmlStr += "<td style='height: fit-content;'>" +
+          "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 10px;'>"+
+            "<tr><td>"+
+              "<div style='height:20px;width:98px;margin:auto; background : linear-gradient(to right,#FFFFFF,#333333);'></div>"+
+            "</td></tr>"+
+            "<tr><td>"+
+              "<div style='float: left;margin-left:2px'>40</div><div style='float:right;margin-right:2px'>90</div>"+
+            "</td></tr></table>"+
+          "<div style='height: 5px;'></div></td>" ;
+        } else{
+          htmlStr += "<td style='text-align: center;'>"+v+"</td>";
+          substr += "<td style='height: fit-content;'><div style='height: 5px;'></div>"+
+            "<table border='1px solid #ccc' cellspacing='0' cellpadding='0' style='margin: auto;font-size: 11px;'>";
+          $.map(k,function(key,value){        
+            substr += "<tr><td bgcolor='"+key+"' height='15' width='15'></td>"+
+              "<td>"+value+"</td></tr>";
+          });
+          substr += "</table><div style='height: 5px;'></div></td>";
+        }
+
+        if(i%1==0){
+          htmlStr += substr;
+          htmlStr +="</tr><tr>";
+          substr = "";
+        }
+        i++;
+      });
+      htmlStr += substr;
+      htmlStr += "</tr><tr>";
+      htmlStr += "</table><div style='height: 5px;'></div>";
+ 
+ 
+    $('#nmfFloatContainer').append(htmlStr);
+ 
+ 
+  }
+ 
+ 
+  function getNmfData(){
+
+    //debugger
+    //Gene name list
+    $.ajax({
+      url: baseURL+'get_gene_name_list',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 'param':'param' }),
+      success: function (result) {
+        //debugger
+        var geneTmp = result['geneName']
+
+        $.each(geneTmp,function(n,value) {
+          geneList.push({id:value,title:value})
+        });
+
+        selectizeElement = $('#nmfGenesOpt').selectize({
+          plugins: ["remove_button"],
+          maxItems: 10,
+          maxOptions: 100,
+          valueField: 'id',
+          labelField: 'title',
+          searchField: 'title',
+          sortField: 'title',
+          options: geneList,
+          create: false
+        });
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
+    });
+
+    //default heat map
+    var tmpuniprotIdArray = $('#nmfGenesOpt').val().split(',');
+    nmfRNAMorpheus = getNMFRNAHeatMap(tmpuniprotIdArray);
+    nmfOtherMorpheus = getNMFOtherHeatMap(tmpuniprotIdArray);
+ 
+    return nmfMorpheus
+ 
+  }
+
+  async function getNMFRNAHeatMap(tmpuniprotIdArray){
+
+    showSpinner('nmfContent');
+
+    $.ajax({
+      url: baseURL+'get_nmf_immune_heatmap_data',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 'geneNameList': tmpuniprotIdArray }),
+      success: function (result) {
+        //debugger
+        var resultMap = JSON.parse(result);
+        var patientsArray = getConcatSampleList(resultMap['columns']);
+
+        var subArray = []
+        var subUniprotArray = []
+        var subLinkArray = []
+        for(var i = 0;i<resultMap['data'].length;i++){
+          var tmp = resultMap['data'][i];
+          subArray.push(tmp.slice(4,tmp.length-1));
+          subUniprotArray.push(tmp.slice(tmp.length-1,tmp.length)[0]);
+          subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
+        }
+
+        subGenArray = subLinkArray
+        nmfRNAMorpheus = paintNmfHeatMap(subUniprotArray,patientsArray,subArray,'nmfHeatmapRNADiv',metaArray,subLinkArray)
+        return nmfRNAMorpheus
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
+    });
+  }
+
+
+  async function getNMFOtherHeatMap(tmpuniprotIdArray){
+
+    $.ajax({
+      url: baseURL+'get_nmf_immune_heatmap_data',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 'geneNameList': tmpuniprotIdArray }),
+      success: function (result) {
+        //debugger
+        var resultMap = JSON.parse(result);
+        var patientsArray = getConcatSampleList(resultMap['columns']);
+
+        var subArray = []
+        var subUniprotArray = []
+        var subLinkArray = []
+        for(var i = 0;i<resultMap['data'].length;i++){
+          var tmp = resultMap['data'][i];
+          subArray.push(tmp.slice(4,tmp.length-1));
+          subUniprotArray.push(tmp.slice(tmp.length-1,tmp.length)[0]);
+          subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
+        }
+
+        subGenArray = subLinkArray
+        nmfOtherMorpheus = paintNmfHeatMap(subUniprotArray,patientsArray,subArray,'nmfHeatmapOtherDiv',metaArray,subLinkArray)
+        hideSpinner('nmfContent')
+        return nmfOtherMorpheus
+      },
+      error: function (error) {
+        console.error('error:', error);
+        reject('error');
+      }
+    });
+  }
+ 
+ 
+ 
+ /////////////////////// HeatMap 그리기//////////////////////////////
+ ////uniprotIdArray : 행  gene/ protein 명 배열
+ ////patientsArray : 열 환자 id 배열
+ ////dataArray : 데이터 [[]] 2차원 배열
+ ////heatMapDiv : headmap div id
+ ////metaArray : meta data 배열
+ function paintNmfHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray,linkArray){
+ 
+ 
+  var patientTmp = []
+  var subPatient = []
+  var nmfMetaObj = {
+    "vectors" :[]
+  }
+ 
+  //debugger;
+ 
+ 
+  for(var i=0; i<metaArray.length; i++){
+    var tmp = metaArray[i].substr(0,metaArray[i].length-1);
+    var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
+   
+    for(var j=0; j<patientsArray.length;j++){
+      var paiTmp = patientsArray[j].substr(0,patientsArray[j].length-1)+'T';
+      if(tmpArray.indexOf(paiTmp)>-1){
+        patientTmp.push(tmpArray.indexOf(paiTmp));
+        subPatient.push(patientsArray[j])
+      }
+    }
+  }
+ 
+ 
+  var finalDataArray = [];
+  for(var i = 0; i<dataArray.length;i++){
+    var tmp = dataArray[i];
+    var fArray = []
+    for(var j=0;j<patientTmp.length;j++){
+      fArray.push(tmp[patientTmp[j]])
+    }
+    finalDataArray.push(fArray)
+  }
+ 
+ 
+ 
+ 
+  var metaList = []
+  if(metaArray !=null && metaArray.length > 0){
+      for(var i=0; i<metaArray.length; i++){
+          var tmp = metaArray[i].substr(0,metaArray[i].length-1);
+          var colValue = tmp.split(',')[0];
+          var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
+          var putArray =[];
+          for(var j=0;j<patientTmp.length;j++){
+            putArray.push(tmpArray[patientTmp[j]]);
+          }
+          if(colValue=='Sample ID'){
+            metaList.push({
+              'name':colValue,
+              'array':subPatient
+            })
+          } else{
+            metaList.push({
+              'name':colValue,
+              'array':putArray
+            })
+          }
+        }
+  }
+   nmfMetaObj['vectors'] = metaList
+ 
+ 
+  $('#'+heatMapDiv).empty();
+ 
+ 
+  var json = {
+    "rows": uniprotIdArray.length,
+    "columns": subPatient.length,
+    "seriesArrays": [finalDataArray],
+    "seriesDataTypes": ["Float32"],
+    "seriesNames": ["NMF"],
+    "rowMetadataModel": {
+      "vectors": [{
+        "name": "Gene",
+        "array": uniprotIdArray
+      },{
+        "name": "Link",
+        "array": linkArray
+      }]
+    },
+    "columnMetadataModel": nmfMetaObj
+  }
+ 
+ 
+  var columnColorMap = getColumnColorModel(metaList);
+  //debugger
+ 
+ 
+  var comMorpheus = new morpheus.HeatMap({
+    el: $('#'+heatMapDiv),
+    dataset: morpheus.Dataset.fromJSON(json),
+    colorScheme: { // optional color scheme. default is relative
+      type: 'fixed',
+      /*map: [{
+        value: -12,
+        color: '#0000ff'
+      }, {
+        value: 0,
+        color: '#ffffff'
+      }, {
+        value: 12,
+        color: '#ff0000'
+      }]*/
+    },
+    //showRowNumber: true,
+    tools: [{ // optional tools to run at load time
+      //name: 'Hierarchical Clustering',
+      //params: {cluster: 'Rows and columns'}
+    }],
+    menu:toolbarMenu,
+    columnColorModel:columnColorMap
+  });
+ 
+ 
+  return comMorpheus;
+ 
+ 
+ }
+ 
+ 
+ 
+ 
+ /////////////////////// Sample(Patient)리스트 가져오기//////////////////////////////
+ function getConcatSampleList(subColumns){
+   var patientsArray = subColumns.slice(4,subColumns.length-2);
+   return patientsArray
+ 
+ }
+ 
+ 
+  //////////////// 색상 gradient ////////////////
+ function getColumnColorModel(metaList){
+ 
+  let returnMap = {};
+  var orangeList = [];
+  var grayList = [];
+
+  for(var i=0;i<metaList.length;i++){
+    var tmp = metaList[i];
+    if(tmp['name']!='Subtype Membership'&&tmp['name']!='Age'){
+      var colors = nmfMetaColorNameMap[tmp['name']];
+      returnMap[tmp['name']] = colors;
+    }
+    if(tmp['name']=='Subtype Membership'){
+      orangeList = orangeList.concat(tmp['array'])
+    }
+    if(tmp['name']=='Age'){
+      grayList = grayList.concat(tmp['array'])
+    }
+  }
+
+  var orangeSortList = orangeList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+  var graySortList = grayList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+
+  var orangeColorList = gradient('#FFFFFF','#FF6600',orangeSortList.length);
+  var grayColorList = gradient('#FFFFFF','#333333',graySortList.length);
+
+  var tmpMap = {};
+  $.each(orangeList,function(i,v){
+    var index = orangeSortList.indexOf(parseFloat(v.trim()).toFixed(3));
+    tmpMap[v]=orangeColorList[index]
+  })
+  returnMap['Subtype Membership']=tmpMap;
+  tmpMap = {};
+  $.each(grayList,function(i,v){
+    var index = graySortList.indexOf(parseFloat(v.trim()).toFixed(3));
+    tmpMap[v]=grayColorList[index]
+  })
+  returnMap['Age']=tmpMap;
+ 
+  return returnMap;
+ }
+ 
+ 
+ function ascOrder (a, b) {
+  return a - b
+ }
+ 
+ 
+ function rgbToHex(r, g, b){
+  var hex = ((r << 16) | (g << 8) | b).toString(16);
+  return "#" + new Array(Math.abs(hex.length - 7)).join("0") + hex;
+ }
+ // hex to rgb
+ function hexToRgb(hex){
+   var rgb = [];
+   for (var i = 1; i < 7; i += 2){
+      rgb.push(parseInt("0x" + hex.slice(i, i + 2)));
+   }
+   return rgb;
+ }
+ 
+ 
+ function gradient(startColor, endColor, step){
+    var sColor = hexToRgb(startColor),
+   eColor = hexToRgb(endColor);
+ 
+ 
+   var rStep = (eColor[0] - sColor[0]) / step,
+      gStep = (eColor[1] - sColor[1]) / step,
+      bStep = (eColor[2] - sColor[2]) / step;
+ 
+ 
+  var gradientColorArr = [];
+  for (var i = 0;i < step;i++){
+      gradientColorArr.push(rgbToHex(parseInt(rStep * i + sColor[0]), parseInt(gStep * i + sColor[1]), parseInt(bStep * i + sColor[2])));
+  }
+  return gradientColorArr;
+ }
+ 
+ 
+ function gradient_two(startColor, endColor, sortList){
+ 
+ 
+  var upZeroList = []
+  var downZeroList = []
+  var k = 0
+  var j = 0
+ 
+ 
+  $.each(sortList,function(i,v){
+    if(v>=0){
+      upZeroList[k] = v;
+      k++;
+    }else{
+      downZeroList[j] = v;
+      j++
+    }
+  });
+ 
+ 
+  upZeroColorArr = gradient('#FFFFFF',endColor,upZeroList.length);
+  downZeroColorArr = gradient(startColor,'#FFFFFF',downZeroList.length);
+ 
+ 
+ var gradientColorArr = $.merge(downZeroColorArr, upZeroColorArr)
+ return gradientColorArr;
+ }
+ 
+ 
+ </script>
+ 
+ 
