@@ -1,2 +1,2 @@
-# PDIAMOND
-Web service for PDIAMOND project
+# C.OMICS
+Web service for C.OMICS project
