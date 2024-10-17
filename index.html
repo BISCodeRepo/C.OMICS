@@ -220,11 +220,12 @@
 
       $.ajax({
         type:"GET",   
-        url: "../file/NMF_meta.csv",
+        url: "../file/nmf_meta_sort.csv",
         data:[],  
         dataType:"text",
         cache:false,
         success:function(data){  
+          //debugger
           metaArray = data.split('\n');
           //$('#NMFmainContent').load('/subpage/nmf.html')
         }
@@ -247,7 +248,7 @@
               $('#GENEmainContent').hide();
               $('#COMPARISONmainContent').hide();
               $('#SURVIVALmainContent').hide();
-
+            
               switch($(this).attr('name')){
                   case 'HOME':
                       $('#homeMainContent').show();
@@ -259,7 +260,7 @@
                       $('#NMFmainContent').show();
                       if(nmfPage){
                           nmfPage = false;
-                          $('#NMFmainContent').load('/subpage/nmf.html')
+                          $('#NMFmainContent').load('/subpage/nmf_cluster.html')
                       } 
                   break;
                   case 'IMMUNE':
@@ -273,28 +274,28 @@
                       $('#PROTEINmainContent').show();
                       if(proteinPage){
                           proteinPage = false
-                          $('#PROTEINmainContent').load('/subpage/quantitation_protein.html')
+                          $('#PROTEINmainContent').load('/subpage/quantitation_protein_all.html')
                       }
                   break;
                   case 'PHOSPHO':
                       $('#PHOSPHOmainContent').show();
                       if(phosphoPage){
                           phosphoPage = false
-                          $('#PHOSPHOmainContent').load('/subpage/quantitation_phosphosite.html')
+                          $('#PHOSPHOmainContent').load('/subpage/quantitation_phosphosite_all.html')
                       }
                   break;
                   case 'ACETYL':
                       $('#ACETYLmainContent').show();
                       if(acetylPage){
                           acetylPage = false
-                          $('#ACETYLmainContent').load('/subpage/quantitation_acetylsite.html')
+                          $('#ACETYLmainContent').load('/subpage/quantitation_acetylsite_all.html')
                       }
                   break;
                   case 'RNA':
                       $('#GENEmainContent').show();
                       if(genePage){
                           genePage = false
-                          $('#GENEmainContent').load('/subpage/quantitation_gene.html')
+                          $('#GENEmainContent').load('/subpage/quantitation_gene_all.html')
                       }
                   break;
                   case 'COMPARISON':

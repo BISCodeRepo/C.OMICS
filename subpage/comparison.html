@@ -56,8 +56,8 @@
           sortOrder = 0
         }
         $('#comparison-container1').empty();
-        GetDatafitPlot(ComparisonAllData,uniqueValue)
-        //comparsionClickEvent();
+        //GetDatafitPlot(ComparisonAllData,uniqueValue)
+        comparsionClickEvent();
       });
 
 
@@ -75,7 +75,7 @@
 
       const targetValue = $('#comparison-select-tools').text();
       groupValue = $('#comparison-select-tools1').text();
-
+      //debugger
       if(targetValue == null || targetValue == ""){
         alert("Select the gene name!")
         return;
@@ -88,6 +88,12 @@
 
       uniqueValue = allUniqueValue.get(groupValue);
       uniqueValue = uniqueValue.sort();
+
+      if(groupValue == 'Subtype' && uniqueValue.indexOf('0')<0){   
+        uniqueValue.push('0')     
+      } else if(groupValue =='Histology' && uniqueValue.indexOf('Normal')<0){          
+        uniqueValue.push('Normal')
+      }
 
       drawComparisonPlot(targetValue,uniqueValue);
 
@@ -137,8 +143,8 @@
       patientData.map((row) => {
         const rowData = row.trimEnd().split(",");
         rowHeader.push(rowData[0]);
-        let uniqueValue = unique(rowData.slice(1));
-        allUniqueValue.set(rowData[0], uniqueValue);
+        let uniqueValues = unique(rowData.slice(1));
+        allUniqueValue.set(rowData[0], uniqueValues);
       });
  
       allUniqueValue.delete('Sample ID');
@@ -204,7 +210,6 @@
           var resultMap = JSON.parse(result);
           ComparisonAllData = resultMap
           GetComparisonDatafitPlot(resultMap,uniqueValue)
-
         },
         error: function (error) {
           console.error('error:', error);
@@ -234,24 +239,26 @@
       var targetAcetylArray = new Map();
       var targetAcetylPatient = new Map();
 
+      //debugger
+
       for(var i = 0;i<resultMap['data'].length;i++){
         var tmp = resultMap['data'][i];
         switch(tmp[0]){
           case 'RNA':
-            targetGeneArray.set(tmp[3], tmp.slice(4,209));
-            targetGenePatient.set(tmp[3], resultMap['columns'].slice(4,209));
+            targetGeneArray.set(tmp[3], tmp.slice(6,tmp.length));
+            targetGenePatient.set(tmp[3], resultMap['columns'].slice(6,tmp.length));
           break;
           case 'PROTEIN':
-            targetProteinArray.set(tmp[3]+'_'+tmp[1], tmp.slice(4,tmp.length-1));
-            targetProteinPatient.set(tmp[3]+'_'+tmp[1], resultMap['columns'].slice(4,tmp.length-1));
+            targetProteinArray.set(tmp[3], tmp.slice(6,tmp.length));
+            targetProteinPatient.set(tmp[3], resultMap['columns'].slice(6,tmp.length));
           break;
           case 'PHOSPHO':
-            targetPhosphoArray.set(tmp[3], tmp.slice(4,tmp.length-1));
-            targetPhosphoPatient.set(tmp[3], resultMap['columns'].slice(4,tmp.length-1));
+            targetPhosphoArray.set(tmp[3], tmp.slice(6,tmp.length));
+            targetPhosphoPatient.set(tmp[3], resultMap['columns'].slice(6,tmp.length));
           break;
           case 'ACETYLE':
-            targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length-1));
-            targetAcetylPatient.set(tmp[3], resultMap['columns'].slice(4,tmp.length-1));
+            targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length));
+            targetAcetylPatient.set(tmp[3], resultMap['columns'].slice(6,tmp.length));
           break;
         }
       }
@@ -284,8 +291,30 @@
     function drawComparisonBoxPlot(targetArray,targetPatient,uniqueValue,plotName){
 
       var res = new Map()
+      var tmpAllPatient = allPatient
 
       var boxPlotColor = nmfMetaColorNameMap[$('#comparison-select-tools1').text()]
+      
+      if($('#comparison-select-tools1').text() == 'Subtype'){
+        boxPlotColor['0']= '#663300'
+        //uniqueValue.push('0')
+        
+        tmpAllPatient.forEach(function(map) {
+         if(map['Sample ID'].includes('-N')){
+          map['Subtype'] = '0'
+         }
+        });
+        
+      } else if($('#comparison-select-tools1').text() =='Histology'){
+        boxPlotColor['Normal'] = '#3399FF'
+        //uniqueValue.push('Normal')
+
+        tmpAllPatient.forEach(function(map) {
+         if(map['Sample ID'].includes('-N')){
+          map['Histology'] = 'Normal'
+         }
+        });
+      }
 
       for (const [key, value] of targetArray) {
         let curArray = value;
@@ -302,13 +331,15 @@
             },
           })
         }
-
+        debugger
         curArray.forEach((value, index) => {
-          if (allPatient.has(curPatient[index])) {
-            const curPatientInfo = allPatient.get(curPatient[index]);
+          if (tmpAllPatient.has(curPatient[index])) {
+            const curPatientInfo = tmpAllPatient.get(curPatient[index]);
             for (var i = 0; i < uniqueValue.length; i++) {
               if (curPatientInfo[groupValue] === uniqueValue[i]) {
-                data[i]["y"].push(value);
+                if (value !=null && value !=undefined){
+                  data[i]["y"].push(value);
+                }       
                 break;
               }
             }
@@ -325,7 +356,7 @@
       let promises = []
       var allLayout = new Map()
       var allPvalue = new Map()
- 
+      //debugger;
  
       for (let i = 0; i < allKeys.length; i++) {
         let value = allKeys[i]

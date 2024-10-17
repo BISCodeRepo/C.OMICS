@@ -19,7 +19,7 @@
  
   <h4 class="component-ttl"></h4>
  
-  <div id="nmfHeatmapRNADiv" style="width:90%;margin:auto;background-color: white;"> </div>
+  <div id="nmfHeatmapRNADiv" style="width:80%;margin-left: 5%;;background-color: white;"> </div>
   <div id="nmfHeatmapOtherDiv" style="width:90%;margin:auto;background-color: white;"> </div>
  
   <div class="nmfContainer">
@@ -240,7 +240,7 @@
     nmfRNAMorpheus = getNMFRNAHeatMap(tmpuniprotIdArray);
     nmfOtherMorpheus = getNMFOtherHeatMap(tmpuniprotIdArray);
  
-    return nmfMorpheus
+    return 
  
   }
 
@@ -249,7 +249,7 @@
     showSpinner('nmfContent');
 
     $.ajax({
-      url: baseURL+'get_nmf_immune_heatmap_data',
+      url: baseURL+'get_only_rna_heatmap_data',
       type: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ 'geneNameList': tmpuniprotIdArray }),
@@ -260,16 +260,16 @@
 
         var subArray = []
         var subUniprotArray = []
-        var subLinkArray = []
+        //var subLinkArray = []
         for(var i = 0;i<resultMap['data'].length;i++){
           var tmp = resultMap['data'][i];
-          subArray.push(tmp.slice(4,tmp.length-1));
+          subArray.push(tmp.slice(6,tmp.length-1));
           subUniprotArray.push(tmp.slice(tmp.length-1,tmp.length)[0]);
-          subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
+          //subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
         }
 
-        subGenArray = subLinkArray
-        nmfRNAMorpheus = paintNmfHeatMap(subUniprotArray,patientsArray,subArray,'nmfHeatmapRNADiv',metaArray,subLinkArray)
+        //subGenArray = subLinkArray
+        nmfRNAMorpheus = paintRNAHeatMap(subUniprotArray,patientsArray,subArray,'nmfHeatmapRNADiv',metaArray)
         return nmfRNAMorpheus
       },
       error: function (error) {
@@ -283,7 +283,7 @@
   async function getNMFOtherHeatMap(tmpuniprotIdArray){
 
     $.ajax({
-      url: baseURL+'get_nmf_immune_heatmap_data',
+      url: baseURL+'get_other_heatmap_data',
       type: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ 'geneNameList': tmpuniprotIdArray }),
@@ -297,13 +297,13 @@
         var subLinkArray = []
         for(var i = 0;i<resultMap['data'].length;i++){
           var tmp = resultMap['data'][i];
-          subArray.push(tmp.slice(4,tmp.length-1));
+          subArray.push(tmp.slice(6,tmp.length-1));
           subUniprotArray.push(tmp.slice(tmp.length-1,tmp.length)[0]);
           subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
         }
 
         subGenArray = subLinkArray
-        nmfOtherMorpheus = paintNmfHeatMap(subUniprotArray,patientsArray,subArray,'nmfHeatmapOtherDiv',metaArray,subLinkArray)
+        nmfOtherMorpheus = paintOtherHeatMap(subUniprotArray,patientsArray,subArray,'nmfHeatmapOtherDiv',metaArray,subLinkArray)
         hideSpinner('nmfContent')
         return nmfOtherMorpheus
       },
@@ -322,80 +322,79 @@
  ////dataArray : 데이터 [[]] 2차원 배열
  ////heatMapDiv : headmap div id
  ////metaArray : meta data 배열
- function paintNmfHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray,linkArray){
+ function paintOtherHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray,linkArray){
  
  
-  var patientTmp = []
-  var subPatient = []
+  var patientTmp = [] //
+  var subPatient = [] // sample id에 해당하는 환자 값들
   var nmfMetaObj = {
     "vectors" :[]
   }
  
   //debugger;
  
- 
   for(var i=0; i<metaArray.length; i++){
-    var tmp = metaArray[i].substr(0,metaArray[i].length-1);
-    var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
-   
+
+   //var tmp = metaArray[i].substr(0,metaArray[i].length-1);
+    var tmpArray = metaArray[i].split(',').slice(1,metaArray[i].split(',').length)
+
     for(var j=0; j<patientsArray.length;j++){
-      var paiTmp = patientsArray[j].substr(0,patientsArray[j].length-1)+'T';
+      var paiTmp = patientsArray[j];
       if(tmpArray.indexOf(paiTmp)>-1){
         patientTmp.push(tmpArray.indexOf(paiTmp));
         subPatient.push(patientsArray[j])
       }
     }
-  }
- 
- 
-  var finalDataArray = [];
-  for(var i = 0; i<dataArray.length;i++){
-    var tmp = dataArray[i];
-    var fArray = []
-    for(var j=0;j<patientTmp.length;j++){
-      fArray.push(tmp[patientTmp[j]])
     }
-    finalDataArray.push(fArray)
-  }
- 
- 
- 
- 
-  var metaList = []
-  if(metaArray !=null && metaArray.length > 0){
-      for(var i=0; i<metaArray.length; i++){
-          var tmp = metaArray[i].substr(0,metaArray[i].length-1);
-          var colValue = tmp.split(',')[0];
-          var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
-          var putArray =[];
-          for(var j=0;j<patientTmp.length;j++){
-            putArray.push(tmpArray[patientTmp[j]]);
-          }
-          if(colValue=='Sample ID'){
-            metaList.push({
-              'name':colValue,
-              'array':subPatient
-            })
-          } else{
-            metaList.push({
-              'name':colValue,
-              'array':putArray
-            })
-          }
-        }
-  }
+
+
+/*var finalDataArray = [];
+for(var i = 0; i<dataArray.length;i++){
+var tmp = dataArray[i];
+var fArray = []
+for(var j=0;j<patientTmp.length;j++){
+  fArray.push(tmp[patientTmp[j]])
+}
+finalDataArray.push(fArray)
+}*/
+
+
+
+
+var metaList = []
+if(metaArray !=null && metaArray.length > 0){
+  for(var i=0; i<metaArray.length; i++){
+      var tmp = metaArray[i].substr(0,metaArray[i].length);
+      var colValue = tmp.split(',')[0];
+      var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
+      var putArray =[];
+      for(var j=0;j<patientTmp.length;j++){
+        putArray.push(tmpArray[patientTmp[j]]);
+      }
+      if(colValue=='Sample ID'){
+        metaList.push({
+          'name':colValue,
+          'array':subPatient
+        })
+      } else{
+        metaList.push({
+          'name':colValue,
+          'array':putArray
+        })
+      }
+    }
+}
    nmfMetaObj['vectors'] = metaList
  
  
   $('#'+heatMapDiv).empty();
  
- 
   var json = {
     "rows": uniprotIdArray.length,
-    "columns": subPatient.length,
-    "seriesArrays": [finalDataArray],
+    "columns": patientsArray.length,
+    "seriesArrays": [dataArray],
     "seriesDataTypes": ["Float32"],
-    "seriesNames": ["NMF"],
+    "seriesNames": ["Protein&Modifications"],
     "rowMetadataModel": {
       "vectors": [{
         "name": "Gene",
@@ -418,16 +417,16 @@
     dataset: morpheus.Dataset.fromJSON(json),
     colorScheme: { // optional color scheme. default is relative
       type: 'fixed',
-      /*map: [{
-        value: -12,
+      map: [{
+        value: -13,
         color: '#0000ff'
       }, {
         value: 0,
         color: '#ffffff'
       }, {
-        value: 12,
+        value: 13,
         color: '#ff0000'
-      }]*/
+      }]
     },
     //showRowNumber: true,
     tools: [{ // optional tools to run at load time
@@ -443,13 +442,133 @@
  
  
  }
+
+ function paintRNAHeatMap(uniprotIdArray,patientsArray,dataArray,heatMapDiv,metaArray){
+ 
+ 
+ var patientTmp = []
+ var subPatient = []
+ var nmfMetaObj = {
+   "vectors" :[]
+ }
+
+ //debugger;
+
+
+ for(var i=0; i<metaArray.length; i++){
+
+   //var tmp = metaArray[i].substr(0,metaArray[i].length-1);
+   var tmpArray = metaArray[i].split(',').slice(1,metaArray[i].split(',').length)
+  
+   for(var j=0; j<patientsArray.length;j++){
+     var paiTmp = patientsArray[j];
+     if(tmpArray.indexOf(paiTmp)>-1){
+       patientTmp.push(tmpArray.indexOf(paiTmp));
+       subPatient.push(patientsArray[j])
+     }
+   }
+ }
+
+
+/* var finalDataArray = [];
+ for(var i = 0; i<dataArray.length;i++){
+   var tmp = dataArray[i];
+   var fArray = []
+   for(var j=0;j<patientTmp.length;j++){
+     fArray.push(tmp[patientTmp[j]])
+   }
+   finalDataArray.push(fArray)
+ }*/
+
+
+
+
+ var metaList = []
+ if(metaArray !=null && metaArray.length > 0){
+     for(var i=0; i<metaArray.length; i++){
+         var tmp = metaArray[i].substr(0,metaArray[i].length-1);
+         var colValue = tmp.split(',')[0];
+         var tmpArray = tmp.split(',').slice(1,tmp.split(',').length)
+         var putArray =[];
+         for(var j=0;j<patientTmp.length;j++){
+           putArray.push(tmpArray[patientTmp[j]]);
+         }
+         if(colValue=='Sample ID'){
+           metaList.push({
+             'name':colValue,
+             'array':subPatient
+           })
+         } else{
+           metaList.push({
+             'name':colValue,
+             'array':putArray
+           })
+         }
+       }
+ }
+  nmfMetaObj['vectors'] = metaList
+
+
+ $('#'+heatMapDiv).empty();
+
+  var json = {
+     "rows": uniprotIdArray.length,
+     "columns": patientsArray.length,
+     "seriesArrays": [dataArray],
+     "seriesDataTypes": ["Float32"],
+     "seriesNames": ["RNA"],
+     "rowMetadataModel": {
+       "vectors": [{
+         "name": "Gene",
+         "array": uniprotIdArray
+       }]
+     },
+     "columnMetadataModel": nmfMetaObj
+   }
+
+
+ var columnColorMap = getColumnColorModel(metaList);
+ //debugger
+
+
+ var comMorpheus = new morpheus.HeatMap({
+   el: $('#'+heatMapDiv),
+   dataset: morpheus.Dataset.fromJSON(json),
+   colorScheme: { // optional color scheme. default is relative
+     type: 'fixed',
+     map: [{
+       value: 0,
+       color: '#0000ff'
+     }, {
+       value: 5,
+       color: '#ffffff'
+     }, {
+       value: 16,
+       color: '#ff0000'
+     }]
+   },
+   //showRowNumber: true,
+   tools: [{ // optional tools to run at load time
+     //name: 'Hierarchical Clustering',
+     //params: {cluster: 'Rows and columns'}
+   }],
+   menu:toolbarMenu,
+   columnColorModel:columnColorMap
+ });
+
+
+ return comMorpheus;
+
+
+}
+
  
  
  
  
  /////////////////////// Sample(Patient)리스트 가져오기//////////////////////////////
  function getConcatSampleList(subColumns){
-   var patientsArray = subColumns.slice(4,subColumns.length-2);
+   var patientsArray = subColumns.slice(6,subColumns.length-1);
    return patientsArray
  
  }
@@ -464,6 +583,9 @@
 
   for(var i=0;i<metaList.length;i++){
     var tmp = metaList[i];
+    if(tmp['array'][tmp['array'].length-1]==undefined){
+      tmp['array'][tmp['array'].length-1] = ""
+    }
     if(tmp['name']!='Subtype Membership'&&tmp['name']!='Age'){
       var colors = nmfMetaColorNameMap[tmp['name']];
       returnMap[tmp['name']] = colors;
@@ -475,9 +597,23 @@
       grayList = grayList.concat(tmp['array'])
     }
   }
-
-  var orangeSortList = orangeList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
-  var graySortList = grayList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+  //debugger;
+  var orangeSortList = orangeList
+  .map(x => {
+    // If x is empty, set it to "0", otherwise trim and parse it as a float
+    let num = x.trim() === "" ? 0 : parseFloat(x.trim());
+    return num.toFixed(3);
+  })
+  .sort(ascOrder);
+  var graySortList = grayList
+  .map(x => {
+    // If x is empty, set it to "0", otherwise trim and parse it as a float
+    let num = x.trim() === "" ? 0 : parseFloat(x.trim());
+    return num.toFixed(3);
+  })
+  .sort(ascOrder);
+  //var orangeSortList = orangeList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
+  //var graySortList = grayList.map(x => parseFloat(x.trim()).toFixed(3)).sort(ascOrder);
 
   var orangeColorList = gradient('#FFFFFF','#FF6600',orangeSortList.length);
   var grayColorList = gradient('#FFFFFF','#333333',graySortList.length);

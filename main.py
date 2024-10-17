@@ -42,7 +42,19 @@ CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                      r"/api/get_comparison_and_survival_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
-                                     }
+                                     },
+                     r"/api/get_only_rna_heatmap_data": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/api/get_other_heatmap_data": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },      
+                     r"/api/get_nmf_meta_columns": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     }      
                      })
 
 def get_prix_gene_name(geneNames):
@@ -62,14 +74,21 @@ def get_heatmap_data():
     
     return nmf_df
 
+def get_all_data():
+    
+    all_df = pd.read_pickle('file/all_df.pkl')
+    
+    return all_df
+
+
 
 def get_only_rna_data():
-    rna_df = pd.read_pickle()
+    rna_df = pd.read_pickle('file/rna_sort.pkl')
     return rna_df
 
 
 def get_other_data():
-    other_df = pd.read_pickle()
+    other_df = pd.read_pickle('file/other_sort.pkl')
     return other_df
 
 
@@ -81,6 +100,16 @@ def get_heatmap_gene_name_list(gene_type,gene_site,uniprot_site):
         return tmp + "_p("+uniprot_site+")" 
     else:
         return tmp
+
+@app.route('/api/get_nmf_meta_columns', methods=['POST'])
+def get_nmf_meta_columns():
+    try:
+        data = request.json
+        meta_df = pd.read_pickle('file/nmf_meta_sort.pkl')
+          
+        return jsonify(meta_df.to_json(orient='split'))
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
                    
 @app.route('/api/kruskal_wallis', methods=['POST'])
@@ -136,20 +165,46 @@ def get_gene_name_list():
         return jsonify({"error": str(e)})
     
 
-@app.route('/api/get_only_rna', methods=['POST'])
-def get_only_rna():
+@app.route('/api/get_only_rna_heatmap_data', methods=['POST'])
+def get_only_rna_heatmap_data():
     try:
         data = request.json
-        #print(data)
-        rna = get_only_rna_data()
-    
-        #print(nmf_df['search_gene_name'])
-        gene_name_vals = set(rna['search_gene_name'].tolist())
-        #print(len(list(gene_name_vals)))
-        return jsonify({'geneName':list(gene_name_vals)})
+        gene_name_list = data['geneNameList']
+        print(gene_name_list)
+        
+        rna_df = get_only_rna_data()
+
+        sub_rna_df = rna_df[rna_df['search_gene_name'].apply(lambda x: any(keyword == x for keyword in gene_name_list))] 
+        sub_rna_df['heatmap_gene_name'] = sub_rna_df.apply(lambda x:get_heatmap_gene_name_list(x['Type'],x['GeneName_Site'],x['UniProt_Site']), axis=1)
+        print(len(sub_rna_df))
+        
+        sub_rna_sort = sub_rna_df.sort_values(by=['GeneName_Site'],ascending=[True])
+        
+        return jsonify(sub_rna_sort.to_json(orient='split'))
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/get_other_heatmap_data', methods=['POST'])
+def get_other_heatmap_data():
+    try:
+        data = request.json
+        gene_name_list = data['geneNameList']
+        print(gene_name_list)
+        
+        other_df = get_other_data()
+
+        sub_other_df = other_df[other_df['search_gene_name'].apply(lambda x: any(keyword == x for keyword in gene_name_list))] 
+        sub_other_df['heatmap_gene_name'] = sub_other_df.apply(lambda x:get_heatmap_gene_name_list(x['Type'],x['GeneName_Site'],x['UniProt_Site']), axis=1)
+        print(len(sub_other_df))
+        
+        sub_other_sort = sub_other_df.sort_values(by=['GeneName_Site'],ascending=[True])
+        
+        return jsonify(sub_other_sort.to_json(orient='split'))
     except Exception as e:
         return jsonify({"error": str(e)})
     
+
     
 @app.route('/api/get_nmf_immune_heatmap_data', methods=['POST'])
 def get_nmf_immune_heatmap_data():
@@ -176,15 +231,9 @@ def get_protein_heatmap_data():
     try:
         data = request.json
         #print(data)
-        nmf_df = get_heatmap_data()
-        
-        protein_df = nmf_df[nmf_df['Type']=='PROTEIN'].copy()
-        print("PROTEIN Total : "+str(len(protein_df)))
-
-        protein_df['heatmap_gene_name'] =  protein_df.apply(lambda x:x['UniProt_Site'], axis=1)
-        print(len(protein_df))
-        
-        protein_sort = protein_df.sort_values(by=['UniProt_Site'],ascending=[True])
+        print(data)
+        protein_sort = pd.read_pickle('file/protein_sort.pkl')
+        print(len(protein_sort))
         
         return jsonify(protein_sort.to_json(orient='split'))
     except Exception as e:
@@ -195,16 +244,9 @@ def get_protein_heatmap_data():
 def get_phospho_heatmap_data():
     try:
         data = request.json
-        #print(data)
-        nmf_df = get_heatmap_data()
-        
-        phospho_df = nmf_df[nmf_df['Type']=='PHOSPHO'].copy()
-        print("PHOSPHO Total : "+str(len(phospho_df)))
-
-        phospho_df['heatmap_gene_name'] = phospho_df.apply(lambda x:x['UniProt_Site'], axis=1)
-        print(len(phospho_df))
-        
-        phospho_sort = phospho_df.sort_values(by=['UniProt_Site'],ascending=[True])
+        print(data)
+        phospho_sort = pd.read_pickle('file/phospho_sort.pkl')
+        print(len(phospho_sort))
         
         return jsonify(phospho_sort.to_json(orient='split'))
     except Exception as e:
@@ -215,16 +257,10 @@ def get_phospho_heatmap_data():
 def get_acetyl_heatmap_data():
     try:
         data = request.json
-        #print(data)
-        nmf_df = get_heatmap_data()
+        print(data)
+        acetyl_sort = pd.read_pickle('file/acetyl_sort.pkl')
         
-        acetyl_df = nmf_df[nmf_df['Type']=='ACETYL'].copy()
-        print("ACETYL Total : "+str(len(acetyl_df)))
-
-        acetyl_df['heatmap_gene_name'] = acetyl_df.apply(lambda x:x['UniProt_Site'], axis=1)
-        print(len(acetyl_df))
-        
-        acetyl_sort = acetyl_df.sort_values(by=['UniProt_Site'],ascending=[True])
+        print(len(acetyl_sort))
         
         return jsonify(acetyl_sort.to_json(orient='split'))
     except Exception as e:
@@ -236,17 +272,14 @@ def get_gene_heatmap_data():
     try:
         data = request.json
         print(data)
-        nmf_df = get_heatmap_data()
+        rna_df = pd.read_pickle('file/rna_sort.pkl')
         
-        rna_df = nmf_df[nmf_df['Type']=='RNA']
-        print("RNA Total : "+str(len(rna_df)))
-        
-        rna_df['heatmap_gene_name'] = rna_df.apply(lambda x:x['GeneName'], axis=1)
+        #rna_df['heatmap_gene_name'] = rna_df.apply(lambda x:x['GeneName'], axis=1)
         print(len(rna_df))
         
-        rna_sort = rna_df.sort_values(by=['GeneName'],ascending=[True])
+        #rna_sort = rna_df.sort_values(by=['GeneName'],ascending=[True])
         
-        return jsonify(rna_sort.to_json(orient='split'))
+        return jsonify(rna_df.to_json(orient='split'))
     except Exception as e:
         return jsonify({"error": str(e)})
     
@@ -260,9 +293,10 @@ def get_comparison_and_survival_data():
         geneName = data['geneName']
         #print(geneName)
         
-        nmf_df = get_heatmap_data()
+        all_df = get_all_data()
         
-        sub_comparison_data = nmf_df[nmf_df['search_gene_name']==geneName]
+        sub_comparison_data = all_df[all_df['search_gene_name']==geneName]
+
         print(len(sub_comparison_data))
         
         return jsonify(sub_comparison_data.to_json(orient='split'))
