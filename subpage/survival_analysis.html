@@ -18,9 +18,13 @@
         <input id="pvalue-start" type="number" class="survival-number-input" step="0.0001" min="0.0000" max = "1.0000" title="Enter a number between 0 and 1." value="0.0000"/> ~
         <input id="pvalue-end" type="number" class="survival-number-input" step="0.0001" min="0.0000" max = "1.0000" title="Enter a number between 0 and 1." value="1.0000"/>
 
+        <h3 class="custom-ttl2">Measure</h3>
+
+        <select id="survival_measure-tools" placeholder="Measure" style="height: 40px; width: 130px;"></select>
+
         <button type="button" class="green-btn" id="survival_apply-btn">Apply</button>
 
-        <h3 class="custom-ttl2" style="margin-left: 20px;">P-value sorting</h3>
+        <h3 class="custom-ttl2">P-value sorting</h3>
 
        <!--<select id="survival_select-tools2" style="height: 40px;width:140px;"></select>--> 
 
@@ -71,7 +75,7 @@
 
         $.ajax({
             type:"GET",   
-            url: "../file/Overall_survivals.csv",
+            url: "../file/get_survival_overall_data.csv",
             data:[],  
             dataType:"text",
             cache:false,
@@ -126,6 +130,7 @@
       const typeValue = $('#survival_type-tools').val();
       const pvalueStart = $('#pvalue-start').val();
       const pvalueEnd = $('#pvalue-end').val();
+      const measure = $('#survival_measure-tools').val();
 
       if(isEmpty(targetValue) && isEmpty(pvalueStart) && isEmpty(pvalueEnd)){
           alert("Select the gene name or enter the P-value range value!");
@@ -537,6 +542,17 @@
         searchField: 'title',
         options: [{id:'RNA',title:'RNA'},{id:'PROTEIN',title:'Protein'},
                   {id:'ACETYL',title:'Acetylsite'},{id:'PHOSPHO',title:'Phosphosite'}],
+        create: false
+      });
+
+      var $select4 = $('#survival_measure-tools').selectize({
+        plugins: ["remove_button"],
+        maxItems: 1,
+        maxOptions: 2,
+        valueField: 'id',
+        labelField: 'title',
+        searchField: 'title',
+        options: [{id:'Median',title:'Median'},{id:'Mean',title:'Mean'}],
         create: false
       });
 

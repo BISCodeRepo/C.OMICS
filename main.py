@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 app = Flask(__name__)
-#origins = ["https://comics.hanyang.ac.kr","http://comics.hanyang.ac.kr","http://166.104.110.31:7000"]
-origins = ["http://127.0.0.1:5500"]
+origins = ["https://comics.hanyang.ac.kr","http://comics.hanyang.ac.kr","http://166.104.110.31:7000"]
+#origins = ["http://127.0.0.1:5500"]
 CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                                           "methods": ["POST"],
                                           "allow_headers": ["Content-Type"]
@@ -54,7 +54,11 @@ CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                      r"/api/get_nmf_meta_columns": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
-                                     }      
+                                     },
+                     r"/api/get_survival_data": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     }       
                      })
 
 def get_prix_gene_name(geneNames):
@@ -303,6 +307,49 @@ def get_comparison_and_survival_data():
     
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+    
+@app.route('/api/get_survival_data', methods=['POST'])
+def get_survival_data():
+    try:
+        data = request.json
+        print(data)
+        
+        geneName = data['geneName']
+        #print(geneName)
+        
+        all_df = get_heatmap_data()
+        
+        sub_comparison_data = all_df[all_df['search_gene_name']==geneName]
+
+        print(len(sub_comparison_data))
+        
+        return jsonify(sub_comparison_data.to_json(orient='split'))
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+    
+@app.route('/api/get_survival_overall_data', methods=['POST'])
+def get_survival_overall_data():
+    try:
+        data = request.json
+        print(data)
+        
+        geneName = data['geneName']
+        #print(geneName)
+        
+        all_df = get_heatmap_data()
+        
+        sub_comparison_data = all_df[all_df['search_gene_name']==geneName]
+
+        print(len(sub_comparison_data))
+        
+        return jsonify(sub_comparison_data.to_json(orient='split'))
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
 
 
 if __name__ == '__main__':
