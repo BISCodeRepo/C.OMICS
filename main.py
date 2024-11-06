@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 app = Flask(__name__)
-origins = ["https://comics.hanyang.ac.kr","http://comics.hanyang.ac.kr","http://166.104.110.31:7000"]
-#origins = ["http://127.0.0.1:5500"]
+#origins = ["https://comics.hanyang.ac.kr","http://comics.hanyang.ac.kr","http://166.104.110.31:7000"]
+origins = ["http://127.0.0.1:5500"]
 CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                                           "methods": ["POST"],
                                           "allow_headers": ["Content-Type"]
@@ -58,7 +58,23 @@ CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                      r"/api/get_survival_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
-                                     }       
+                                     },
+                     r"/api/get_survival_median_pvalue": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/api/get_survival_mean_pvalue": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/api/get_survival_overall_data": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     },
+                     r"/api/get_subtype_suvival_data": {"origins": origins,
+                                     "methods": ["POST"],
+                                     "allow_headers": ["Content-Type"]
+                                     }
                      })
 
 def get_prix_gene_name(geneNames):
@@ -320,11 +336,11 @@ def get_survival_data():
         
         all_df = get_heatmap_data()
         
-        sub_comparison_data = all_df[all_df['search_gene_name']==geneName]
+        sub_survival_data = all_df[all_df['search_gene_name']==geneName]
 
-        print(len(sub_comparison_data))
+        print(len(sub_survival_data))
         
-        return jsonify(sub_comparison_data.to_json(orient='split'))
+        return jsonify(sub_survival_data.to_json(orient='split'))
     
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -336,21 +352,58 @@ def get_survival_overall_data():
         data = request.json
         print(data)
         
-        geneName = data['geneName']
-        #print(geneName)
-        
-        all_df = get_heatmap_data()
-        
-        sub_comparison_data = all_df[all_df['search_gene_name']==geneName]
+        all_survial_df = pd.read_pickle('file/Overall_survivals.pkl')
 
-        print(len(sub_comparison_data))
+        print(len(all_survial_df))
         
-        return jsonify(sub_comparison_data.to_json(orient='split'))
+        return jsonify(all_survial_df.to_json(orient='split'))
     
     except Exception as e:
         return jsonify({"error": str(e)})
     
-
+    
+    
+@app.route('/api/get_survival_median_pvalue', methods=['POST'])
+def get_survival_median_pvalue():
+    try:
+        data = request.json
+        print(data)
+        
+        pvalue_median_df = pd.read_pickle('file/survival_median_pvalue.pkl')
+        
+        return jsonify(pvalue_median_df.to_json(orient='split'))
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+    
+@app.route('/api/get_survival_mean_pvalue', methods=['POST'])
+def get_survival_mean_pvalue():
+    try:
+        data = request.json
+        print(data)
+        
+        pvalue_mean_df = pd.read_pickle('file/survival_mean_pvalue.pkl')
+        
+        return jsonify(pvalue_mean_df.to_json(orient='split'))
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+    
+@app.route('/api/get_subtype_suvival_data', methods=['POST'])
+def get_subtype_suvival_data():
+    try:
+        data = request.json
+        print(data)
+        
+        subtype_overall_df = pd.read_pickle('file/survival_subtype_overall.pkl')
+        
+        return jsonify(subtype_overall_df.to_json(orient='split'))
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
 
 if __name__ == '__main__':
       
