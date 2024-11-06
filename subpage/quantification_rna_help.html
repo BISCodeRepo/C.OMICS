@@ -1,0 +1,108 @@
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+<style>
+section {
+  background-color: rgb(255, 255, 255);
+  padding: 10px;
+  margin-bottom: 10px;
+}
+h1,h2,h3,h4,h5,h6{
+    padding : 5px;
+    margin-bottom: 5px;
+    
+}
+img{
+    margin-top : 15px;
+    margin-bottom: 15px;
+}
+p{
+    padding : 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    color: rgb(100, 100, 100);
+}
+hr{
+    margin-bottom: 5px;
+}
+</style>
+<div class="container" style ="width:90%; height:100%;">
+    <div class ="manual-content" style="
+        position: absolute;
+        top: 10px;left: 400px;">
+        <div id="contents-header">
+        <h1>About Quantitation-RNA</h1><hr>
+        <h4>
+            In this page, you can check the relationship between gene and patients information with RNA quantitation data.
+        </h4>
+        <p>The Quantitation-RNA page displays quantitative values for both normal and tumor patients.</p>
+        <p>Since this function is identical to that on the Quantitation-Protein page, please refer to the Quantitation-Protein manual for details.</p>
+        </p>
+        </div>
+        
+    </div>
+	<div class="row">
+        <div style="width:300px; padding: 8px 0; left:3px; position:fixed;">
+            <div style="overflow-y: scroll; overflow-x: hidden; height: 100%;">
+                <ul class="nav nav-list">
+                    <li><label class="tree-toggler nav-header">NMF Cluster</label>
+                        <ul class="nav nav-list tree">
+                            <li class = item-1 current active>
+                                <a class="" href="/subpage/nmf_help.html" style="background-color:antiquewhite;">NMF Cluster</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Immune Cluster</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/immune_help.html">Immune Cluster</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Quantitation</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_protein_help.html">Protein</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_phosphosite_help.html">Phosphosite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_acetylsite_help.html">Acetylsite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_rna_help.html"><span class="sign"><i class="icon-play"></i></span>
+                                <span class="lbl">RNA</span> (current)</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Group Comparison</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/group_comparison_help.html">Group Comparison</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Survival Analysis</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/survival_help.html">Survival Analysis</a></li>
+                        </ul>
+                    </li>
+                    <li class="divider"></li>
+                </ul>
+            </div>
+        </div>
+	</div>
+</div>
+<script>
+    $(document).ready(function () {
+    $('label.tree-toggler').click(function () {
+        $(this).parent().children('ul.tree').toggle(300);
+    });
+});
+</script>

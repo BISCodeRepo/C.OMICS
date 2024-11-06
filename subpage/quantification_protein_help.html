@@ -34,59 +34,46 @@ hr{
         position: absolute;
         top: 10px;left: 400px;">
         <div id="contents-header">
-        <h1>About NMF Cluster</h1><hr>
+        <h1>About Quantitation-Protein</h1><hr>
         <h4>
-            In this page, you can check the relationship between genes and patients information with NMF cluster data.
+            In this page, you can check the relationship between protein and patients information with protein quantitation data.
         </h4>
-        <p>The NMF cluster page displays quantitative values for both normal and tumor patients.</p>
-        <p>The quantitative value of RNA is represented as log(TPM+1), while the quantitative values of Protein and Modifications 
-            (such as Acetylation and Phosphorylation) are represented as ratio values.</p>
-        <p>Since the calculation methods differ, RNA and other quantitative values are displayed in two separate heatmaps.</p>
+        <p>The Quantitation-Protein page displays quantitative values for both normal and tumor patients.</p>
         </p>
         </div>
         <div class="section1">
             <h3>Basic functions</h3><hr>
             <section>
-                <h4>1. Click the [Apply] button</h4>
-                <hr>
-                <p>If you want to check some genes, then insert genes in blank of 'Genes of interest' (①).</p>
-                <p>After inserting it, please push the 'Apply' button (②).</p>
-                <img style="width:1054px" alt="apply_gene" src="../file/assets/img/nmf/apply_gene.png">
-                <p>Then, you can check the heatmap which show the relationship between patient with chosen genes.</p>
-                <img style="width:1679px" alt="after_apply" src="../file/assets/img/nmf/after_apply.png"><hr>
-            </section>
-
-            <section>
-                <h4>2. Click the [Legend] button</h4><hr>
+                <h4>1. Click the [Legend] button</h4><hr>
                 <p>The legend is initially expanded when the screen opens. You can hide it by clicking the 'X' button, 
                     or expand it again by clicking the 'Legend' button, depending on your preference.</p>
-                <img style="width:1059px;" alt="legend_button" src="../file/assets/img/nmf/legend_button.png">
+                <img style="width:1014px;" alt="legend_button" src="../file/assets/img/quantition_protein/protein_lengend.png">
                 <p>If you click the 'X' button, you can get hide the legend.</p>
-                <img style="width:1014px;" alt="legend_popup" src="../file/assets/img/nmf/legend_popup.png"><hr>
+                <img style="width:1014px;" alt="legend_popup" src="../file/assets/img/quantition_protein/protein_button.png"><hr>
             </section>
             <section>
-                <h4>3. Click the [Link] column</h4>
+                <h4>2. Click the [Link] column</h4>
                 <hr>
                 <p>
                 You can see the Link column on the right side.</p>
-                <img style="width: 440px;" alt="link" src="../file/assets/img/nmf/link.png">
+                <img style="width: 440px;" alt="link" src="../file/assets/img/quantition_protein/link.png">
                 <p>It means the Uniprot ID which have relationship with gene.</p>
-                <img style="width:1019px;" alt="click_the_link" src="../file/assets/img/nmf/click_the_link.png">
+                <img style="width:1019px;" alt="click_the_link" src="../file/assets/img/quantition_protein/click_the_link.png">
                 <p> It has a hyperlink to connect Uniprot site.</p>
                 <p> Therefore, if you click that ID, you can move to Uniprot site. </p>
-                <img width="837" alt="link_to_uniprot" src="../file/assets/img/nmf/link_to_uniprot.png"><hr>
+                <img width="837" alt="link_to_uniprot" src="../file/assets/img/quantition_protein/link_to_uniprot.png"><hr>
             </section>
             <section>
-                <h4>4. Meta data sorting</h4>
+                <h4>3. Meta data sorting</h4>
                 <hr>
                 <p>If you want to sort by the value of meta information, click the meta column name. The sorting function operates separately for each of the two heatmaps.</p>
-                <img style="width: 1019px;" alt="link" src="../file/assets/img/nmf/meta_data.png">
+                <img style="width: 1019px;" alt="link" src="../file/assets/img/quantition_protein/meta_data.png">
                 <p>The first click on the same column name will sort in ascending order, the second click will sort in descending order, 
                     and the third click will disable the sorting function.</p>
-                <img style="width:1019px;" alt="click_the_link" src="../file/assets/img/nmf/meta_event.png"><hr>
+                <img style="width:1019px;" alt="click_the_link" src="../file/assets/img/quantition_protein/meta_event.png"><hr>
             </section>
             <section>
-                <h4>5. Legend information</h4>
+                <h4>4. Legend information</h4>
                 <hr>
                 <table class="table table-bordered">
                     <tbody>
@@ -188,10 +175,7 @@ hr{
                     <li><label class="tree-toggler nav-header">NMF Cluster</label>
                         <ul class="nav nav-list tree">
                             <li class = item-1 current active>
-                                <a class="" href="/subpage/nmf_help.html" style="background-color:antiquewhite;">
-                                    <span class="sign"><i class="icon-play"></i></span>
-                                    <span class="lbl">NMF Cluster</span> (current)
-                                </a>
+                                <a class="" href="/subpage/nmf_help.html" style="background-color:antiquewhite;">NMF Cluster</a>
                             </li>
                         </ul>
                     </li>
@@ -202,10 +186,13 @@ hr{
                             <li><a href="/subpage/immune_help.html">Immune Cluster</a></li>
                         </ul>
                     </li>
+
                     <li class="divider"></li>
                     <li><label class="tree-toggler nav-header">Quantitation</label>
                         <ul class="nav nav-list tree">
-                            <li><a href="/subpage/quantification_protein_help.html">Protein</a></li>
+                            <li><a href="/subpage/quantification_protein_help.html"> 
+                                <span class="sign"><i class="icon-play"></i></span>
+                                <span class="lbl">Protein</span> (current)</a></li>
                         </ul>
                         <ul class="nav nav-list tree">
                             <li><a href="/subpage/quantification_phosphosite_help.html">Phosphosite</a></li>
@@ -217,6 +204,7 @@ hr{
                             <li><a href="/subpage/quantification_rna_help.html">RNA</a></li>
                         </ul>
                     </li>
+
                     <li class="divider"></li>
                     <li><label class="tree-toggler nav-header">Group Comparison</label>
                         <ul class="nav nav-list tree">

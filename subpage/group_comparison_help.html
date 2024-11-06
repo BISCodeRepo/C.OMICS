@@ -36,48 +36,129 @@ hr{
         <div id="contents-header">
         <h1>About Group Comparison</h1><hr>
         <h4>
-            In this page, you can compare the target with grouping by meta information of NMF cluster (ex: sex, DX, Subtype, etc.)
+            The group comparison function allows you to compare your desired target with meta information from the NMF cluster (ex: sex, DX, Subtype, etc.) through grouping.
         </h4>
 
-        <h5>
-            You can choose the target in protein/RNA/phosphosite/acetylsite. <br>
-
-            <h5>The t-test (Test statistic) is divided by the number of groups.</h5>
-            <h5>If the number of groups is 2, t-test is progressing by the Wilcoxon Rank-Sum Test (= Mann-Whitney U-test).</h5>
-            <h5>Moreover, if the number of groups is over 3, it is progressing by the Kruskal-Wallis test (= One way ANOVA on rank).</h5>
+        <h5>The target can be chosen from the following categories: Protein, RNA, Phosphosite, or Acetylsite.</h5>
+        <p>The t-test (Test statistic) is divided by the number of groups.</p>
+        <p>If the number of groups is 2, the Wilcoxon Rank-Sum Test (= Mann-Whitney U-test) is used.</p>
+        <p>Otherwise, if the number of groups is over 3, the Kruskal-Wallis test (= One way ANOVA on rank) is used.</p>
+        <p>The p-value represents the difference between each meta data of values.</p>
+        <p>In the meta columns, for the 'Subtype' and 'Histology' plots, normal data is included, and a boxplot is drawn. </p>
+        <p>In 'Subtype', a value of "0" indicates normal data, while in 'Histology', a value of "Normal" represents normal data.</p>
         </p>
+
         </div>
         <div class="section1">
             <h3>Basic functions</h3> <hr>
             <section>
-                <h4>1. Apply button</h4> <hr>
-                <p>You can choose the target in the ①. After choosing the target to compare, please choose the meta information in the ②.</p> 
-                <p>Please choose the 'Apply' button. Finally you are able to compare the target with meta information!</p>
-                <img width="1054" alt="group_comparison_apply" src="../file/assets/img/group_comparison/group_comparison1.png">
+                <h4>1. Using Group Comparison</h4> <hr>
+                <p>In the first box ① as shown below, select your target. The second box ② is then used to choose the meta information for it to be compared to.</p> 
+                <p>Press the [Apply] button to see results.</p>
+                <img style="width:1068px" alt="group_comparison_apply" src="../file/assets/img/group_comparison/group_comparison1.png">
                 <hr>
             </section>
 
             <section>
-                <h4>2. Sort button</h4><hr>
-                <p>You can sort the results of grouping information by only clicking the 'Sort by' (①). It consists of 'P-Value' and 'Gene Name'. </p>
-                <p>You can also adjust the ascending/descending order by clicking the ②.</p>
-                <p>If you click the 'Legend' button, you can get the information of NMF cluster data like below.</p>
-                <img width="1054" alt="group_comparison_sort" src="../file/assets/img/group_comparison/group_comparison_sort.png">
+                <h4>2. Result Sorting</h4><hr>
+                <p>Search results can also be organized by its P-Value in the same type data.</p>
+                <img style="width:1068px" alt="group_comparison_sort" src="../file/assets/img/group_comparison/group_comparison_sort.png">
                 <hr>
             </section>
+
+            <section>
+                <h4>3. Legend information</h4>
+                <hr>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Subtype</th>
+                            <td>Korean NSCLC Subtype (0 to 5, 0 is normal).</td>
+                        </tr>
+                        <tr>
+                            <th>Subtype Core</th>
+                            <td>If a sample's subtype membership score is 0.5 or higher, it is classified as 'Y'; otherwise, it is classified as 'N'.</td>
+                        </tr>
+                        <tr>
+                            <th>Histology</th>
+                            <td>Name of pathological diagnosis classification for using this study.<p></p>
+                                (AD :Adenocarcinoma , SC : Squamous cell carcinoma, MA : Mucinous adenocarcinoma, NC : Large cell neuroendocrine carcinoma  and others, Normal: normal)</td>
+                        </tr>
+                        <tr>
+                            <th>Sex</th>
+                            <td>Sex (F: Female, M: Male).</td>
+                        </tr>
+                        <tr>
+                            <th>Smoking</th>
+                            <td>Status of smoking history on samples.
+                            <p></p>(Cr: current smoker; Ex: quit smoking more than a year before sugery; N: non-smoker; NA: no information)</td>
+                        </tr>
+                        <tr>
+                            <th>TNM Stage</th>
+                            <td>The 8th Edition of the American Joint Committee on Cancer (AJCC-TNM) stage.</td>
+                        </tr>
+                        <tr>
+                            <th>Pathologic N</th>
+                            <td>Status of node metastasis on samples.<p></p>
+                                (N0: no lymph node metastasis; N1: eastern pulmonary lymph node metastasis ; N2: eastern mediastinal lymph node metastatis)</td>
+                        </tr>
+                        <tr>
+                            <th>Adjuvant Treatment</th>
+                            <td>Status of adjuvant treatment on samples.<p></p>
+                                (CTx: Chemotherapy; RTx: Radiation therapy; None: no treatment)</td>
+                        </tr>
+                        <tr>
+                            <th>Recurrence Status</th>
+                            <td>Status of recurrence on samples.<p></p>
+                                 (1: Recur occur; 0: Not recur occur; NA: No data)</td>
+                        </tr>
+                        <tr>
+                            <th>TIL Pattern</th>
+                            <td>The pattern of tumor infiltrating lymphocytes (TIL).</td>
+                        </tr>
+                        <tr>
+                            <th>Immune Cluster</th>
+                            <td>Cell type-based Immune Cluster (Hot, Cold).</td>
+                        </tr>
+                        <tr>
+                            <th>Whole Genome Doubling</th>
+                            <td>Presence of whole genome doubling.</td>
+                        </tr>
+                        <tr>
+                            <th>TP53</th>
+                            <td>TP53 mutation status which contains CNV loss and truncating mutation or both.</td>
+                        </tr>
+                        <tr>
+                            <th>Other Tumor Suppressor genes</th>
+                            <td>Other tumor suppressor genes mutation status which contains CNV loss and truncating mutation or both. <p></p>
+                                Other tumor suppressor genes consisted of CDKN2A, STK11, KEAP1, RB1, PPP2R1A, and SMARCA4.</td>
+                        </tr>
+                        <tr>
+                            <th>EGFR</th>
+                            <td>EGFR mutation status which contains L858R, exon19 deletion, other indels and other SNVs.</td>
+                        </tr>
+                        <tr>
+                            <th>Other Oncogene Alteration</th>
+                            <td>Other oncogenes mutation or fusion which contains KRAS, PIK3CA ERBB2, MET, ALK, ROS1, RET.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+            </section>
+
         </div>
         <div class="section2">
             <h3>Tab funtions</h3><br>
             <section>
-                <h4>1. Zoom in & Zoom out</h4><hr>
-                <p>If you want to zoom in & out, just cklik the zoom button. You can control the zoom function by clicking the button.</p>
-                <img width="1054" alt="group_comparison_zoom" src="../file/assets/img/group_comparison/group_comparison_zoom.png">
+                <h4>1. Image Size Adjustment</h4><hr>
+                <p>How large the image appears on the screen can be adjusted using the zoom in and out buttons.</p>
+                <img style="width:1068px" alt="group_comparison_zoom" src="../file/assets/img/group_comparison/group_comparison_zoom.png">
             </section>
 
             <section>
-                <h4>2. Save plot as image</h4><hr>
-                <p>After group comparing, you may want to save the result. Then click the button to save plot as image.</p>
-                <img width="1054" alt="group_comparison_save_img" src="../file/assets/img/group_comparison/group_comparison_saveimg.png">               
+                <h4>2. Saving Visualized Data</h4><hr>
+                <p>The resulting plot can be saved by pressing the save image button as shown below.</p>
+                <img style="width:1068px" alt="group_comparison_save_img" src="../file/assets/img/group_comparison/group_comparison_saveimg.png">               
                 <hr>
             </section>
         </div>
@@ -99,6 +180,22 @@ hr{
                         </ul>
                     </li>
 
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Quantitation</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_protein_help.html">Protein</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_phosphosite_help.html">Phosphosite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_acetylsite_help.html">Acetylsite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_rna_help.html">RNA</a></li>
+                        </ul>
+                    </li>
+                    
                     <li class="divider"></li>
                     <li><label class="tree-toggler nav-header">Group Comparison</label>
                         <ul class="nav nav-list tree">

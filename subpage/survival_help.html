@@ -35,39 +35,47 @@ hr{
         top: 10px;left: 400px;">
         <div id="contents-header">
             <h1>About Survival Analysis</h1><hr>
-            <h4>In this page, you can check the survial analysis about the protein/phosphosite/acetylsite/RNA based on month.</h4>
-            <p>By using the Plotly.js library, the survial plots are arranged as the target into the line chart. P-value is calculated with the rank-sum, and the Expression is divided into high/low. Furthermore, '|' is expressed the deceased patient in the plot.</p>
-            <p>By using the Selectize.js library, search efficiency is improved to implement an auto-match function when input is made in the target search input box.</p>
+            <h4>Monthly survival analysis about Proteins, Phosphosites, Acetylsites, and RNA can be found here.</h4>
+            <p>High and low groups were defined based on the median or mean value, and a survival plot was generated for each gene.</p>
+            <p>The plot titled 'Subtype Survival Analysis' next to the search box displays a survival plot by subtype, independent of any specific gene.</p>
         </div>
 
         <div class="section1">
             <h3>Basic functions</h3> <hr>
             <section>
-                <h4>1. Apply button</h4> <hr>
-                <p>YYou can choose the target in the ①. After choosing the target to check, please click the 'Apply' button (②).</p> 
-                <p>Finally you are able to get the line chart with the P-value</p>
-                <img width="1054" alt="survival_apply" src="../file/assets/img/survival/survival_apply.png"><hr>
+                <h4>1. Get a list that satisfies a condition</h4> <hr>
+                <p>In the first box ① as shown below, select your target. The third dropdown requires you to select either 'median' or 'mean' (②).</p> 
+                <p>The 'Type', second dropdown lets you select one of RNA, Protein, Acetylsite, or Phosphosite. 
+                    If no selection is made, it will display all plots corresponding to these four types.</p>
+                <p>The initial p-value range is set from 0 to 1. By adjusting the p-value range, you can view survival plots that meet the specified conditions.</p>
+                <p>Clicking the [Apply] button generates survival chart and its respective P-value.</p>
+                <img style="width:840px" alt="survival_apply" src="../file/assets/img/survival/survival_apply.png"><hr>
             </section>
 
             <section>
-                <h4>2. Sort button</h4><hr>
-                <p>You can sort the box plot by only clicking the 'Sort by' (①). It consists of 'P-Value' and 'Gene Name'.</p>
-                <p>You can also adjust the ascending/descending order by clicking the ②.</p>
-                <img width="1054" alt="survival_sort" src="../file/assets/img/survival/survival_sort.png"><hr>
+                <h4>2. Generating the line chart</h4><hr>
+                <p>If you click on a gene name in the list, the corresponding survival plots are displayed on the left.</p>
+                <img style="width:840px" alt="survival_sort" src="../file/assets/img/survival/survival_list.png"><hr>
+            </section>
+
+            <section>
+                <h4>3. Result Sorting</h4><hr>
+                <p>Search results can also be organized by its P-Value in the same type data.</p>
+                <img style="width:840px" alt="survival_sort" src="../file/assets/img/survival/survival_sort.png"><hr>
             </section>
         </div>
         <div class="section2">
             <h3>Tab funtions</h3>
             <section>
-                <h4>1. Zoom in & Zoom out</h4><hr>
-                <p>If you want to zoom in & out, just cklik the zoom button. You can control the zoom function by clicking the button.</p><br>
-                <img width="1054" alt="survival_zoom" src="../file/assets/img/survival/survival_zoom.png"><hr>
+                <h4>1. Image Size Adjustment</h4><hr>
+                <p>How large the image appears on the screen can be adjusted using the zoom in and out buttons.</p><br>
+                <img style="width:840px" alt="survival_zoom" src="../file/assets/img/survival/survival_zoom.png"><hr>
             </section>
 
             <section>
-                <h4>2. Save plot as image</h4><hr>
-                <p>You may want to save the box plot data. Then click the button to save plot as image.</p>
-                <img width="1054" alt="survival_save_img" src="../file/assets/img/survival/survival_save.png"><hr>
+                <h4>2. Saving Visualized Data</h4><hr>
+                <p>The resulting plot can be saved by pressing the save image button as shown below.</p>
+                <img style="width:840px" alt="survival_save_img" src="../file/assets/img/survival/survival_save.png"><hr>
             </section>
         </div>
     </div>
@@ -85,6 +93,22 @@ hr{
                     <li><label class="tree-toggler nav-header">Immune Cluster</label>
                         <ul class="nav nav-list tree">
                             <li><a href="/subpage/immune_help.html">Immune Cluster</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Quantitation</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_protein_help.html">Protein</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_phosphosite_help.html">Phosphosite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_acetylsite_help.html">Acetylsite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_rna_help.html">RNA</a></li>
                         </ul>
                     </li>
 

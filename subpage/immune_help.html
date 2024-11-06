@@ -37,46 +37,154 @@ hr{
         <h1>About Immnue Cluster</h1><hr>
 
         <h4>
-            In this page, you can check the relationship between genes and patients information with Immune cluster data.
+            Immune cluster data can be used to check the relationship between genes and patient information.
         </h4>
+        <p>The Immune cluster page displays quantitative values for tumor patients.</p>
+        </p>
         </div>
         <div class="section1">
             <h3>Basic functions</h3><hr>
             <section>
-                <h4>1. Click the apply button</h4>
+                <h4>1. Click the [Apply] button</h4>
                 <hr>
-                <p>If you want to check some genes, then insert genes in blank of 'Genes of interest' (①).</p>
-                <p>After inserting it, please push the 'Apply' button (②).</p>
-                <img width="1054" alt="apply_gene_immune" src="../file/assets/img/immune/apply_gene_immune.png">
+                <p>To utilize specific genes, in the 'Genes of interest' bar find and select up to 10 genes (①).</p>
+                <p>After filling the box with your desired inquiries, please push the 'Apply' button (②).</p>
+                <img style="width:1054px" alt="apply_gene_immune" src="../file/assets/img/immune/apply_gene_immune.png">
                 <br>
-                <p>Then, you can check the heatmap which show the relationship between patient with chosen genes.</p>
-                <img width="1177" alt="after_apply_immune" src="../file/assets/img/immune/after_apply_immune.png"><hr>
+                <p>As shown below, the heatmap produced from your search can then be used to determine the relationship between patients and genes of your choice.</p>
+                <img style="width:1168px" alt="after_apply_immune" src="../file/assets/img/immune/after_apply_immune.png"><hr>
             </section>
 
             <section>
-                <h4>2. Click the legend button</h4>
-                <hr>
-                <p>
-                <img width="820" alt="legend_button_immune" src="../file/assets/img/immune/legend_button_immune.png"><br>
-                If you click the 'Legend' button, you can get the information of Immune cluster data like below.<br>
-                <img width="1145" alt="legend_popup_immune" src="../file/assets/img/immune/legend_popup_immune.png">
-                </p><hr>
+                <h4>2. Click the [Legend] button</h4><hr>
+                <p>The legend is initially expanded when the screen opens. You can hide it by clicking the 'X' button, 
+                    or expand it again by clicking the 'Legend' button, depending on your preference.</p>
+                <img style="width:1059px;" alt="legend_button" src="../file/assets/img/immune/legend_button_immune.png">
+                <p>If you click the 'X' button, you can get hide the legend.</p>
+                <img style="width:1064px;" alt="legend_popup" src="../file/assets/img/immune/legend_popup_immune.png"><hr>
             </section>
 
             <section>
-                <h4>3. Click the Link column</h4>
+                <h4>3. Click the [Link] column</h4>
                 <hr>
                 <p>
-                You can see the Link column on the right side.<br>
-                <img width="189" alt="link_immune" src="../file/assets/img/immune/link_immune.png">
-                It means the Uniprot ID which have relationship with gene.<br>
-                <img width="818" alt="click_the_link_immune" src="../file/assets/img/immune/click_the_link_immune.png"><br>
-                It has a hyperlink to connect Uniprot site.
-                Therefore, if you click that ID, not starred 'X', you can move to Uniprot site.
-                <br>
-                <img width="837" alt="link_to_uniprot_immune" src="../file/assets/img/immune/link_to_uniprot_immune.png">
-                <br>
-                </p><hr>
+                You can see the Link column on the right side.</p>
+                <img style="width: 440px;" alt="link" src="../file/assets/img/immune/link_immune.png">
+                <p>It means the Uniprot ID which have relationship with gene.</p>
+                <img style="width:1055px;" alt="click_the_link" src="../file/assets/img/immune/click_the_link_immune.png">
+                <p> It has a hyperlink to connect Uniprot site.</p>
+                <p> Therefore, if you click that ID, not starred 'X', you can move to Uniprot site. </p>
+                <img width="837" alt="link_to_uniprot" src="../file/assets/img/immune/link_to_uniprot_immune.png"><hr>
+            </section>
+            <section>
+                <h4>4. Meta data sorting</h4>
+                <hr>
+                <p>If you want to sort by the value of meta information, click the meta column name. </p>
+                <img style="width: 1019px;" alt="link" src="../file/assets/img/immune/meta_data.png">
+                <p>The first click on the same column name will sort in ascending order, the second click will sort in descending order, 
+                    and the third click will disable the sorting function.</p>
+                <img style="width:1019px;" alt="click_the_link" src="../file/assets/img/immune/meta_event.png"><hr>
+            </section>
+            <section>
+                <h4>5. Legend information</h4>
+                <hr>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Pathway Based IC</th>
+                            <td>HTE or CTE status from clustering analysis based on pathway enrichment scores for Immunogram.</td>
+                        </tr>
+                        <tr>
+                            <th>TIL Pattern</th>
+                            <td>The pattern of tumor infiltrating lymphocytes (TIL).</td>
+                        </tr>
+                        <tr>
+                            <th>Histology</th>
+                            <td>Name of pathological diagnosis classification for using this study.<p></p>
+                                (AD :Adenocarcinoma , SC : Squamous cell carcinoma, MA : Mucinous adenocarcinoma, NC : Large cell neuroendocrine carcinoma  and others)</td>
+                        </tr>
+                        <tr>
+                            <th>Multi Omics Subtype</th>
+                            <td>NMF subtypes of patients with NSCLC in this study.</td>
+                        </tr>
+                        <tr>
+                            <th>Stage</th>
+                            <td>Tumor stage</td>
+                        </tr>
+                        <tr>
+                            <th>Cell Type Based IC</th>
+                            <td>HTE or CTE status from clustering analysis based on cell type enrichment scores using xCell.</td>
+                        </tr>
+                        <tr>
+                            <th>CD8 T Cells</th>
+                            <td>Enrichment score of CD8+ T cells.</td>
+                        </tr>
+                        <tr>
+                            <th>CD4 T Cells</th>
+                            <td>Enrichment score of CD4+ T cells.</td>
+                        </tr>
+                        <tr>
+                            <th>Tregs</th>
+                            <td>Enrichment score of regulatory T cells.</td>
+                        </tr>
+                        <tr>
+                            <th>B Cells</th>
+                            <td>Enrichment score of B cells.</td>
+                        </tr>
+                        <tr>
+                            <th>NK Cells</th>
+                            <td>Enrichment score of natural killer cells.</td>
+                        </tr>
+                        <tr>
+                            <th>Neutrophils</th>
+                            <td>Enrichment score of neutrophils.</td>
+                        </tr>
+                        <tr>
+                            <th>DC</th>
+                            <td>Enrichment score of dendritic cells.</td>
+                        </tr>
+                        <tr>
+                            <th>Monocytes</th>
+                            <td>Enrichment score of monocytes.</td>
+                        </tr>
+                        <tr>
+                            <th>Macrophages</th>
+                            <td>Enrichment score of macrophages.</td>
+                        </tr>
+                        <tr>
+                            <th>Epithelial Cells</th>
+                            <td>Enrichment score of epithelial cells.</td>
+                        </tr>
+                        <tr>
+                            <th>Recognition of Tumor Cells</th>
+                            <td>Enrichment score of recognition of tumor cells pathway.</td>
+                        </tr>
+                        <tr>
+                            <th>Trafficking and Infiltration</th>
+                            <td>Enrichment score of trafficking and infiltration pathway.</td>
+                        </tr>
+                        <tr>
+                            <th>Checkpoint Expression</th>
+                            <td>Enrichment score of checkpoint expression pathway.</td>
+                        </tr>
+                        <tr>
+                            <th>Inhibitor Cells</th>
+                            <td>Enrichment score of inhibitor cells pathway.</td>
+                        </tr>
+                        <tr>
+                            <th>Priming and Activation</th>
+                            <td>Enrichment score of priming and activation pathway.</td>
+                        </tr>
+                        <tr>
+                            <th>Tcell Immunity</th>
+                            <td>Enrichment score of T cell immunity pathway.</td>
+                        </tr>
+                        <tr>
+                            <th>Inhibitory Molecules</th>
+                            <td>Enrichment score of inhibitory molecules pathway.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
         </div>
         <div class="section2">
@@ -106,6 +214,21 @@ hr{
                                     <span class="lbl">Immune Cluster</span> (current)
                                 </a>
                             </li>
+                        </ul>
+                    </li>
+                    <li class="divider"></li>
+                    <li><label class="tree-toggler nav-header">Quantitation</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_protein_help.html">Protein</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_phosphosite_help.html">Phosphosite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_acetylsite_help.html">Acetylsite</a></li>
+                        </ul>
+                        <ul class="nav nav-list tree">
+                            <li><a href="/subpage/quantification_rna_help.html">RNA</a></li>
                         </ul>
                     </li>
                     <li class="divider"></li>
