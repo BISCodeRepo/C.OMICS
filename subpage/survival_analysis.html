@@ -5,58 +5,72 @@
 
   <div class="component-item">
     <h3 class="component-ttl"></h3>
-    <div class="white-bd-box search-02-box">
+    <div style="display: flex;justify-content: space-between;">
+    <div class="white-bd-box search-02-box" style="width: 30%; height: 306px; margin-left:10%">
       <div class="box-inner">
-        <h3 class="custom-ttl2">Gene name</h3>
-        <select id="survival_select-tools" multiple placeholder="Target" style="height: 40px; width:250px;"></select>
-
-        <h3 class="custom-ttl2">Type</h3>
-        <select id="survival_type-tools" multiple placeholder="Type" style="height: 40px; width: 150px;"></select>
-
-        <h3 class="custom-ttl2">P-value (range: 0~1)</h3>
-
-        <input id="pvalue-start" type="number" class="survival-number-input" step="0.0001" min="0.0000" max = "1.0000" title="Enter a number between 0 and 1." value="0.0000"/> ~
-        <input id="pvalue-end" type="number" class="survival-number-input" step="0.0001" min="0.0000" max = "1.0000" title="Enter a number between 0 and 1." value="1.0000"/>
-
-        <h3 class="custom-ttl2">Measure</h3>
-
-        <select id="survival_measure-tools" placeholder="Measure" style="height: 40px; width: 130px;"></select>
-
-        <button type="button" class="green-btn" id="survival_apply-btn">Apply</button>
-
-        <h3 class="custom-ttl2">P-value sorting</h3>
-
-       <!--<select id="survival_select-tools2" style="height: 40px;width:140px;"></select>--> 
-
-        <button type="button" class="ico-btn" id="survival_sort-icon">
-          <span class="txt-hidden">필터</span>
-          <img src="subpage/images/ico-arrows-down-up.svg" alt="필터 아이콘" class="ico">
-        </button>
+        <table style="border-collapse: separate; border-spacing: 10px 15px;table-layout: auto;">
+          <tr>
+            <th><h4 class="custom-ttl2">Gene name</h4></th>
+            <td>
+            <select id="survival_select-tools" multiple placeholder="Target" style="height: 40px; width:190px;"></select>
+            </td>
+          </tr>
+          <tr>
+            <th><h4 class="custom-ttl2">Type</h4></th>
+            <td>
+            <select id="survival_type-tools" multiple placeholder="Type" style="height: 40px; width: 150px;"></select>
+          </td></tr>
+          <tr>
+            <th><h4 class="custom-ttl2">P-value (range: 0~1)</h4></th>
+            <td>
+            <input id="pvalue-start" type="number" class="survival-number-input" step="0.0001" min="0.0000" max = "1.0000" title="Enter a number between 0 and 1." value="0.0000"/> ~
+            <input id="pvalue-end" type="number" class="survival-number-input" step="0.0001" min="0.0000" max = "1.0000" title="Enter a number between 0 and 1." value="1.0000"/>
+          </td></tr>
+          <tr>
+            <th><h4 class="custom-ttl2">Measure</h4></th>
+           <td><select id="survival_measure-tools" placeholder="Measure" style="height: 40px; width: 130px;"></select>
+          </td></tr>
+          <tr>
+            <th><button type="button" class="green-btn" id="survival_apply-btn">Apply</button></th>
+            <td><div style="display: flex; align-items: center;">
+                <h4 class="custom-ttl2">P-value sorting</h4>
+                <button type="button" class="ico-btn" id="survival_sort-icon">
+                  <span class="txt-hidden">필터</span>
+                  <img src="subpage/images/ico-arrows-down-up.svg" alt="필터 아이콘" class="ico">
+                </button></div></td>
+             </td>
+          </tr>
+        </table>
       </div>
     </div>
+    <div id="subtype_survival_plot" class="white-bd-box" style="width: 45%;margin-right:10%; height:306px;">
+      
+    </div>
+  </div>
   </div>
   <h4 class="component-ttl"></h4>
 
   <div id="survival_main_task_div" style="width: 95%; margin: auto;">
-    <div id="survival_geneName_list" style="width:17%;height:76vh;float:left;margin-right:1%;overflow:auto">
+
+    <div id="survival_geneName_list" style="width:17%;height:48%;float:left;margin-right:1%;overflow:auto">
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3 class="panel-title">Gene name</h3>
         </div>
         <ul class="list-group" id="geneNameListUl"> </ul>
       </div>
+      
     </div>
-
     <div id="survival_container1"> </div>
   </div>
-  
 
 </div>
 
 
 <script type="text/javascript">
 
-    var allPvalueList = [];
+    var allMedianPvalueList = [];
+    var allMeanPvalueList = [];
     var overallList = [];
     var sur_allPatient = new Map();
     var sur_patientInfo = [];
@@ -73,27 +87,83 @@
 
       showSpinner('survivalContent');
 
+      $.ajax({
+        url: baseURL+'get_gene_name_list',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 'param':'param' }),
+        success: function (result) {
+          //debugger
+          var geneTmp = result['geneName']
+          var geneList = []
+  
+          $.each(geneTmp,function(n,value) {
+            geneList.push({id:value,title:value})
+          });
+  
+          var $select = $('#comparison-select-tools').selectize({
+            plugins: ["remove_button"],
+            maxItems: 1,
+            maxOptions: 100,
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            sortField: 'title',
+            options: geneList,
+            create: false,
+          });
+
+          hideSpinner('comparisonContent');
+        },
+        error: function (error) {
+          console.error('error:', error);
+          reject('error');
+        }
+      });
+
         $.ajax({
-            type:"GET",   
-            url: "../file/get_survival_overall_data.csv",
-            data:[],  
-            dataType:"text",
-            cache:false,
-            success:function(data){  
-                overallList = data.split('\n');
-            }
+          url: baseURL+'get_survival_overall_data',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ 'geneName': '' }),
+          success:function(data){  
+              var resultMap = JSON.parse(data);            
+              overallList = resultMap.data;
+          }
         });  
 
         $.ajax({
-            type:"GET",   
-            url: "../file/survival_pvalue.csv",
-            data:[],  
-            dataType:"text",
-            cache:false,
-            success:function(data){  
-                allPvalueList = data.split('\n');
-            }
+          url: baseURL+'get_survival_median_pvalue',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ 'geneName': '' }),
+          success:function(data){  
+            var resultMap = JSON.parse(data);            
+            allMedianPvalueList = resultMap.data;
+          }
         }); 
+
+        $.ajax({
+          url: baseURL+'get_survival_mean_pvalue',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ 'geneName': '' }),
+          success:function(data){  
+            var resultMap = JSON.parse(data);            
+            allMeanPvalueList = resultMap.data;
+          }
+        });
+
+        $.ajax({
+          url: baseURL+'get_subtype_suvival_data',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ 'geneName': '' }),
+          success:function(data){  
+            var resultMap = JSON.parse(data);            
+            getSubtypeOverall(resultMap.data);
+          }
+        });
 
         getSurvivalData();
 
@@ -123,6 +193,105 @@
 
     });
 
+    function getSubtypeOverall(overallData){
+
+      //debugger
+      var subtypeData = []
+
+      var data_subtype1 = []
+      var data_subtype2 = []
+      var data_subtype3 = []
+      var data_subtype4 = []
+      var data_subtype5 = []
+
+      for(var i=1;i<overallData.length;i++){ //find the death,os
+
+        var tmp = overallData[i];
+        switch (tmp[3]){
+          case '1':
+            data_subtype1.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+          break;
+          case '2':
+            data_subtype2.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+          break;
+          case '3':
+            data_subtype3.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+          break;
+          case '4':
+            data_subtype4.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+          break;
+          case '5':
+            data_subtype5.push({'time':tmp[2]/12,'death':tmp[1]=='Y'?true:false,'sample':tmp[0]})
+          break;
+        }
+
+      }
+
+      var tabale_subtype1 =  KM_Curve(data_subtype1);
+      var tabale_subtype2 =  KM_Curve(data_subtype2);
+      var tabale_subtype3 =  KM_Curve(data_subtype3);
+      var tabale_subtype4 =  KM_Curve(data_subtype4);
+      var tabale_subtype5 =  KM_Curve(data_subtype5);
+
+      var table_all = [tabale_subtype1,tabale_subtype2,tabale_subtype3,tabale_subtype4,tabale_subtype5]
+
+      for (var i =0 ; i<table_all.length;i++){
+
+        var kmsurv_sub = table_all[i][0];
+        var censor_sub = table_all[i][1];
+        var subtypeColor = nmfMetaColorNameMap['Subtype'][i+1]
+
+        kmsurv_sub.unshift({"t_i": min_date, "d_i": 0, "Y_i": 0, "s_t": 0, "S_t": 1})
+        censor_sub.unshift({"c_i": min_date, "c_s": 1})
+
+        var trace1 = {
+          x: kmsurv_sub.map((item) => item.t_i*12),
+          y: kmsurv_sub.map((item) => item.S_t),
+          mode: 'lines',
+          name: (i+1),
+          
+          line: {shape: 'hv', color: subtypeColor},
+        };
+  
+        var trace2 = {
+          x: censor_sub.map((item) => item.c_t*12),
+          y: censor_sub.map((item) => item.c_s),
+          mode: 'markers',
+          
+          marker: { size: 6, color: subtypeColor, symbol : 142 },
+          showlegend :false
+        }
+
+        subtypeData.push(trace1)
+        subtypeData.push(trace2)
+      }
+      
+      var subtypeLayout = {
+        title : {
+          text : 'Subtype survival analysis',
+        },
+        yaxis:{
+              autotick: false,
+              ticks: 'outside',
+              tick0: 0,
+              dtick: 0.25,
+              range : [0,1]
+        },
+        xaxis :{
+          title :'month',
+          dtick : 25,
+          range:[0,125]
+        },
+        legend: {
+          autosize : false,
+          font: {size: 12},
+          yref: 'paper',
+          title : ''
+        }};
+
+      Plotly.newPlot("subtype_survival_plot", subtypeData, subtypeLayout);
+
+    }
 
     function survivalClickEvent(){
 
@@ -132,8 +301,8 @@
       const pvalueEnd = $('#pvalue-end').val();
       const measure = $('#survival_measure-tools').val();
 
-      if(isEmpty(targetValue) && isEmpty(pvalueStart) && isEmpty(pvalueEnd)){
-          alert("Select the gene name or enter the P-value range value!");
+      if(isEmpty(targetValue) || isEmpty(pvalueStart) || isEmpty(pvalueEnd) || isEmpty(measure)){
+          alert("Select the gene name or enter the P-value range value or select the measure!");
           return;
       }
 
@@ -161,34 +330,53 @@
       }
 
 
-      getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue);
+      getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue,measure);
     }
 
-    function getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue){
+    function getSurvivalGeneNameList(targetValue,pvalueStart,pvalueEnd,typeValue,measure){
         
         $('#survival_geneName_list').css('display','block');
         
         subPavlueList = [];
         var tmpList = []
-        if(!isEmpty(targetValue)){ // target is existed
-            tmpList = allPvalueList.filter((value, index, self) => {
+        
+        if(measure == 'Median'){
+          if(!isEmpty(targetValue)){ // target is existed
+            tmpList = allMedianPvalueList.filter((value, index, self) => {
               //console.log(index)
-              return index>0 && (value.trimEnd().split(",")[1].indexOf("_")>-1? value.trimEnd().split(",")[1].split('_')[0]==targetValue:value.trimEnd().split(",")[1] == targetValue)
-              && parseFloat(value.trimEnd().split(",")[2])<=parseFloat(pvalueEnd) 
-              && parseFloat(value.trimEnd().split(",")[2])>=parseFloat(pvalueStart);
+              return index>0 && (value[1].indexOf("_")>-1? value[1].split('_')[0]==targetValue:value[1] == targetValue)
+              && parseFloat(value[2])<=parseFloat(pvalueEnd) 
+              && parseFloat(value[2])>=parseFloat(pvalueStart);
               });
-        } else { //target is null
-            tmpList = allPvalueList.filter((value, index, self) => {
-                return index>0 && parseFloat(value.trimEnd().split(",")[2])<=parseFloat(pvalueEnd)
-                 && parseFloat(value.trimEnd().split(",")[2])>=parseFloat(pvalueStart);
+          } else { //target is null
+              tmpList = allMedianPvalueList.filter((value, index, self) => {
+                  return index>0 && parseFloat(value[2])<=parseFloat(pvalueEnd)
+                  && parseFloat(value[2])>=parseFloat(pvalueStart);
+                });
+              
+          }
+        } else { //mean
+          if(!isEmpty(targetValue)){ // target is existed
+            tmpList = allMeanPvalueList.filter((value, index, self) => {
+              //console.log(index)
+              return index>0 && (value[1].indexOf("_")>-1? value[1].split('_')[0]==targetValue:value[1] == targetValue)
+              && parseFloat(value[2])<=parseFloat(pvalueEnd) 
+              && parseFloat(value[2])>=parseFloat(pvalueStart);
               });
-            
+          } else { //target is null
+            tmpList = allMeanPvalueList.filter((value, index, self) => {
+                return index>0 && parseFloat(value[2])<=parseFloat(pvalueEnd)
+                && parseFloat(value[2])>=parseFloat(pvalueStart);
+              });
+              
+          }
         }
+        
         if(!isEmpty(typeValue)){ //Type is existed
             $.each(tmpList,function(n,v){
-                var tmp = v.trimEnd().split(",");
-                if(tmp[0]==typeValue){
-                    subPavlueList.push(v.trimEnd());
+                //var tmp = v.trimEnd().split(",");
+                if(v[0]==typeValue){
+                    subPavlueList.push(v);
                 }
 
             });
@@ -206,7 +394,7 @@
         
         var liSet = new Set()
         for (var i = 0; i < subPavlueList.length; i++) {
-            var tmp = subPavlueList[i].trimEnd().split(',');
+            var tmp = subPavlueList[i];
             if(tmp[1].indexOf('_')>-1){
                 liSet.add(tmp[1].split('_')[0]);
             } else{
@@ -260,7 +448,7 @@
 
     function GetSurvivalDatafitPlot(resultMap,sur_selectval){
 
-      //debugger
+     // debugger
 
       if(resultMap['data']==null || resultMap['data'].length ==0){
         return
@@ -286,43 +474,43 @@
             targetGenePatient = resultMap['columns'].slice(4,209);
           break;
           case 'PROTEIN':
-            targetProteinArray.set(tmp[3]+'_'+tmp[1], tmp.slice(4,tmp.length-1));
-            targetProteinPatient = resultMap['columns'].slice(4,tmp.length-1);
+            targetProteinArray.set(tmp[3], tmp.slice(4,tmp.length-2));
+            targetProteinPatient = resultMap['columns'].slice(4,tmp.length-2);
           break;
           case 'PHOSPHO':
-            targetPhosphoArray.set(tmp[3], tmp.slice(4,tmp.length-1));
-            targetPhosphoPatient = resultMap['columns'].slice(4,tmp.length-1);
+            targetPhosphoArray.set(tmp[3], tmp.slice(4,tmp.length-2));
+            targetPhosphoPatient = resultMap['columns'].slice(4,tmp.length-2);
           break;
           case 'ACETYLE':
-            targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length-1));
-            targetAcetylPatient = resultMap['columns'].slice(4,tmp.length-1);
+            targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length-2));
+            targetAcetylPatient = resultMap['columns'].slice(4,tmp.length-2);
           break;
         }
       }
 
       if(targetGeneArray!=null && targetGeneArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'RNA' && v.split(',')[1] == sur_selectval }).length > 0){
+        return v[0] == 'RNA' && v[1] == sur_selectval }).length > 0){
         $('#survival_container1').append("<div id='SurvivalRNAPlot' class='typeDivPlot'><h3 class='custom-ttl3'>RNA</h3>");
         preDrawSurvivalPlot(targetGeneArray,targetGenePatient,'SurvivalRNAPlot','RNA')
         $('#survival_container1').append("<hr></div>");
       }
     
       if(targetProteinArray!=null && targetProteinArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'PROTEIN' && targetProteinArray.has(v.split(',')[1])}).length > 0){
+        return v[0] == 'PROTEIN' && targetProteinArray.has(v[1])}).length > 0){
         $('#survival_container1').append("<div id='SurvivalProteinPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Protein</h3>");
         preDrawSurvivalPlot(targetProteinArray,targetProteinPatient,'SurvivalProteinPlot','PROTEIN')
         $('#survival_container1').append("<hr></div>");
       }
 
       if(targetAcetylArray!=null && targetAcetylArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'ACETYL'&& targetAcetylArray.has(v.split(',')[1])}).length > 0){
+        return v[0] == 'ACETYL'&& targetAcetylArray.has(v[1])}).length > 0){
         $('#survival_container1').append("<div id='SurvivalAcetylPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Acetylsite</h3>");
         preDrawSurvivalPlot(targetAcetylArray,targetAcetylPatient,'SurvivalAcetylPlot','ACETYL')
         $('#survival_container1').append("<hr></div>");
       }
 
       if(targetPhosphoArray!=null && targetPhosphoArray.size>0 && subPavlueList.filter((v, index, self) => {
-        return v.split(',')[0] == 'PHOSPHO'&& targetPhosphoArray.has(v.split(',')[1])}).length > 0){
+        return v[0] == 'PHOSPHO'&& targetPhosphoArray.has(v[1])}).length > 0){
         $('#survival_container1').append("<div id='SurvivalPhosphoPlot' class='typeDivPlot'><h3 class='custom-ttl3'>Phosphosite</h3>");
         preDrawSurvivalPlot(targetPhosphoArray,targetPhosphoPatient,'SurvivalPhosphoPlot','PHOSPHO')
         $('#survival_container1').append("<hr></div>");
@@ -335,17 +523,17 @@
 
       //debugger
       var p_val_array = []
-      for(const [key, value] of targetArray){
+      for(var [key, value] of targetArray){
         var tmp = subPavlueList.filter((v, index, self) => {
-          return v.split(',')[0] == type && v.split(',')[1] == key;
+          return v[0] == type && v[1] == key;
         });
         high_patients = []
         low_patients = []
         if(tmp!=null && tmp.length > 0){ //geneName
 
-          var median = tmp[0].trimEnd().split(',')[3]
-          var p_val = tmp[0].trimEnd().split(',')[2]
-          var title = tmp[0].trimEnd().split(',')[1]
+          var median = tmp[0][3]
+          var p_val = tmp[0][2]
+          var title = tmp[0][1]
 
           for(var i =0;i<value.length;i++){
             if(parseFloat(value[i]) > parseFloat(median)){
@@ -359,7 +547,7 @@
           data_lows = []
           for(var i=1;i<overallList.length;i++){ //find the death,os
 
-            var tmp = overallList[i].trimEnd().split(",");
+            var tmp = overallList[i];
             if( high_patients.filter((v, index, self) => {
               return tmp[0] == v;
             }).length >0){
