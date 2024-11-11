@@ -6,7 +6,7 @@
   <div class="component-item">
     <h3 class="component-ttl"></h3>
     <div style="display: flex;justify-content: space-between;">
-    <div class="white-bd-box search-02-box" style="width: 30%; height: 306px; margin-left:10%">
+    <div class="white-bd-box search-02-box" style="width: 30%; height: 306px; margin-left:15%">
       <div class="box-inner">
         <table style="border-collapse: separate; border-spacing: 10px 15px;table-layout: auto;">
           <tr>
@@ -43,7 +43,7 @@
         </table>
       </div>
     </div>
-    <div id="subtype_survival_plot" class="white-bd-box" style="width: 45%;margin-right:10%; height:306px;">
+    <div id="subtype_survival_plot" style="width: 30%;margin-right:15%; height:306px;">
       
     </div>
   </div>
@@ -289,7 +289,7 @@
           title : ''
         }};
 
-      Plotly.newPlot("subtype_survival_plot", subtypeData, subtypeLayout);
+      Plotly.newPlot("subtype_survival_plot", subtypeData, subtypeLayout,{displaylogo: false});
 
     }
 
@@ -301,9 +301,14 @@
       const pvalueEnd = $('#pvalue-end').val();
       const measure = $('#survival_measure-tools').val();
 
-      if(isEmpty(targetValue) || isEmpty(pvalueStart) || isEmpty(pvalueEnd) || isEmpty(measure)){
-          alert("Select the gene name or enter the P-value range value or select the measure!");
+      if(isEmpty(targetValue) && isEmpty(pvalueStart) && isEmpty(pvalueEnd)){
+          alert("Select the gene name or enter the P-value range value!");
           return;
+      }
+
+      if(isEmpty(measure)){
+        alert("Select the mesure!");
+        return;
       }
 
       if(!isEmpty(pvalueStart) || !isEmpty(pvalueEnd)){
@@ -448,7 +453,7 @@
 
     function GetSurvivalDatafitPlot(resultMap,sur_selectval){
 
-     // debugger
+      debugger
 
       if(resultMap['data']==null || resultMap['data'].length ==0){
         return
@@ -481,7 +486,7 @@
             targetPhosphoArray.set(tmp[3], tmp.slice(4,tmp.length-2));
             targetPhosphoPatient = resultMap['columns'].slice(4,tmp.length-2);
           break;
-          case 'ACETYLE':
+          case 'ACETYL':
             targetAcetylArray.set(tmp[3], tmp.slice(4,tmp.length-2));
             targetAcetylPatient = resultMap['columns'].slice(4,tmp.length-2);
           break;
@@ -672,7 +677,7 @@
           newBox.append(charDiv);
         }
         // console.log(allLayout.get(value))
-        Plotly.newPlot(plotName+"_survival-myDiv" +boxIndex, p_val_array[i].data, p_val_array[i].layout);
+        Plotly.newPlot(plotName+"_survival-myDiv" +boxIndex, p_val_array[i].data, p_val_array[i].layout,{displaylogo: false});
         boxIndex++;
       }
     }

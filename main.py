@@ -39,7 +39,7 @@ CORS(app, resources={r"/api/kruskal_wallis": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
-                     r"/api/get_comparison_and_survival_data": {"origins": origins,
+                     r"/api/get_comparison_data": {"origins": origins,
                                      "methods": ["POST"],
                                      "allow_headers": ["Content-Type"]
                                      },
@@ -304,14 +304,13 @@ def get_gene_heatmap_data():
         return jsonify({"error": str(e)})
     
 
-@app.route('/api/get_comparison_and_survival_data', methods=['POST'])
-def get_comparison_and_survival_data():
+@app.route('/api/get_comparison_data', methods=['POST'])
+def get_comparison_data():
     try:
         data = request.json
         print(data)
         
         geneName = data['geneName']
-        #print(geneName)
         
         all_df = get_all_data()
         

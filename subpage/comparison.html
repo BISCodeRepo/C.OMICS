@@ -86,13 +86,18 @@
         return;
       }
 
-      uniqueValue = allUniqueValue.get(groupValue);
+      if(groupValue == "Subtype Core"){
+        uniqueValue = allUniqueValue.get('Subtype');
+      }else{
+        uniqueValue = allUniqueValue.get(groupValue);
+      }
+
       uniqueValue = uniqueValue.sort();
 
-      if(groupValue == 'Subtype' && uniqueValue.indexOf('0')<0){   
-        uniqueValue.push('0')     
+      if((groupValue == 'Subtype' || groupValue == "Subtype Core") && uniqueValue.indexOf('0')<0){   
+        uniqueValue.push('0');     
       } else if(groupValue =='Histology' && uniqueValue.indexOf('Normal')<0){          
-        uniqueValue.push('Normal')
+        uniqueValue.push('Normal');
       }
 
       drawComparisonPlot(targetValue,uniqueValue);
@@ -201,7 +206,7 @@
       var targetPatient = new Map();
 
       $.ajax({
-        url: baseURL+'get_comparison_and_survival_data',
+        url: baseURL+'get_comparison_data',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ 'geneName': targetValue,'metaName': uniqueValue}),
@@ -221,7 +226,7 @@
     function GetComparisonDatafitPlot(resultMap,uniqueValue){
 
       var subArray = [];
-      //debugger
+      debugger
 
       if(resultMap['data']==null || resultMap['data'].length ==0){
         return
@@ -314,6 +319,26 @@
           map['Histology'] = 'Normal'
          }
         });
+      } else if($('#comparison-select-tools1').text() =='Subtype Core'){
+        boxPlotColor = nmfMetaColorNameMap['Subtype']
+        boxPlotColor['0']= '#663300'
+        //uniqueValue.push('0')
+        
+        tmpAllPatient.forEach(function(map) {
+         if(map['Sample ID'].includes('-N')){
+          map['Subtype'] = '0'
+         }
+        });
+
+        var tmpAllPatient1 = new Map();
+        
+        tmpAllPatient.forEach((value) => {
+          if(value['Subtype Core'] != 'N'){
+            tmpAllPatient1.set(value['Sample ID'], value)
+          }
+        });
+
+        tmpAllPatient = tmpAllPatient1
       }
 
       for (const [key, value] of targetArray) {
@@ -331,12 +356,17 @@
             },
           })
         }
+        var groupValueTmp = groupValue
+        if(groupValue == "Subtype Core"){
+          groupValueTmp = "Subtype"
+        }
+
         //debugger
         curArray.forEach((value, index) => {
           if (tmpAllPatient.has(curPatient[index])) {
             const curPatientInfo = tmpAllPatient.get(curPatient[index]);
             for (var i = 0; i < uniqueValue.length; i++) {
-              if (curPatientInfo[groupValue] === uniqueValue[i]) {
+              if (curPatientInfo[groupValueTmp] === uniqueValue[i]) {
                 if (value !=null && value !=undefined){
                   data[i]["y"].push(value);
                 }       
@@ -344,8 +374,12 @@
               }
             }
           }
-        })
-        res.set(curTarget, data)
+        });
+
+       for(var j = 0; j<data.length;j++){
+          data[j]['name'] = data[j]['name'] + ' (n='+data[j]['y'].length+')'
+       }
+       res.set(curTarget, data)
       }
       cal(res,plotName)
     }
@@ -370,12 +404,17 @@
 
           pValue = formatComparisonNumbers(pValue)
           //pText = "P-value = " + pValue 
+
+          var titleTmp = groupValue
+          if(groupValue == "Subtype Core"){
+            titleTmp = groupValue+" = 'Yes'"
+          }
  
           var layout = {
             title: value + "<br>P-value = "+pValue,
             xaxis: {
               title: {
-                text: groupValue,
+                text: titleTmp,
               }
             },
             annotations: [
@@ -442,7 +481,7 @@
           newBox.append(charDiv);
         }
         // console.log(allLayout.get(value))
-        Plotly.newPlot(plotName+"_comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value));
+        Plotly.newPlot(plotName+"_comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value),{displaylogo: false});
         boxIndex++;
       })
  
