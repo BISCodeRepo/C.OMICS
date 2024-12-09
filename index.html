@@ -100,6 +100,103 @@
      width:0;
      transition:width 0.5s;
    }
+   .main-content {
+    width: 90%;
+    margin: 1% auto;
+  }
+
+  .content-box {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+  }
+
+  .text-section {
+      width: 35%;
+  }
+
+  .image-section {
+      width: 63%;
+      position: relative;
+  }
+
+  .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 103rem; /* 슬라이더 최대 크기 */
+      margin: auto;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+  }
+
+  .carousel-images {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      width:100%;
+  }
+
+  .carousel-images img {
+      max-width: 103rem;
+      width:103rem;
+      flex-shrink: 0;
+  }
+
+  .carousel-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 10;
+  }
+
+  .carousel-button.left {
+      left: 10px;
+  }
+
+  .carousel-button.right {
+      right: 10px;
+  }
+
+  .reference-section {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+  }
+
+  .reference-section h3 {
+      margin-bottom: 10px;
+  }
+
+  .reference-section p {
+      margin: 5px 0;
+  }
+
+  .reference-section a {
+      color: #007BFF;
+      text-decoration: none;
+  }
+
+  .reference-section a:hover {
+      text-decoration: underline;
+  }
+
+  .close{
+    display: none;
+  }
+  .dropdown-menu li a[data-name="Pin tab"]{
+    display: none;
+  }
+
    </style>
 </head>
 <body>
@@ -160,17 +257,47 @@
            </header>
          </div>         
      </div>
+
      <div id="homeContent">
-       <div class="layerPopup">
-        <div class="spinner"></div>
-       </div>
-       <div id="mainContent">
-        <div id="homeMainContent" style="margin-left:30%">
-          <div style="width:50%">
-            <h3 style="margin-left: 2%;">No.1 logo</h3>
-            <img src="/subpage/images/1-Photoroom.png" style="width: 100%;">
+       <div id="homeMainContent" class="main-content">
+        <div id="mainContent">
+          <div style="text-align: center; margin-bottom: 1%;">
+            <span style="color:#790F09;font-size: 36px;font-weight: 500; margin-right: 20px;">Cancer</span><span style="font-size: 36px;font-weight: 500;">Omics</span>
+          </div>
+          <div class="content-box">
+            <div class="text-section">
+              <h2>Introduction</h2>
+              <i><h3>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment</h3></i>
+              <p style="font-size: 16px;">Non-small cell lung cancer (NSCLC) is histologically classified into lung adenocarcinoma (LUAD) and lung squamous cell carcinoma (LSCC). 
+                However, some tumors are histologically ambiguous and other pathophysiological features or microenvironmental factors may be more prominent. 
+                Here we report integrative multiomics analyses using data for 229 patients from a Korean NSCLC cohort and 462 patients from previous multiomics 
+                studies. Histological examination reveals five molecular subtypes, one of which is a NSCLC subtype with PI3K-Akt pathway upregulation, 
+                showing a high proportion of metastasis and poor survival outcomes regardless of any specific NSCLC histology. Proliferative subtypes 
+                are present in LUAD and LSCC, which show strong associations with whole genome doubling (WGD) events. Comprehensive characterization of the 
+                immune microenvironment reveals various immune cell compositions and neoantigen loads across molecular subtypes, which predicting different 
+                prognoses. Immunological subtypes exhibit a hot tumor-enriched state and a higher efficacy of adjuvant therapy.</p>
+            </div>
+            <div class="image-section">
+              <div class="carousel-container">
+                  <div class="carousel-images">
+                      <img src="/subpage/images/figureA.jpg" style="width:103rem;height:53rem" alt="Image 1">
+                      <img src="/subpage/images/figureB.jpg" style="width:103rem;height:53rem" alt="Image 2">
+                      <img src="/subpage/images/figureC.jpg" style="width:103rem;height:53rem" alt="Image 3">
+                  </div>
+                  <button class="carousel-button left" onclick="moveSlide(-1)">&#8249;</button>
+                  <button class="carousel-button right" onclick="moveSlide(1)">&#8250;</button>
+              </div>
+            </div>
+          </div>
+          <div class="reference-section">
+            <h2>Reference</h2>
+            <p>Song KJ, Choi S, Kim K, Hwang HS, Chang E, Park JS, Shim SB, Choi S, Heo YJ, An WJ, Yang DY, Cho KC, Ji W, Choi CM, Lee JC, Kim HR, Yoo J, Ahn HS, 
+              Lee GH, Hwa C, Kim S, Kim K, Kim MS, Paek E, Na S, Jang SJ, An JY, Kim KP.</p>
+            <p>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment. </p>
+            <p>Nat Commun. 2024 Nov 23;15(1):10164. <a href="https://pubmed.ncbi.nlm.nih.gov/39580524/" target="_blank">doi: 10.1038/s41467-024-54434-4.</a> PMID: 39580524; PMCID: PMC11585665.</p>
           </div>
         </div>
+      </div>
          <div id="NMFmainContent" ></div>
          <div id="IMMUNEmainContent" ></div>
          <div id="PROTEINmainContent" ></div>
@@ -179,7 +306,7 @@
          <div id="GENEmainContent"></div>
          <div id="COMPARISONmainContent"></div>
          <div id="SURVIVALmainContent"></div>
-     </div>
+     
      </div>
   
  </div>
@@ -317,7 +444,39 @@
         
       });
 
+      
    });
+
+   //debugger
+  let currentIndex = 0;
+
+  const images = document.querySelectorAll('.carousel-images img');
+  const imageContainer = document.querySelector('.carousel-images');
+
+  const imageCount = images.length;
+
+  imageContainer.style.transform = `translateX(0%)`;
+
+  function moveSlide(direction) {
+
+    currentIndex += direction;
+
+    if (currentIndex < 0) {
+        currentIndex = imageCount - 1;
+    }
+
+    if (currentIndex >= imageCount) {
+        currentIndex = 0;
+    }
+
+    const offset = -currentIndex * 100; 
+    imageContainer.style.transform = `translateX(${offset}%)`;
+  }
+
+  setInterval(() => {
+    moveSlide(1);
+  }, 3000);
+
 
    function dropdownOpen() {     
     $('.dropdown').mouseover(function () {

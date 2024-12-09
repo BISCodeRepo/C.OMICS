@@ -226,7 +226,7 @@
     function GetComparisonDatafitPlot(resultMap,uniqueValue){
 
       var subArray = [];
-      debugger
+      //debugger
 
       if(resultMap['data']==null || resultMap['data'].length ==0){
         return
@@ -481,7 +481,7 @@
           newBox.append(charDiv);
         }
         // console.log(allLayout.get(value))
-        Plotly.newPlot(plotName+"_comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value),{displaylogo: false});
+        Plotly.newPlot(plotName+"_comparison-myDiv" + boxIndex, res.get(value), allLayout.get(value),{displaylogo: false},{modeBarButtonsToRemove: ['Zoom','Pan']});
         boxIndex++;
       })
  
