@@ -115,18 +115,24 @@
   }
 
   .text-section {
-      width: 35%;
+      width: 45%;
+      margin-right: 5px;
+      flex: 1;
   }
 
   .image-section {
-      width: 63%;
+      width: 53%;
       position: relative;
+      flex:1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 5px;
   }
 
   .carousel-container {
       position: relative;
       width: 100%;
-      max-width: 103rem; /* 슬라이더 최대 크기 */
       margin: auto;
       overflow: hidden;
       border-radius: 10px;
@@ -134,15 +140,15 @@
   }
 
   .carousel-images {
-      display: flex;
-      transition: transform 0.5s ease-in-out;
-      width:100%;
+    display: flex;
+    transition: transform 0.5s ease-in-out;
   }
 
   .carousel-images img {
-      max-width: 103rem;
-      width:103rem;
-      flex-shrink: 0;
+    width: 100%; /* 화면 너비에 맞게 이미지 조정 */
+    height: auto; /* 이미지 비율 유지 */
+    object-fit: cover; /* 다른 비율의 이미지를 슬라이드에 맞게 조정 */
+    flex-shrink: 0; /* 이미지가 크기를 잃지 않도록 고정 */
   }
 
   .carousel-button {
@@ -266,9 +272,9 @@
           </div>
           <div class="content-box">
             <div class="text-section">
-              <h2>Introduction</h2>
-              <i><h3>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment</h3></i>
-              <p style="font-size: 16px;">Non-small cell lung cancer (NSCLC) is histologically classified into lung adenocarcinoma (LUAD) and lung squamous cell carcinoma (LSCC). 
+              <h3 style="margin-top: 0;">Introduction</h3>
+              <i><h4>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment</h4></i>
+              <p>Non-small cell lung cancer (NSCLC) is histologically classified into lung adenocarcinoma (LUAD) and lung squamous cell carcinoma (LSCC). 
                 However, some tumors are histologically ambiguous and other pathophysiological features or microenvironmental factors may be more prominent. 
                 Here we report integrative multiomics analyses using data for 229 patients from a Korean NSCLC cohort and 462 patients from previous multiomics 
                 studies. Histological examination reveals five molecular subtypes, one of which is a NSCLC subtype with PI3K-Akt pathway upregulation, 
@@ -280,9 +286,9 @@
             <div class="image-section">
               <div class="carousel-container">
                   <div class="carousel-images">
-                      <img src="/subpage/images/figureA.jpg" style="width:103rem;height:53rem" alt="Image 1">
-                      <img src="/subpage/images/figureB.jpg" style="width:103rem;height:53rem" alt="Image 2">
-                      <img src="/subpage/images/figureC.jpg" style="width:103rem;height:53rem" alt="Image 3">
+                      <img src="/subpage/images/figureA.jpg" alt="Image 1">
+                      <img src="/subpage/images/figureB.jpg" alt="Image 2">
+                      <img src="/subpage/images/figureC.jpg" alt="Image 3">
                   </div>
                   <button class="carousel-button left" onclick="moveSlide(-1)">&#8249;</button>
                   <button class="carousel-button right" onclick="moveSlide(1)">&#8250;</button>
@@ -290,7 +296,7 @@
             </div>
           </div>
           <div class="reference-section">
-            <h2>Reference</h2>
+            <h3>Reference</h3>
             <p>Song KJ, Choi S, Kim K, Hwang HS, Chang E, Park JS, Shim SB, Choi S, Heo YJ, An WJ, Yang DY, Cho KC, Ji W, Choi CM, Lee JC, Kim HR, Yoo J, Ahn HS, 
               Lee GH, Hwa C, Kim S, Kim K, Kim MS, Paek E, Na S, Jang SJ, An JY, Kim KP.</p>
             <p>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment. </p>

@@ -171,10 +171,11 @@
           var subArray = []
           var subUniprotArray = []
           var subLinkArray = []
+          //debugger
           for(var i = 0;i<resultMap['data'].length;i++){
             var tmp = resultMap['data'][i];
             subArray.push(tmp.slice(6,tmp.length));
-            subUniprotArray.push(tmp[1]);
+            subUniprotArray.push(tmp[3]);
             subLinkArray.push(tmp.slice(1,2)[0].indexOf('_')>-1?tmp.slice(1,2)[0].split('_')[0]:tmp.slice(1,2)[0]);
           }
 
