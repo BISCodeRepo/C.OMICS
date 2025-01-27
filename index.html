@@ -102,32 +102,25 @@
    }
    .main-content {
     width: 90%;
-    margin: 1% auto;
+    margin: auto;
   }
 
   .content-box {
-      display: flex;
-      justify-content: space-between;
-      padding: 20px;
+      flex-direction: column;
       border: 1px solid #ddd;
       border-radius: 10px;
       background: #fff;
+      padding: 13px;
+      display: flex;
   }
 
   .text-section {
-      width: 45%;
-      margin-right: 5px;
-      flex: 1;
+      order:1
   }
 
   .image-section {
-      width: 53%;
-      position: relative;
-      flex:1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-left: 5px;
+      order:2;
+      text-align: center;
   }
 
   .carousel-container {
@@ -172,11 +165,7 @@
   }
 
   .reference-section {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background: #fff;
+      order: 3;
   }
 
   .reference-section h3 {
@@ -201,6 +190,18 @@
   }
   .dropdown-menu li a[data-name="Pin tab"]{
     display: none;
+  }
+
+  /* Responsive design for smaller screens */
+  @media (max-width: 768px) {
+    .content-box {
+      flex-direction: column;
+    }
+
+    .image-section img {
+      width: 100%;
+      height: auto;
+    }
   }
 
    </style>
@@ -267,13 +268,13 @@
      <div id="homeContent">
        <div id="homeMainContent" class="main-content">
         <div id="mainContent">
-          <div style="text-align: center; margin-bottom: 1%;">
-            <span style="color:#790F09;font-size: 36px;font-weight: 500; margin-right: 20px;">Cancer</span><span style="font-size: 36px;font-weight: 500;">Omics</span>
+          <div style="text-align: center; margin-bottom: 10px;">
+            <span style="color:#790F09;font-size: 22px;font-weight: 500; margin-right: 20px;">Cancer</span><span style="font-size: 22px;font-weight: 500;">Omics</span>
           </div>
           <div class="content-box">
             <div class="text-section">
-              <h3 style="margin-top: 0;">Introduction</h3>
-              <i><h4>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment</h4></i>
+              <h4 style="margin-top: 0;">Introduction</h4>
+              <!--<h3>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment</h3>-->
               <p>Non-small cell lung cancer (NSCLC) is histologically classified into lung adenocarcinoma (LUAD) and lung squamous cell carcinoma (LSCC). 
                 However, some tumors are histologically ambiguous and other pathophysiological features or microenvironmental factors may be more prominent. 
                 Here we report integrative multiomics analyses using data for 229 patients from a Korean NSCLC cohort and 462 patients from previous multiomics 
@@ -282,25 +283,18 @@
                 are present in LUAD and LSCC, which show strong associations with whole genome doubling (WGD) events. Comprehensive characterization of the 
                 immune microenvironment reveals various immune cell compositions and neoantigen loads across molecular subtypes, which predicting different 
                 prognoses. Immunological subtypes exhibit a hot tumor-enriched state and a higher efficacy of adjuvant therapy.</p>
+
             </div>
             <div class="image-section">
-              <div class="carousel-container">
-                  <div class="carousel-images">
-                      <img src="/subpage/images/figureA.jpg" alt="Image 1">
-                      <img src="/subpage/images/figureB.jpg" alt="Image 2">
-                      <img src="/subpage/images/figureC.jpg" alt="Image 3">
-                  </div>
-                  <button class="carousel-button left" onclick="moveSlide(-1)">&#8249;</button>
-                  <button class="carousel-button right" onclick="moveSlide(1)">&#8250;</button>
-              </div>
+              <img src="/subpage/images/all.png" style="height: 100%;width:44%">
             </div>
-          </div>
-          <div class="reference-section">
-            <h3>Reference</h3>
-            <p>Song KJ, Choi S, Kim K, Hwang HS, Chang E, Park JS, Shim SB, Choi S, Heo YJ, An WJ, Yang DY, Cho KC, Ji W, Choi CM, Lee JC, Kim HR, Yoo J, Ahn HS, 
-              Lee GH, Hwa C, Kim S, Kim K, Kim MS, Paek E, Na S, Jang SJ, An JY, Kim KP.</p>
-            <p>Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment. </p>
-            <p>Nat Commun. 2024 Nov 23;15(1):10164. <a href="https://pubmed.ncbi.nlm.nih.gov/39580524/" target="_blank">doi: 10.1038/s41467-024-54434-4.</a> PMID: 39580524; PMCID: PMC11585665.</p>
+            <div class="reference-section">
+              <h4>Reference</h4>
+              <i><p style="font-size: 13px;">Song KJ, Choi S, Kim K, Hwang HS, Chang E, Park JS, Shim SB, Choi S, Heo YJ, An WJ, Yang DY, Cho KC, Ji W, Choi CM, Lee JC, Kim HR, Yoo J, Ahn HS, 
+                Lee GH, Hwa C, Kim S, Kim K, Kim MS, Paek E, Na S, Jang SJ, An JY, Kim KP.</p></i>
+              <p style="font-weight:bold;">Proteogenomic analysis reveals non-small cell lung cancer subtypes predicting chromosome instability, and tumor microenvironment. </p>
+              <p>Nat Commun. 2024 Nov 23;15(1):10164. <a href="https://pubmed.ncbi.nlm.nih.gov/39580524/" target="_blank">doi: 10.1038/s41467-024-54434-4.</a> PMID: 39580524; PMCID: PMC11585665.</p>
+            </div>
           </div>
         </div>
       </div>
